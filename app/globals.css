@@ -128,3 +128,13 @@
     @apply font-sans;
   }
 }
+
+*,
+html,
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-geist-pixel), monospace, sans-serif !important;
+}
