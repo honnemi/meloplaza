@@ -13,6 +13,7 @@ export type FormState = {
   songName: string;
   songArtist: string;
   songAlbum: string;
+  songAlbumCover: string,
   songYear: string;
   songId: string;
   // Message step
@@ -33,6 +34,7 @@ const defaultState: FormState = {
   songName: "",
   songArtist: "",
   songAlbum: "",
+  songAlbumCover: "",
   songYear: "",
   songId: "",
   message: "",

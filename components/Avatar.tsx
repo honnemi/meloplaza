@@ -1,21 +1,20 @@
+import { AVATAR_FACES } from "@/app/avatar-customisation";
+
 interface AvatarProps {
-  colour: string; // Accepts hex, rgb, or hsl (e.g., "#3b82f6" or "rgb(59, 130, 246)")
-  face: string;
+  colour: string;
+  faceIndex: number;
 }
 
-export default function Avatar({ colour, face }: AvatarProps) {
+export default function Avatar({ colour, faceIndex }: AvatarProps) {
   return (
-    <div className="relative flex flex-col items-center pb-3">
-      {/* Ground shadow */}
-      <div className="absolute bottom-0 h-2 w-20 rounded-[50%] bg-black/20 blur-md" />
-
+    <div className="relative flex flex-col items-center pb-4">
       {/* Bubble container */}
       <div
         className="relative z-10 flex size-24 items-center justify-center rounded-full text-3xl shadow-[inset_-2px_-4px_12px_rgba(255,255,255,0.6),inset_2px_4px_10px_rgba(0,0,0,0.05)] backdrop-blur-sm"
         style={{
           backgroundColor: `color-mix(in srgb, ${colour} 25%, transparent)`,
           borderColor: `color-mix(in srgb, ${colour} 40%, transparent)`,
-          borderWidth: '1px',
+          borderWidth: "1px",
           backgroundImage: `
             radial-gradient(
               circle at 35% 20%,
@@ -31,8 +30,11 @@ export default function Avatar({ colour, face }: AvatarProps) {
           `,
         }}
       >
-        {face}
+        {AVATAR_FACES[faceIndex]}
       </div>
+
+      {/* Ground shadow */}
+      <div className="absolute bottom-1 z-0 h-2.5 w-16 rounded-[50%] bg-black/40 blur-[3px]" />
     </div>
   );
 }

@@ -27,18 +27,18 @@ export default function AddMessage() {
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-6 sm:p-12">
       <Window
-        title="Add a message to go with it!"
+        title="Write a personal message to go with it!"
         footer={
           <div className="flex justify-between w-full">
             <Button label="Back" href="/select-song" />
             {message.trim().length !== 0 && (
-              <Button label="Next" href="/confirm" onClick={handleNext} />
+              <Button label="Next" href="/confirm-new-user" onClick={handleNext} />
             )}
           </div>
         }
       >
         <h1 className="text-lg font-bold mb-2 text-center text-gray-800">
-          Why this song? Think about your selected prompt:
+          Think about your selected prompt:
         </h1>
 
         <p className="text-md italic text-center mb-4 text-gray-600 min-h-6">

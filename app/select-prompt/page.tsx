@@ -39,7 +39,7 @@ export default function PromptSelection() {
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-6 sm:p-12">
       <Window
-        title="Looking great! Now, which prompt catches your eye?"
+        title="Which prompt catches your eye?"
         footer={
           <div className="flex justify-between w-full">
             <Button label="Back" href="/create-avatar" />

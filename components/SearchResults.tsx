@@ -15,11 +15,11 @@ export default function SearchResults({
 }: SearchResultsProps) {
   return (
     <div className="w-full mt-4">
-      {/* STACKED on mobile/tablet, side-by-side on large screens */}
-      <div className="flex flex-col lg:flex-row w-full gap-5">
+      {/* Align both blocks vertically in the center */}
+      <div className="flex flex-col lg:flex-row w-full gap-5 lg:items-center justify-center">
         
-        {/* Results */}
-        <div className="w-full lg:w-80 lg:flex-none">
+        {/* Results Block */}
+        <div className="w-full lg:w-80 lg:flex-none flex flex-col justify-center">
           <h2 className="text-lg font-semibold text-gray-800 mb-2">
             Search results
           </h2>
@@ -69,8 +69,8 @@ export default function SearchResults({
           </ul>
         </div>
 
-        {/* Player */}
-        <div className="w-full min-w-0 lg:flex-1">
+        {/* Player Block */}
+        <div className="w-full min-w-0 lg:flex-1 flex items-center justify-center pt-0 lg:pt-8">
           <MusicPlayer selectedTrack={selectedTrack} />
         </div>
       </div>

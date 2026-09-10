@@ -19,8 +19,6 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             )
           } catch {
-            // The `setAll` method can be ignored if
-            // middleware is handling cookie sync
           }
         },
       },

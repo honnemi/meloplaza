@@ -34,7 +34,7 @@ export default function AvatarCreation() {
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-12">
       <Window
-        title="Welcome! Let's customise your melo."
+        title="Let's customise your melo!"
         footer={
           <div className="flex justify-between w-full">
             <Button label="Back" href="/" />
@@ -50,7 +50,7 @@ export default function AvatarCreation() {
                 Preview
               </span>
 
-              <Avatar colour={colour} face={face} />
+              <Avatar colour={colour} faceIndex={faceIndex} />
 
               <span className="text-sm font-bold text-gray-800 text-center max-w-45 truncate h-5 mt-2">
                 {displayName || "Anonymous"}

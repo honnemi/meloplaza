@@ -28,7 +28,9 @@ export default function SongSelection({
         album: {
           name: formData.songAlbum,
           release_date: formData.songYear,
-          images: [],
+          images: formData.songAlbumCover
+            ? [{ url: formData.songAlbumCover }]
+            : [],
         },
       });
     }
@@ -36,6 +38,13 @@ export default function SongSelection({
 
   const handleNext = () => {
     if (selectedTrack) {
+      // Extract cover URL
+      const albumCoverUrl =
+        selectedTrack.album?.images?.[0]?.url ||
+        selectedTrack.albumCover ||
+        formData.songAlbumCover ||
+        "";
+
       updateForm({
         songId: selectedTrack.id,
         songName: selectedTrack.name,
@@ -48,6 +57,7 @@ export default function SongSelection({
           selectedTrack.album?.release_date?.slice(0, 4) ||
           selectedTrack.songYear ||
           "",
+        songAlbumCover: albumCoverUrl,
       });
     }
   };
@@ -82,10 +92,7 @@ export default function SongSelection({
           defaultValue={query || ""}
         />
 
-        <SecondaryButton
-          label="Search"
-          type="submit"
-        />
+        <SecondaryButton label="Search" type="submit" />
       </Form>
 
       {/* Results */}
