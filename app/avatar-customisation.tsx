@@ -16,7 +16,13 @@ export const AVATAR_FACES = [
   "≧⩊≦",
   "•ㅅ•",
   "◕ᴗ◕",
-  "•3•"
+  "•3•",
+  "T_T",
+  "p_p",
+  "^_^",
+  ">//<",
+  "e_e",
+  "3_3"
 ];
 
 export const AVATAR_COLOURS = [

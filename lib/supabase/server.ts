@@ -25,3 +25,13 @@ export async function createClient() {
     }
   )
 }
+
+export async function getUsers() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from('Users').select();
+      if (error) {
+        console.error('Error fetching users:', error.message);
+        return;
+      }
+    return data
+}

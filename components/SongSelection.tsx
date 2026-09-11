@@ -79,30 +79,32 @@ export default function SongSelection({
         </div>
       }
     >
-      {/* Search */}
-      <Form
-        action="/select-song"
-        className="flex flex-col sm:flex-row gap-2 w-full"
-      >
-        <input
-          name="q"
-          type="text"
-          placeholder="Search tracks, artists..."
-          className="border-2 p-2 rounded w-full min-w-0 text-black border-gray-300 shadow-inner shadow-black/40 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          defaultValue={query || ""}
-        />
+      <div className="w-full min-w-0">
+        {/* Search */}
+        <Form
+          action="/select-song"
+          className="flex flex-col sm:flex-row gap-2 w-full"
+        >
+          <input
+            name="q"
+            type="text"
+            placeholder="Search tracks, artists..."
+            className="border-2 p-2 rounded w-full min-w-0 text-black border-gray-300 shadow-inner shadow-black/40 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 truncate"
+            defaultValue={query || ""}
+          />
 
-        <SecondaryButton label="Search" type="submit" />
-      </Form>
+          <SecondaryButton label="Search" type="submit" />
+        </Form>
 
-      {/* Results */}
-      {(query || selectedTrack) && (
-        <SearchResults
-          tracks={tracks}
-          selectedTrack={selectedTrack}
-          onSelectTrack={setSelectedTrack}
-        />
-      )}
+        {/* Results */}
+        {(query || selectedTrack) && (
+          <SearchResults
+            tracks={tracks}
+            selectedTrack={selectedTrack}
+            onSelectTrack={setSelectedTrack}
+          />
+        )}
+      </div>
     </Window>
   );
 }

@@ -2,11 +2,21 @@ type WindowProps = {
   title: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  className?: string;
+  contentClassName?: string;
 };
 
-export default function Window({ title, children, footer }: WindowProps) {
+export default function Window({
+  title,
+  children,
+  footer,
+  className = "",
+  contentClassName = "",
+}: WindowProps) {
   return (
-    <div className="relative z-10 flex flex-col w-[60%] h-150 overflow-hidden rounded-lg border-2 border-gray-400 shadow-md">
+    <div
+      className={`relative z-10 flex flex-col w-[60%] h-150 overflow-hidden rounded-lg border-2 border-gray-400 shadow-md ${className}`}
+    >
       {/* Top bar */}
       <div
         className="shrink-0 font-[Geist_Pixel] bg-gray-300 border-b-2 border-gray-400 p-4 text-lg font-bold text-black text-center shadow-md select-none"
@@ -26,7 +36,9 @@ export default function Window({ title, children, footer }: WindowProps) {
             "repeating-linear-gradient(135deg, transparent 0px, transparent 3px, rgba(255,255,255,0.12) 3px, rgba(255,255,255,0.12) 5px)",
         }}
       >
-        <div className="h-full bg-white p-6 text-black rounded-sm border-gray-300 border-2 overflow-y-auto relative z-10 shadow-inner shadow-black/40">
+        <div
+          className={`h-full bg-white p-6 text-black rounded-sm border-gray-300 border-2 overflow-y-auto relative z-10 shadow-inner shadow-black/40 ${contentClassName}`}
+        >
           {children}
         </div>
       </div>

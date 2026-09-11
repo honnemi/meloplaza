@@ -12,8 +12,12 @@ export default function AvatarCreation() {
 
   // Restore saved state from context if available, otherwise default to initial values
   const [faceIndex, setFaceIndex] = useState<number>(formData.faceIndex ?? 0);
-  const [displayName, setDisplayName] = useState<string>(formData.displayName || "");
-  const [colour, setColour] = useState<string>(formData.colour || AVATAR_COLOURS[0] || "#3B82F6");
+  const [displayName, setDisplayName] = useState<string>(
+    formData.displayName || ""
+  );
+  const [colour, setColour] = useState<string>(
+    formData.colour || AVATAR_COLOURS[0] || "#3B82F6"
+  );
 
   // Retrieve current face string using current faceIndex
   const face = AVATAR_FACES[faceIndex] || AVATAR_FACES[0];
@@ -31,10 +35,21 @@ export default function AvatarCreation() {
     });
   };
 
+  // Enforce character limit for display name
+  const characterLimit = 30;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+
+    if (inputValue.length <= characterLimit) {
+      setDisplayName(inputValue);
+    }
+  };
+
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-12">
       <Window
-        title="Let's customise your melo!"
+        title="First, let's customise your melo!"
         footer={
           <div className="flex justify-between w-full">
             <Button label="Back" href="/" />
@@ -42,49 +57,65 @@ export default function AvatarCreation() {
           </div>
         }
       >
-        <div className="flex flex-col md:flex-row gap-6 lg:gap-10 items-stretch w-full p-2">
-          {/* Avatar preview */}
-          <div className="flex flex-col items-center justify-center flex-1 w-full gap-4">
-            <div className="flex flex-col items-center justify-center border-2 p-5 sm:p-6 rounded-sm shadow-inner shadow-black/40 w-full gap-3">
-              <span className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-1">
-                Preview
-              </span>
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-stretch w-full p-2">
 
-              <Avatar colour={colour} faceIndex={faceIndex} />
+          {/* Left side */}
+          <div className="flex flex-col flex-1 w-full gap-4">
 
-              <span className="text-sm font-bold text-gray-800 text-center max-w-45 truncate h-5 mt-2">
-                {displayName || "Anonymous"}
-              </span>
-            </div>
-
-            <SecondaryButton
-              label="Randomise Face"
-              onClick={handleRandomise}
-            />
-          </div>
-
-          {/* Customisation */}
-          <div className="flex flex-col flex-1 justify-center gap-6 w-full">
             {/* Display name */}
-            <div>
+            <div className="w-full">
               <h3 className="text-sm font-bold text-gray-700 mb-2">
-                Display name
+                Display Name
               </h3>
 
               <input
                 name="name-input"
                 type="text"
                 value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
+                onChange={handleChange}
                 placeholder="Enter display name"
                 className="border-2 p-2 rounded w-full text-black border-gray-300 shadow-inner shadow-black/40 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+
+              <div className="flex flex-row justify-end mt-2">
+                <span
+                  className={`text-sm transition-all duration-150 ${
+                    displayName.length >= characterLimit
+                      ? "text-red-500 font-semibold"
+                      : "text-gray-600"
+                  }`}
+                >
+                  {displayName.length}/{characterLimit}
+                </span>
+              </div>
+            </div>
+
+            {/* Avatar preview */}
+            <div className="flex flex-col items-center justify-center border-2 p-5 sm:p-6 rounded-sm shadow-inner shadow-black/40 flex-1 gap-3">
+              <span className="text-sm font-bold text-gray-800 text-center max-w-45 truncate h-5 mt-2">
+                {displayName || "Anonymous"}
+              </span>
+
+              <Avatar colour={colour} faceIndex={faceIndex} />
+
+            </div>
+          </div>
+
+          {/* Right side */}
+          <div className="flex flex-col flex-1 w-full gap-6">
+
+            {/* Top section - aligns with display name input */}
+            <div className="h-[74px] flex items-end justify-center">
+              <SecondaryButton
+                label="Randomise Face 🎲"
+                onClick={handleRandomise}
               />
             </div>
 
             {/* Colours */}
             <div>
               <h3 className="text-sm font-bold text-gray-700 mb-3">
-                Select Colour
+                Colour Select
               </h3>
 
               <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-3 w-full">
@@ -99,6 +130,7 @@ export default function AvatarCreation() {
               </div>
             </div>
           </div>
+
         </div>
       </Window>
     </div>

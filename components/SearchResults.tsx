@@ -16,12 +16,12 @@ export default function SearchResults({
   return (
     <div className="w-full mt-4">
       {/* Align both blocks vertically in the center */}
-      <div className="flex flex-col lg:flex-row w-full gap-5 lg:items-center justify-center">
+      <div className="flex flex-col w-full gap-5 items-center justify-center">
         
         {/* Results Block */}
-        <div className="w-full lg:w-80 lg:flex-none flex flex-col justify-center">
+        <div className="w-full flex flex-col justify-center">
           <h2 className="text-lg font-semibold text-gray-800 mb-2">
-            Search results
+            Search Results
           </h2>
 
           <ul className="w-full h-64 overflow-y-auto border-2 border-gray-300 rounded">
@@ -68,9 +68,12 @@ export default function SearchResults({
             )}
           </ul>
         </div>
-
+              
         {/* Player Block */}
-        <div className="w-full min-w-0 lg:flex-1 flex items-center justify-center pt-0 lg:pt-8">
+        <div className="w-full flex flex-col items-start justify-center">
+          <h2 className="text-lg font-semibold text-gray-800 mb-2">
+            Preview Song
+          </h2>
           <MusicPlayer selectedTrack={selectedTrack} />
         </div>
       </div>

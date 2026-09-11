@@ -3,14 +3,21 @@ import { AVATAR_FACES } from "@/app/avatar-customisation";
 interface AvatarProps {
   colour: string;
   faceIndex: number;
+  size?: string;
+  textSize?: string;
 }
 
-export default function Avatar({ colour, faceIndex }: AvatarProps) {
+export default function Avatar({
+  colour,
+  faceIndex,
+  size = "size-24",
+  textSize = "text-3xl",
+}: AvatarProps) {
   return (
     <div className="relative flex flex-col items-center pb-4">
       {/* Bubble container */}
       <div
-        className="relative z-10 flex size-24 items-center justify-center rounded-full text-3xl shadow-[inset_-2px_-4px_12px_rgba(255,255,255,0.6),inset_2px_4px_10px_rgba(0,0,0,0.05)] backdrop-blur-sm"
+        className={`relative z-10 flex ${size} ${textSize} items-center justify-center rounded-full shadow-[inset_-2px_-4px_12px_rgba(255,255,255,0.6),inset_2px_4px_10px_rgba(0,0,0,0.05)] backdrop-blur-sm`}
         style={{
           backgroundColor: `color-mix(in srgb, ${colour} 25%, transparent)`,
           borderColor: `color-mix(in srgb, ${colour} 40%, transparent)`,
