@@ -15,33 +15,40 @@ export default function Avatar({
 }: AvatarProps) {
   return (
     <div className="relative flex flex-col items-center pb-4">
-      {/* Bubble container */}
+      {/* Ground shadow */}
       <div
-        className={`relative z-10 flex ${size} ${textSize} items-center justify-center rounded-full shadow-[inset_-2px_-4px_12px_rgba(255,255,255,0.6),inset_2px_4px_10px_rgba(0,0,0,0.05)] backdrop-blur-sm`}
+        className="absolute z-0 rounded-[50%] bg-black/20"
         style={{
-          backgroundColor: `color-mix(in srgb, ${colour} 25%, transparent)`,
-          borderColor: `color-mix(in srgb, ${colour} 40%, transparent)`,
-          borderWidth: "1px",
-          backgroundImage: `
-            radial-gradient(
-              circle at 35% 20%,
-              rgba(255, 255, 255, 0.7) 0%,
-              rgba(255, 255, 255, 0.15) 25%,
-              transparent 50%
-            ),
-            radial-gradient(
-              circle at 65% 85%,
-              color-mix(in srgb, ${colour} 60%, transparent) 0%,
-              transparent 60%
-            )
-          `,
+          width: "83.33%",
+          height: "20.83%",
+          bottom: "4.17%",
+        }}
+      />
+
+      {/* Bubble */}
+      <div
+        className={`relative z-10 flex ${size} ${textSize} items-center justify-center overflow-hidden rounded-full`}
+        style={{
+          backgroundColor: colour,
         }}
       >
-        {AVATAR_FACES[faceIndex]}
-      </div>
+        {/* Angled highlight */}
+        <div
+          className="pointer-events-none absolute rounded-[50%] bg-white/50 blur-[1px]"
+          style={{
+            width: "25%",
+            height: "12.5%",
+            left: "14.6%",
+            top: "14.6%",
+            transform: "rotate(-25deg)",
+          }}
+        />
 
-      {/* Ground shadow */}
-      <div className="absolute bottom-1 z-0 h-2.5 w-16 rounded-[50%] bg-black/40 blur-[3px]" />
+        {/* Face */}
+        <span className="relative z-10">
+          {AVATAR_FACES[faceIndex]}
+        </span>
+      </div>
     </div>
   );
 }

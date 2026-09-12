@@ -9,7 +9,7 @@ const handleAnimationComplete = () => {
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen w-full px-4">
+    <div className="flex flex-col items-center justify-center min-h-screen w-full">
       <main className="flex flex-col items-center justify-center w-full">
         <SplitText
           text="meloplaza"

@@ -26,7 +26,7 @@ export default function AddMessage() {
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row lg:items-start lg:justify-start">
+    <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row">
       <ProfilePreview></ProfilePreview> 
       <Window
         title="Write a personal message to go with it!"
@@ -45,7 +45,7 @@ export default function AddMessage() {
         </p>
 
         <textarea
-          className="w-full border-2 rounded-sm p-4 text-black focus:outline-none border-gray-200 shadow-inner shadow-black/40 transition-all duration-150 focus:border-blue-500"
+          className="w-full rounded-sm p-4 text-black focus:outline-none border-2 border-gray-500 border-t-gray-600 border-l-gray-600 border-b-gray-300 border-r-gray-300 transition-all duration-150 focus:border-blue-500"
           rows={8}
           placeholder="Enter message..."
           value={message}

@@ -16,8 +16,8 @@ export default function ProfilePreview() {
       <div className="flex flex-col items-center md:flex-row md:items-start gap-3 w-full">
 
         {/* Avatar preview */}
-        <div className="w-30 h-30 shrink-0 flex flex-col items-center justify-center border-2 p-1 rounded-sm shadow-inner shadow-black/40 gap-1">
-          <span className="text-[10px] font-bold text-gray-800 text-center max-w-20 break-words">
+        <div className="w-30 h-30 shrink-0 flex flex-col items-center justify-center border-2 border-gray-300 rounded-sm gap-2">
+          <span className="text-[10px] font-bold text-gray-800 text-center max-w-20 wrap-break-word">
             {formData.displayName || "Anonymous"}
           </span>
 
@@ -25,7 +25,7 @@ export default function ProfilePreview() {
             colour={formData.colour}
             faceIndex={formData.faceIndex}
             size="size-14"
-            textSize="text-xl"
+            textSize="text-l"
           />
         </div>
 
@@ -34,13 +34,13 @@ export default function ProfilePreview() {
           <div className="space-y-2 text-gray-700">
 
             {/* Selected Prompt */}
-            <div className="border border-gray-200 p-2 rounded bg-gray-50">
+            <div className="border-2 border-gray-300 p-2 rounded-sm bg-gray-50">
               <h2 className="font-semibold text-[9px] text-gray-500 uppercase tracking-wide mb-0.5">
                 Prompt
               </h2>
 
               {formData.prompt ? (
-                <p className="text-xs italic text-gray-800 break-words">
+                <p className="text-xs italic text-gray-800 wrap-break-word">
                   "{formData.prompt}"
                 </p>
               ) : (
@@ -51,7 +51,7 @@ export default function ProfilePreview() {
             </div>
 
             {/* Chosen Song */}
-            <div className="border border-gray-200 p-2 rounded bg-gray-50">
+            <div className="border-2 border-gray-300 p-2 rounded-sm bg-gray-50">
               <h2 className="font-semibold text-[9px] text-gray-500 uppercase tracking-wide mb-1">
                 Song
               </h2>
@@ -71,11 +71,11 @@ export default function ProfilePreview() {
                   )}
 
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-gray-800 break-words">
+                    <p className="text-xs font-bold text-gray-800 wrap-break-word">
                       {formData.songName}
                     </p>
 
-                    <p className="text-[10px] text-gray-600 break-words">
+                    <p className="text-[10px] text-gray-600 wrap-break-word">
                       {formData.songArtist}{" "}
                       {formData.songYear
                         ? `(${formData.songYear})`
@@ -83,7 +83,7 @@ export default function ProfilePreview() {
                     </p>
 
                     {formData.songAlbum && (
-                      <p className="text-[10px] text-gray-500 italic break-words">
+                      <p className="text-[10px] text-gray-500 italic wrap-break-word">
                         {formData.songAlbum}
                       </p>
                     )}
@@ -97,13 +97,13 @@ export default function ProfilePreview() {
             </div>
 
             {/* Personal Message */}
-            <div className="border border-gray-200 p-2 rounded bg-gray-50">
+            <div className="border-2 border-gray-300 p-2 rounded-sm bg-gray-50">
               <h2 className="font-semibold text-[9px] text-gray-500 uppercase tracking-wide mb-0.5">
                 Message
               </h2>
 
               {formData.message ? (
-                <p className="text-xs text-gray-800 whitespace-pre-wrap break-words">
+                <p className="text-xs text-gray-800 whitespace-pre-wrap wrap-break-word">
                   {formData.message}
                 </p>
               ) : (

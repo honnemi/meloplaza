@@ -16,7 +16,7 @@ export default function SearchResults({
   return (
     <div className="w-full mt-4">
       {/* Align both blocks vertically in the center */}
-      <div className="flex flex-col w-full gap-5 items-center justify-center">
+      <div className="flex flex-col w-full gap-4 items-center justify-center">
         
         {/* Results Block */}
         <div className="w-full flex flex-col justify-center">
@@ -24,7 +24,7 @@ export default function SearchResults({
             Search Results
           </h2>
 
-          <ul className="w-full h-64 overflow-y-auto border-2 border-gray-300 rounded">
+          <ul className="w-full h-64 overflow-y-auto border-2 border-gray-300 rounded-sm">
             {tracks.length === 0 ? (
               <p className="p-3 text-sm text-gray-500 text-center">
                 Search above to see tracks.
@@ -35,7 +35,7 @@ export default function SearchResults({
                   <button
                     type="button"
                     onClick={() => onSelectTrack(track)}
-                    className={`w-full py-2 px-2 flex items-center gap-3 text-left ${
+                    className={`w-full py-2 px-2 flex items-center gap-4 text-left ${
                       selectedTrack?.id === track.id
                         ? "bg-blue-100"
                         : index % 2 === 0

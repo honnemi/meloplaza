@@ -42,7 +42,7 @@ export default function PromptSelection() {
     selectedIndex !== null ? PROMPTS[selectedIndex] : null;
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row lg:items-start lg:justify-start">
+    <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row">
       {/* Show information from previous screens */}
       <ProfilePreview />
 
@@ -62,7 +62,7 @@ export default function PromptSelection() {
           </div>
         }
       >
-        <div className="w-full max-h-70 overflow-y-auto border-2 border-gray-300 rounded">
+        <div className="w-full max-h-70 overflow-y-auto border-2 border-gray-300 rounded-sm">
           {PROMPTS.map((promptText, index) => (
             <button
               key={index}

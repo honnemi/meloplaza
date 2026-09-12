@@ -3,7 +3,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { headers } from 'next/headers';
+import { headers } from "next/headers";
 
 export async function getCurrentUserId() {
   const supabase = await createClient();
@@ -24,11 +24,16 @@ export async function getCurrentUserId() {
   return userId;
 }
 
-export async function createUser(colour: string, faceIndex: number, displayName: string) {
+export async function createUser(
+  colour: string,
+  faceIndex: number,
+  displayName: string
+) {
   const supabase = await createClient();
 
-  // 1. Sign the user in anonymously 
-  const { data: authData, error: authError } = await supabase.auth.signInAnonymously();
+  // 1. Sign the user in anonymously
+  const { data: authData, error: authError } =
+    await supabase.auth.signInAnonymously();
 
   if (authError) {
     console.error("Anonymous login failed:", authError.message);
@@ -40,10 +45,10 @@ export async function createUser(colour: string, faceIndex: number, displayName:
 
   // 3. Insert the profile data, embedding the user_id into the record
   const { error: dbError } = await supabase.from("Recommendations").insert({
-    user_id: userId, // 👈 Added this mapping line
+    user_id: userId,
     colour: colour,
     face_index: faceIndex,
-    display_name: displayName
+    display_name: displayName,
   });
 
   if (dbError) {
@@ -54,8 +59,9 @@ export async function createUser(colour: string, faceIndex: number, displayName:
   const headerList = await headers();
   const currentPath = headerList.get("x-pathname") || "/";
 
-// 4. Refresh Next.js route data safely
+  // 4. Refresh Next.js route data safely
   revalidatePath(currentPath);
+
   return { success: true };
 }
 
@@ -80,6 +86,7 @@ export async function createRecommendation({
   songId,
 }: RecommendationProps) {
   const supabase = await createClient();
+  const currentUserId = await getCurrentUserId();
 
   const { error } = await supabase.from("Recommendations").insert({
     prompt: prompt,
@@ -89,7 +96,7 @@ export async function createRecommendation({
     song_year: songYear,
     message: message,
     song_id: songId,
-    createdBy: getCurrentUserId(),
+    created_by: currentUserId,
   });
 
   if (error) {
@@ -101,6 +108,7 @@ export async function createRecommendation({
   const currentPath = headerList.get("x-pathname") || "/";
 
   revalidatePath(currentPath);
+
   return { success: true };
 }
 
@@ -115,6 +123,7 @@ export async function createRecommendationForUser({
   createdFor,
 }: RecommendationProps) {
   const supabase = await createClient();
+  const currentUserId = await getCurrentUserId();
 
   const { error } = await supabase.from("Recommendations").insert({
     prompt: prompt,
@@ -124,6 +133,7 @@ export async function createRecommendationForUser({
     song_year: songYear,
     message: message,
     song_id: songId,
+    created_by: currentUserId,
     created_for: createdFor,
   });
 
@@ -136,5 +146,93 @@ export async function createRecommendationForUser({
   const currentPath = headerList.get("x-pathname") || "/";
 
   revalidatePath(currentPath);
+
   return { success: true };
+}
+
+export async function getUserRecommendationById(userId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("Recommendations")
+    .select(
+      "id, created_by, created_at, prompt, song_name, song_artist, song_album, song_year, message, song_id, song_album_cover"
+    )
+    .eq("created_by", userId)
+    .limit(1)
+    .single();
+
+  if (error) {
+    console.error("Error fetching user:", error.message);
+    return null;
+  }
+
+  return data;
+}
+
+export async function getUserById(userId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("Users")
+    .select("id, colour, face_index, display_name")
+    .eq("id", userId)
+    .limit(1)
+    .single();
+
+  if (error) {
+    console.error("Error fetching user:", error.message);
+    return null;
+  }
+
+  return data;
+}
+
+export async function addToCollection(recommendationId: string) {
+  const supabase = await createClient();
+  const userId = await getCurrentUserId();
+
+  if (!userId) {
+    return { error: "No active user found." };
+  }
+
+  const { error } = await supabase.from("CollectionItems").insert({
+    recommendation: recommendationId,
+    added_by: userId,
+  });
+
+  if (error) {
+    console.error("Error inserting data:", error.message);
+    return { error: error.message };
+  }
+
+  const headerList = await headers();
+  const currentPath = headerList.get("x-pathname") || "/";
+
+  revalidatePath(currentPath);
+
+  return { success: true };
+}
+
+export async function isInCollection(recommendationId: string) {
+  const supabase = await createClient();
+  const userId = await getCurrentUserId();
+
+  if (!userId) {
+    return false;
+  }
+
+  const { data, error } = await supabase
+    .from("CollectionItems")
+    .select("id")
+    .eq("recommendation", recommendationId)
+    .eq("added_by", userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error checking collection:", error.message);
+    return false;
+  }
+
+  return !!data;
 }

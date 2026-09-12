@@ -16,7 +16,7 @@ export default async function SelectSong({
   const tracks = data?.tracks?.items || [];
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row lg:items-start lg:justify-start">
+    <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row">
       <ProfilePreview />
       <SongSelection tracks={tracks} query={query} />
     </div>

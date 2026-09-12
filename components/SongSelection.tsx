@@ -66,7 +66,7 @@ export default function SongSelection({
     <Window
       title="Given that prompt, what song comes to mind?"
       footer={
-        <div className="flex justify-between items-center w-full gap-3">
+        <div className="flex justify-between items-center w-full">
           <Button label="Back" href="/select-prompt" />
 
           {selectedTrack && (
@@ -89,11 +89,11 @@ export default function SongSelection({
             name="q"
             type="text"
             placeholder="Search tracks, artists..."
-            className="border-2 p-2 rounded w-full min-w-0 text-black border-gray-300 shadow-inner shadow-black/40 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 truncate"
+            className="text-input"
             defaultValue={query || ""}
           />
 
-          <SecondaryButton label="Search" type="submit" />
+          <SecondaryButton label="Search" icon={<i className="hn hn-search"></i>} type="submit" />
         </Form>
 
         {/* Results */}

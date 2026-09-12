@@ -1,7 +1,7 @@
 "use client";
 
 import Window from "@/components/Window";
-import Button from "@/components/Button";
+import Button, { SecondaryButton } from "@/components/Button";
 import Avatar from "@/components/Avatar";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -68,11 +68,11 @@ export default function ConfirmNewUserPage() {
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-6 sm:p-12">
       <Window
-        title="Are you ready to enter?"
+        title="Ready to enter?"
         footer={
           <div className="flex justify-between w-full items-center gap-3">
             <Button label="Back" href="/add-message" disabled={loading} />
-            <Button
+            <SecondaryButton
               label={loading ? "Submitting..." : "Confirm"}
               onClick={handleConfirm}
               disabled={loading}
@@ -81,18 +81,18 @@ export default function ConfirmNewUserPage() {
         }
       >
         <h1 className="text-lg font-bold mb-4 text-center text-gray-800">
-          Double-check your profile before submitting:
+          Double-check your profile:
         </h1>
 
         {error && (
-          <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded border border-red-300 text-center">
+          <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded-sm border border-red-300 text-center">
             {error}
           </div>
         )}
 
         <div className="space-y-4 max-h-96 pr-2 text-gray-700">
           {/* Profile */}
-          <div className="border border-gray-200 p-3 rounded bg-gray-50">
+          <div className="border-2 border-gray-300 p-3 rounded-sm bg-gray-50">
             <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide mb-1">
               Profile
             </h2>
@@ -112,7 +112,7 @@ export default function ConfirmNewUserPage() {
           </div>
 
           {/* Selected Prompt */}
-          <div className="border border-gray-200 p-3 rounded bg-gray-50">
+          <div className="border-2 border-gray-300 p-3 rounded-sm bg-gray-50">
             <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide mb-1">
               Selected Prompt
             </h2>
@@ -124,7 +124,7 @@ export default function ConfirmNewUserPage() {
           </div>
 
           {/* Chosen Song */}
-          <div className="border border-gray-200 p-3 rounded bg-gray-50">
+          <div className="border-2 border-gray-300 p-3 rounded-sm bg-gray-50">
             <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide mb-2">
               Chosen Song
             </h2>
@@ -160,7 +160,7 @@ export default function ConfirmNewUserPage() {
           </div>
 
           {/* Personal Message */}
-          <div className="border border-gray-200 p-3 rounded bg-gray-50">
+          <div className="border-2 border-gray-300 p-3 rounded-sm bg-gray-50">
             <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide mb-1">
               Personal Message
             </h2>

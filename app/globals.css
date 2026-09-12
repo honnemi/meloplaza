@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import '@hackernoon/pixel-icon-library/fonts/iconfont.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -137,4 +138,42 @@ input,
 select,
 textarea {
   font-family: var(--font-geist-pixel), monospace, sans-serif !important;
+}
+
+.text-input {
+  width: 100%;
+  background-color: white;
+
+  border: 2px solid #6b7280;
+  border-top-color: #4b5563;
+  border-left-color: #4b5563;
+  border-bottom-color: #d1d5db;
+  border-right-color: #d1d5db;
+
+  border-radius: 0.125rem;
+
+  padding: 0.5rem 0.75rem;
+
+  color: black;
+
+  outline: none;
+
+  box-shadow: inset 2px 2px 3px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes message-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-in {
+  opacity: 0;
+  animation: message-in 0.35s ease-out forwards;
 }
