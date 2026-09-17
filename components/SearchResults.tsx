@@ -17,7 +17,7 @@ export default function SearchResults({
     <div className="w-full mt-4">
       {/* Align both blocks vertically in the center */}
       <div className="flex flex-col w-full gap-4 items-center justify-center">
-        
+
         {/* Results Block */}
         <div className="w-full flex flex-col justify-center">
           <h2 className="text-lg font-semibold text-gray-800 mb-2">
@@ -39,8 +39,8 @@ export default function SearchResults({
                       selectedTrack?.id === track.id
                         ? "bg-blue-100"
                         : index % 2 === 0
-                        ? "bg-gray-100 hover:bg-gray-200"
-                        : "bg-white hover:bg-gray-200"
+                          ? "bg-gray-100 hover:bg-gray-200"
+                          : "bg-white hover:bg-gray-200"
                     }`}
                   >
                     {track.album?.images?.[2] && (
@@ -68,14 +68,17 @@ export default function SearchResults({
             )}
           </ul>
         </div>
-              
-        {/* Player Block */}
-        <div className="w-full flex flex-col items-start justify-center">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">
-            Preview Song
-          </h2>
-          <MusicPlayer selectedTrack={selectedTrack} />
-        </div>
+
+        {/* Player Block - only appears after selecting a song */}
+        {selectedTrack && (
+          <div className="w-full flex flex-col items-start justify-center">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">
+              Selected Song
+            </h2>
+
+            <MusicPlayer selectedTrack={selectedTrack} />
+          </div>
+        )}
       </div>
 
       <style jsx global>{`

@@ -8,16 +8,16 @@ import { useFormStore } from "@/app/context/FormContext";
 import Avatar from "@/components/Avatar";
 
 const PROMPTS = [
-  "A song I'm embarrassed to admit I love",
-  "A song that reminds me of someone I miss",
-  "A song from a language I don't speak but love anyway",
-  "A song that got me through a hard time",
-  "A song that reminds me of a specific place",
-  "A song I associate with a season or time of year",
-  "A song that makes me feel understood",
-  "A song I think is criminally underrated",
-  "A song I grew up listening to",
-  "A song I'd play for a stranger to explain my taste in music",
+  "🫣 A song I'm embarrassed to admit I love",
+  "💭 A song that reminds me of someone I miss",
+  "🌎 A song from a language I don't speak but love anyway",
+  "🩹 A song that got me through a hard time",
+  "📍 A song that reminds me of a specific place",
+  "🍂 A song I associate with a season or time of year",
+  "🪞 A song that makes me feel understood",
+  "💎 A song I think is criminally underrated",
+  "🧸 A song I grew up listening to",
+  "💿 A song I'd play for a stranger to explain my taste in music",
 ];
 
 export default function PromptSelection() {
@@ -47,7 +47,7 @@ export default function PromptSelection() {
       <ProfilePreview />
 
       <Window
-        title="Now, which prompt catches your eye?"
+        title="Which prompt catches your eye?"
         footer={
           <div className="flex justify-between w-full">
             <Button label="Back" href="/create-avatar" />
@@ -56,7 +56,6 @@ export default function PromptSelection() {
               <Button
                 label="Next"
                 href="/select-song"
-                onClick={handleNext}
               />
             )}
           </div>
@@ -67,7 +66,7 @@ export default function PromptSelection() {
             <button
               key={index}
               type="button"
-              onClick={() => setSelectedIndex(index)}
+              onClick={() => {setSelectedIndex(index); updateForm({ prompt: promptText });}}
               className={`w-full text-left text-md p-2 cursor-pointer ${selectedIndex === index
                 ? "bg-blue-100 font-medium"
                 : index % 2 === 0
@@ -80,15 +79,15 @@ export default function PromptSelection() {
           ))}
         </div>
         {selectedPromptText !== null && (
-          <>
+          <div className="flex flex-col items-center justify-center h-[100]">
             <h1 className="text-lg font-bold mt-4 mb-2 text-center text-gray-800">
-              You selected:
+              Selected Prompt
             </h1>
 
             <p className="text-md italic text-center text-gray-600 min-h-6">
               "{selectedPromptText}"
             </p>
-          </>
+          </div>
         )}
       </Window>
     </div>

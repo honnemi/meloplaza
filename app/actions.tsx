@@ -236,3 +236,39 @@ export async function isInCollection(recommendationId: string) {
 
   return !!data;
 }
+
+export async function getUserCollection() {
+  const supabase = await createClient();
+
+  const userId = await getCurrentUserId();
+
+  if (!userId) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("CollectionItems")
+    .select(`
+      recommendation,
+      Recommendations (
+        id,
+        song_name,
+        song_artist,
+        song_album,
+        song_album_cover,
+        song_year,
+        created_at,
+        prompt,
+        message,
+        created_by
+      )
+    `)
+    .eq("added_by", userId);
+
+  if (error) {
+    console.error("Error getting collection:", error.message);
+    return [];
+  }
+
+  return data;
+}

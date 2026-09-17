@@ -49,7 +49,7 @@ export default function AvatarCreation() {
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-12">
       <Window
-        title="First, let's customise your melo!"
+        title="Customise your Melo"
         footer={
           <div className="flex justify-between w-full">
             <Button label="Back" href="/" />
@@ -79,7 +79,7 @@ export default function AvatarCreation() {
                 <span
                   className={`text-sm transition-all duration-150 ${
                     displayName.length >= characterLimit
-                      ? "text-red-500 font-semibold"
+                      ? "text-red-500"
                       : "text-gray-600"
                   }`}
                 >
@@ -90,7 +90,7 @@ export default function AvatarCreation() {
 
             {/* Colours */}
             <div>
-              <h3 className="text-sm font-bold text-gray-700 mb-4">
+              <h3 className="text-sm font-bold text-gray-700 mb-2">
                 Colour Select
               </h3>
 
@@ -106,14 +106,14 @@ export default function AvatarCreation() {
 
           {/* Right side */}
           <div className="flex flex-col flex-1 w-full items-center justify-center gap-4">
-            {/* Avatar preview */}
-            <div className="flex flex-col w-60 h-60 items-center justify-center border-2 border-gray-300 p-5 sm:p-6 rounded-sm gap-3">
-              <span className="text-sm font-bold text-gray-800 text-center max-w-45 truncate h-5 mt-2">
-                {displayName || "Anonymous"}
-              </span>
+          {/* Avatar preview */}
+          <div className="flex flex-col w-60 h-60 items-center justify-center border-2 border-gray-300 p-5 sm:p-6 rounded-sm gap-3">
+            <span className="text-sm font-bold text-gray-800 text-center max-w-45 min-h-10 leading-5 wrap-break-word">
+              {displayName || "Anonymous"}
+            </span>
 
-              <Avatar colour={colour} faceIndex={faceIndex} />
-            </div>
+            <Avatar colour={colour} faceIndex={faceIndex} />
+          </div>
 
             {/* Randomise button */}
             <div className="flex justify-center">

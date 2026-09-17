@@ -29,8 +29,16 @@ export default function Window({
           select-none
           shadow-[inset_0_1px_0px_rgba(255,255,255,0.9)]"
         style={{
-          backgroundImage:
-            "repeating-linear-gradient(135deg, transparent 0px, transparent 3px, rgba(255,255,255,0.15) 3px, rgba(255,255,255,0.15) 5px)",
+          backgroundImage: `
+            linear-gradient(
+              180deg,
+              #dce0e4 0%,
+              #d1d5db 35%,
+              #c9cdd2 50%,
+              #d1d5db 65%,
+              #c5c9ce 100%
+            )
+          `,
         }}
       >
         {title}
@@ -38,7 +46,7 @@ export default function Window({
 
       {/* Main content */}
       <div
-        className="flex-1 bg-gray-200 p-4 min-h-0 relative
+        className="flex-1 bg-gray-200 p-2 min-h-0 relative
           shadow-[inset_0_1px_0px_rgba(255,255,255,0.7)]"
         style={{
           backgroundImage:
@@ -49,7 +57,7 @@ export default function Window({
           className={`h-full bg-gray-50 p-6 text-black
             rounded-sm
             border-2 border-gray-300
-            overflow-y-auto relative z-10
+            overflow-y-auto relative z-10 scroll-smooth
             shadow-[inset_1px_1px_0px_rgba(0,0,0,0.18),inset_-1px_-1px_0px_rgba(255,255,255,0.9)]
             ${contentClassName}`}
         >
@@ -66,9 +74,17 @@ export default function Window({
             p-3
             relative z-10
             shadow-[inset_0_1px_0px_rgba(255,255,255,0.8)]"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(135deg, transparent 0px, transparent 3px, rgba(255,255,255,0.12) 3px, rgba(255,255,255,0.12) 5px)",
+            style={{
+            backgroundImage: `
+              linear-gradient(
+                180deg,
+                #dce0e4 0%,
+                #d1d5db 35%,
+                #c9cdd2 50%,
+                #d1d5db 65%,
+                #c5c9ce 100%
+              )
+            `,
           }}
         >
           {footer}

@@ -2,46 +2,46 @@
 
 import Window from "@/components/Window";
 import Button from "@/components/Button";
-import { useState } from "react";
 import { useFormStore } from "@/app/context/FormContext";
 import ProfilePreview from "@/components/ProfilePreview";
 
 export default function AddMessage() {
   const { formData, updateForm } = useFormStore();
 
-  // Restore existing message from FormContext if present
-  const [message, setMessage] = useState<string>(formData.message || "");
   const characterLimit = 300;
+  const message = formData.message || "";
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const inputValue = e.target.value;
 
     if (inputValue.length <= characterLimit) {
-      setMessage(inputValue);
+      updateForm({
+        message: inputValue,
+      });
     }
-  };
-
-  const handleNext = () => {
-    updateForm({ message });
   };
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row">
-      <ProfilePreview></ProfilePreview> 
+      <ProfilePreview />
+
       <Window
-        title="Write a personal message to go with it!"
+        title="Write a personal message"
         footer={
           <div className="flex justify-between w-full">
             <Button label="Back" href="/select-song" />
+
             {message.trim().length !== 0 && (
-              <Button label="Next" href="/confirm-new-user" onClick={handleNext} />
+              <Button
+                label="Next"
+                href="/confirm-new-user"
+              />
             )}
           </div>
         }
       >
-
         <p className="text-md italic text-center mb-4 text-gray-600 min-h-6">
-          Relate back to your prompt. Why this song in particular?
+          Relate back to the prompt. Why this song in particular?
         </p>
 
         <textarea
@@ -54,11 +54,10 @@ export default function AddMessage() {
         />
 
         <div className="flex flex-row justify-end mt-2">
-          {/* Dynamic text color: turns red at 300 characters */}
           <span
             className={`text-sm transition-all duration-150 ${
               message.length >= characterLimit
-                ? "text-red-500 font-semibold"
+                ? "text-red-500"
                 : "text-gray-600"
             }`}
           >

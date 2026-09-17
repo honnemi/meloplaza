@@ -17,6 +17,7 @@ export default function ConfirmNewUserPage() {
 
   const handleConfirm = async () => {
     if (loading) return;
+
     setLoading(true);
     setError(null);
 
@@ -27,43 +28,67 @@ export default function ConfirmNewUserPage() {
       await supabase.auth.signOut();
 
       // Execute anonymous sign-in to get a fresh user session
-      const { data, error: anonError } = await supabase.auth.signInAnonymously();
+      const { data, error: anonError } =
+        await supabase.auth.signInAnonymously();
 
       if (anonError) {
-        console.error("Supabase Anonymous Sign-In Error:", anonError);
+        console.error(
+          "Supabase Anonymous Sign-In Error:",
+          anonError
+        );
         throw new Error(`Auth failed: ${anonError.message}`);
       }
 
-      const userId = data?.user?.id || data?.session?.user?.id;
+      const userId =
+        data?.user?.id || data?.session?.user?.id;
 
       if (!userId) {
-        throw new Error("Failed to retrieve user ID after anonymous sign-in.");
+        throw new Error(
+          "Failed to retrieve user ID after anonymous sign-in."
+        );
       }
 
       // Post to API route
       const res = await fetch("/api/users", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           ...formData,
-          userId
+          userId,
         }),
       });
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to save profile.");
+
+        throw new Error(
+          errorData.error || "Failed to save profile."
+        );
       }
 
       clearForm();
       router.push("/plaza");
     } catch (err: any) {
       console.error("Submission catch block:", err);
-      setError(err.message || "An unexpected error occurred.");
-    } finally {
+
+      setError(
+        err.message || "An unexpected error occurred."
+      );
+
       setLoading(false);
     }
   };
+
+  // Show the plain loading screen while submitting
+  if (loading) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center text-2xl font-bold cursor-wait">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-6 sm:p-12">
@@ -71,9 +96,14 @@ export default function ConfirmNewUserPage() {
         title="Ready to enter?"
         footer={
           <div className="flex justify-between w-full items-center gap-3">
-            <Button label="Back" href="/add-message" disabled={loading} />
+            <Button
+              label="Back"
+              href="/add-message"
+              disabled={loading}
+            />
+
             <SecondaryButton
-              label={loading ? "Submitting..." : "Confirm"}
+              label="Confirm"
               onClick={handleConfirm}
               disabled={loading}
             />
@@ -94,8 +124,9 @@ export default function ConfirmNewUserPage() {
           {/* Profile */}
           <div className="border-2 border-gray-300 p-3 rounded-sm bg-gray-50">
             <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide mb-1">
-              Profile
+              Avatar
             </h2>
+
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-12 h-12 overflow-hidden shrink-0">
                 <div className="scale-[0.35] transform origin-center">
@@ -105,6 +136,7 @@ export default function ConfirmNewUserPage() {
                   />
                 </div>
               </div>
+
               <p className="font-bold text-gray-800">
                 {formData.displayName || "Anonymous"}
               </p>
@@ -114,26 +146,34 @@ export default function ConfirmNewUserPage() {
           {/* Selected Prompt */}
           <div className="border-2 border-gray-300 p-3 rounded-sm bg-gray-50">
             <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide mb-1">
-              Selected Prompt
+              Prompt
             </h2>
+
             {formData.prompt ? (
-              <p className="italic text-gray-800">"{formData.prompt}"</p>
+              <p className="italic text-gray-800">
+                "{formData.prompt}"
+              </p>
             ) : (
-              <p className="text-gray-400">No prompt selected</p>
+              <p className="text-gray-400">
+                No prompt selected
+              </p>
             )}
           </div>
 
           {/* Chosen Song */}
           <div className="border-2 border-gray-300 p-3 rounded-sm bg-gray-50">
             <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide mb-2">
-              Chosen Song
+              Song
             </h2>
+
             {formData.songName ? (
               <div className="flex items-center gap-3">
                 {formData.songAlbumCover ? (
                   <img
                     src={formData.songAlbumCover}
-                    alt={formData.songAlbum || "Album cover"}
+                    alt={
+                      formData.songAlbum || "Album cover"
+                    }
                     className="w-14 h-14 rounded object-cover border border-gray-200 shrink-0"
                   />
                 ) : (
@@ -141,12 +181,19 @@ export default function ConfirmNewUserPage() {
                     No Cover
                   </div>
                 )}
+
                 <div>
-                  <p className="font-bold text-gray-800">{formData.songName}</p>
+                  <p className="font-bold text-gray-800">
+                    {formData.songName}
+                  </p>
+
                   <p className="text-sm text-gray-600">
                     {formData.songArtist}{" "}
-                    {formData.songYear ? `(${formData.songYear})` : ""}
+                    {formData.songYear
+                      ? `(${formData.songYear})`
+                      : ""}
                   </p>
+
                   {formData.songAlbum && (
                     <p className="text-xs text-gray-500 italic">
                       {formData.songAlbum}
@@ -155,19 +202,26 @@ export default function ConfirmNewUserPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-gray-400">No song selected</p>
+              <p className="text-gray-400">
+                No song selected
+              </p>
             )}
           </div>
 
           {/* Personal Message */}
           <div className="border-2 border-gray-300 p-3 rounded-sm bg-gray-50">
             <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide mb-1">
-              Personal Message
+              Message
             </h2>
+
             {formData.message ? (
-              <p className="text-gray-800 whitespace-pre-wrap">{formData.message}</p>
+              <p className="text-gray-800 whitespace-pre-wrap">
+                {formData.message}
+              </p>
             ) : (
-              <p className="text-gray-400">No message added</p>
+              <p className="text-gray-400">
+                No message added
+              </p>
             )}
           </div>
         </div>

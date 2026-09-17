@@ -17,14 +17,20 @@ export default function SongSelection({
   query,
 }: SongSelectionProps) {
   const { formData, updateForm } = useFormStore();
+
   const [selectedTrack, setSelectedTrack] = useState<any>(null);
 
+  // Restore previously selected song when coming back to this page
   useEffect(() => {
     if (formData.songId && !selectedTrack) {
       setSelectedTrack({
         id: formData.songId,
         name: formData.songName,
-        artists: [{ name: formData.songArtist }],
+        artists: [
+          {
+            name: formData.songArtist,
+          },
+        ],
         album: {
           name: formData.songAlbum,
           release_date: formData.songYear,
@@ -34,37 +40,30 @@ export default function SongSelection({
         },
       });
     }
-  }, [formData, selectedTrack]);
+  }, [formData.songId]);
 
-  const handleNext = () => {
-    if (selectedTrack) {
-      // Extract cover URL
-      const albumCoverUrl =
-        selectedTrack.album?.images?.[0]?.url ||
-        selectedTrack.albumCover ||
-        formData.songAlbumCover ||
-        "";
+  // Save the selected song to the shared form state immediately
+  const handleSelectTrack = (track: any) => {
+    setSelectedTrack(track);
 
-      updateForm({
-        songId: selectedTrack.id,
-        songName: selectedTrack.name,
-        songArtist:
-          selectedTrack.artists?.[0]?.name ||
-          selectedTrack.songArtist ||
-          "",
-        songAlbum: selectedTrack.album?.name || "",
-        songYear:
-          selectedTrack.album?.release_date?.slice(0, 4) ||
-          selectedTrack.songYear ||
-          "",
-        songAlbumCover: albumCoverUrl,
-      });
-    }
+    const albumCoverUrl =
+      track.album?.images?.[0]?.url ||
+      track.albumCover ||
+      "";
+
+    updateForm({
+      songId: track.id,
+      songName: track.name,
+      songArtist: track.artists?.[0]?.name || "",
+      songAlbum: track.album?.name || "",
+      songYear: track.album?.release_date?.slice(0, 4) || "",
+      songAlbumCover: albumCoverUrl,
+    });
   };
 
   return (
     <Window
-      title="Given that prompt, what song comes to mind?"
+      title="Given the prompt, what song comes to mind?"
       footer={
         <div className="flex justify-between items-center w-full">
           <Button label="Back" href="/select-prompt" />
@@ -73,7 +72,6 @@ export default function SongSelection({
             <Button
               label="Next"
               href="/add-message"
-              onClick={handleNext}
             />
           )}
         </div>
@@ -93,7 +91,11 @@ export default function SongSelection({
             defaultValue={query || ""}
           />
 
-          <SecondaryButton label="Search" icon={<i className="hn hn-search"></i>} type="submit" />
+          <SecondaryButton
+            label="Search"
+            icon={<i className="hn hn-search"></i>}
+            type="submit"
+          />
         </Form>
 
         {/* Results */}
@@ -101,10 +103,11 @@ export default function SongSelection({
           <SearchResults
             tracks={tracks}
             selectedTrack={selectedTrack}
-            onSelectTrack={setSelectedTrack}
+            onSelectTrack={handleSelectTrack}
           />
         )}
       </div>
     </Window>
   );
 }
+
