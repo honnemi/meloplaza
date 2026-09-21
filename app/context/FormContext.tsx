@@ -16,6 +16,7 @@ export type FormState = {
   songAlbumCover: string,
   songYear: string;
   songId: string;
+  songDuration: number;
   // Message step
   message: string;
 };
@@ -37,6 +38,7 @@ const defaultState: FormState = {
   songAlbumCover: "",
   songYear: "",
   songId: "",
+  songDuration: 0,
   message: "",
 };
 

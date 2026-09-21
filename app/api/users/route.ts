@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     
     // Extract userId sent from client body
-    const { userId, displayName, colour, faceIndex, prompt, songName, songArtist, songAlbum, songAlbumCover, songYear, songId, message } = body
+    const { userId, displayName, colour, faceIndex, prompt, songName, songArtist, songAlbum, songAlbumCover, songYear, songId, message, songDuration } = body
 
     if (!userId) {
       return NextResponse.json({ error: 'Missing userId in request body' }, { status: 400 })
@@ -44,6 +44,7 @@ export async function POST(request: Request) {
         song_album: songAlbum || null,
         song_album_cover: songAlbumCover || null,
         song_year: songYear || null,
+        song_duration: songDuration || null,
         message: message || null,
     });
 

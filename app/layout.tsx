@@ -1,13 +1,18 @@
 // app/layout.tsx
 import ShapeGrid from "@/components/GridBg";
 import type { Metadata } from "next";
-import { Geist_Pixel, Xanh_Mono } from "next/font/google";
+import { Geist_Pixel, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { FormProvider } from "@/app/context/FormContext";
 import { ViewTransitions } from "next-view-transitions";
 
 const geistPixel = Geist_Pixel({
   variable: "--font-geist-pixel",
+  subsets: ["latin"],
+});
+
+const robotoMono = Roboto_Mono({
+  variable: "--font-roboto-mono",
   subsets: ["latin"],
 });
 
@@ -25,7 +30,7 @@ export default function RootLayout({
     <ViewTransitions>
       <html lang="en">
         <body
-          className={`${geistPixel.variable} antialiased min-h-screen bg-slate-50 text-black m-0 p-0`}
+          className={`${geistPixel.variable} ${robotoMono.variable} antialiased min-h-screen bg-slate-50 text-black m-0 p-0`}
         >
           {/* Fixed background layer */}
           <div className="fixed inset-0 z-0 pointer-events-none">

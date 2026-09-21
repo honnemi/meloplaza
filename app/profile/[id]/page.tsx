@@ -59,9 +59,11 @@ export default function ShowRecommendation() {
       setCheckingCollection(false);
 
       if (alreadyAdded) {
+        // Already collected: show everything immediately
         setSkipDelays(true);
         setShowActions(true);
       } else {
+        // New recommendation: keep the normal reveal delay
         timer = setTimeout(() => {
           setShowActions(true);
         }, 6000);
@@ -103,8 +105,15 @@ export default function ShowRecommendation() {
     );
   }
 
+  // When already added, remove all message animation delays.
+  // Otherwise keep the normal 0–5000ms sequence.
+  const getMessageStyle = (delay: number) => ({
+    animationDelay: skipDelays ? "0ms" : `${delay}ms`,
+    animationDuration: skipDelays ? "0ms" : undefined,
+  });
+
   return (
-    <div className="flex min-h-screen w-full items-center justify-center p-6 sm:p-12">
+    <div className="flex min-h-screen w-full items-center justify-center p-6 pb-10 sm:p-12">
       <Window
         title="MeloMessenger"
         footer={
@@ -114,10 +123,15 @@ export default function ShowRecommendation() {
         }
       >
         <div className="flex flex-col md:flex-row w-full h-full gap-4">
+
           {/* CHAT */}
           <div className="flex flex-col border-2 border-gray-300 overflow-y-auto min-h-100 md:h-full w-full md:flex-1 rounded-sm p-4 gap-4 min-w-0">
+
             {/* MESSAGE 1 */}
-            <div className="message-in" style={{ animationDelay: "0ms" }}>
+            <div
+              className="message-in"
+              style={getMessageStyle(0)}
+            >
               <p>
                 <span
                   className="font-bold"
@@ -142,7 +156,7 @@ export default function ShowRecommendation() {
             {/* MESSAGE 2 */}
             <div
               className="message-in"
-              style={{ animationDelay: "1000ms" }}
+              style={getMessageStyle(1000)}
             >
               <p>
                 <span
@@ -168,7 +182,7 @@ export default function ShowRecommendation() {
             {/* MESSAGE 3 */}
             <div
               className="message-in"
-              style={{ animationDelay: "2000ms" }}
+              style={getMessageStyle(2000)}
             >
               <p>
                 <span
@@ -195,7 +209,7 @@ export default function ShowRecommendation() {
             {/* MESSAGE 4 */}
             <div
               className="message-in"
-              style={{ animationDelay: "3000ms" }}
+              style={getMessageStyle(3000)}
             >
               <p>
                 <span
@@ -221,7 +235,7 @@ export default function ShowRecommendation() {
             {/* MESSAGE 5 */}
             <div
               className="message-in"
-              style={{ animationDelay: "4000ms" }}
+              style={getMessageStyle(4000)}
             >
               <p>
                 <span
@@ -246,8 +260,8 @@ export default function ShowRecommendation() {
 
             {/* MUSIC PLAYER */}
             <div
-              className="message-in"
-              style={{ animationDelay: "5000ms" }}
+              className="message-in py-4"
+              style={getMessageStyle(5000)}
             >
               <MusicPlayer
                 songId={recommendation.song_id}
@@ -311,7 +325,9 @@ export default function ShowRecommendation() {
           </div>
 
           {/* PROFILE + ACTIONS */}
-          <div className="flex flex-col gap-4 w-full md:w-40 shrink-0">
+          <div className="flex flex-col justify-center gap-4 w-full md:w-40 shrink-0 pb-4 md:pb-0">
+
+            {/* PROFILE */}
             <div className="flex flex-col items-center gap-2">
               <div className="flex items-center justify-center w-40 h-40 border-2 border-gray-300 rounded-sm">
                 <Avatar
@@ -320,47 +336,45 @@ export default function ShowRecommendation() {
                 />
               </div>
 
-              <p className="font-bold text-center truncate max-w-full">
+              <p className="font-bold text-center w-full max-w-40 break-words whitespace-normal">
                 {otherUser.display_name}
               </p>
             </div>
 
+            {/* ACTIONS */}
             <div
-              className={`flex flex-col gap-4 transition-all duration-500 ${
-                showActions
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-3 pointer-events-none"
-              }`}
+              className={`
+                w-full
+                transition-all duration-500
+                ${
+                  showActions
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-3 pointer-events-none"
+                }
+              `}
             >
-              <SecondaryButton
-                label={
-                  addedToCollection
-                    ? "Added"
-                    : addingToCollection
-                      ? "Adding..."
-                      : "Add to Collection"
-                }
-                icon={
-                  <i
-                    className={
-                      addedToCollection
-                        ? "hn hn-check-solid"
-                        : "hn hn-save-solid"
-                    }
-                  />
-                }
-                onClick={handleAddToCollection}
-                disabled={addingToCollection || addedToCollection}
-              />
-
-              <Button
-                label="Recommend a Song"
-                icon={
-                  <i className="hn hn-share-alt-solid"
-                  />
-                }
-                href="/onboarding/select-prompt"
-              />
+              <div className="flex flex-col items-center w-full">
+                <SecondaryButton
+                  label={
+                    addedToCollection
+                      ? "Added"
+                      : addingToCollection
+                        ? "Adding..."
+                        : "Add to Collection"
+                  }
+                  icon={
+                    <i
+                      className={
+                        addedToCollection
+                          ? "hn hn-check-solid"
+                          : "hn hn-save-solid"
+                      }
+                    />
+                  }
+                  onClick={handleAddToCollection}
+                  disabled={addingToCollection || addedToCollection}
+                />
+              </div>
             </div>
           </div>
         </div>

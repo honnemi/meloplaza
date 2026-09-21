@@ -26,6 +26,7 @@ export default function SongSelection({
       setSelectedTrack({
         id: formData.songId,
         name: formData.songName,
+        duration_ms: formData.songDuration, 
         artists: [
           {
             name: formData.songArtist,
@@ -58,6 +59,7 @@ export default function SongSelection({
       songAlbum: track.album?.name || "",
       songYear: track.album?.release_date?.slice(0, 4) || "",
       songAlbumCover: albumCoverUrl,
+      songDuration: track.duration_ms || 0 
     });
   };
 

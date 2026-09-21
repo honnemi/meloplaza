@@ -73,6 +73,7 @@ interface RecommendationProps {
   songYear: string;
   message: string;
   songId: string;
+  songDuration: number;
   createdFor?: string;
 }
 
@@ -84,6 +85,7 @@ export async function createRecommendation({
   songYear,
   message,
   songId,
+  songDuration
 }: RecommendationProps) {
   const supabase = await createClient();
   const currentUserId = await getCurrentUserId();
@@ -96,6 +98,7 @@ export async function createRecommendation({
     song_year: songYear,
     message: message,
     song_id: songId,
+    song_duration: songDuration,
     created_by: currentUserId,
   });
 
@@ -120,6 +123,7 @@ export async function createRecommendationForUser({
   songYear,
   message,
   songId,
+  songDuration,
   createdFor,
 }: RecommendationProps) {
   const supabase = await createClient();
@@ -133,6 +137,7 @@ export async function createRecommendationForUser({
     song_year: songYear,
     message: message,
     song_id: songId,
+    song_duration: songDuration,
     created_by: currentUserId,
     created_for: createdFor,
   });
@@ -156,7 +161,7 @@ export async function getUserRecommendationById(userId: string) {
   const { data, error } = await supabase
     .from("Recommendations")
     .select(
-      "id, created_by, created_at, prompt, song_name, song_artist, song_album, song_year, message, song_id, song_album_cover"
+      "id, created_by, created_at, prompt, song_name, song_artist, song_album, song_year, message, song_id, song_album_cover, song_duration"
     )
     .eq("created_by", userId)
     .limit(1)
@@ -257,6 +262,7 @@ export async function getUserCollection() {
         song_album,
         song_album_cover,
         song_year,
+        song_duration,
         created_at,
         prompt,
         message,

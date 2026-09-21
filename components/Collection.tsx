@@ -9,7 +9,7 @@ import Popup from "@/components/PopupWindow";
 import React, { useState } from "react";
 import { getUserById } from "@/app/actions";
 
-interface CollectionItem {
+export interface CollectionItem {
   recommendation: string;
   Recommendations: {
     id: string;
@@ -29,7 +29,7 @@ interface CollectionProps {
   collection: CollectionItem[];
 }
 
-interface SelectedUser {
+export interface SelectedUser {
   id: string;
   display_name: string;
   colour: string;
@@ -205,9 +205,6 @@ export default function Collection({ collection }: CollectionProps) {
 
             {/* Recommended by */}
             <section className="flex flex-col gap-3 py-5 border-b-2 border-gray-300">
-              <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide">
-                RECOMMENDED BY
-              </h2>
 
               {loadingUser ? (
                 <p className="text-sm text-gray-500">
