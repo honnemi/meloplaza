@@ -122,7 +122,7 @@ export default async function PrintCollection() {
         <h2 className="font-bold text-xl">
           THANKS FOR VISITING!
           <div className="flex flex-col items-center mt-4">
-            <img className="grayscale w-50 h-50" src="/assets/logo.svg" />
+            <img className="w-50 h-50" src="/assets/logo-dithered.svg" />
           </div>
         </h2>
       </div>
