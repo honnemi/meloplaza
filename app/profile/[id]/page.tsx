@@ -14,6 +14,63 @@ import Button, { SecondaryButton } from "@/components/Button";
 import Avatar from "@/components/Avatar";
 import MusicPlayer from "@/components/MusicPlayer";
 
+const REPLIES = [
+  "Thanks for the recommendation!",
+  "I've added it to my collection ♡",
+];
+
+const formatTime = (date: string | Date) =>
+  new Date(date).toLocaleString("en-AU", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+// Avatar colours are pastel, so darken them to keep names readable on white
+const nameColour = (colour?: string) => colour;
+
+interface ChatLineProps {
+  name?: string;
+  colour?: string;
+  text: string;
+  time: string;
+  align?: "left" | "right";
+  style?: React.CSSProperties;
+}
+
+function ChatLine({
+  name,
+  colour,
+  text,
+  time,
+  align = "left",
+  style,
+}: ChatLineProps) {
+  const right = align === "right";
+
+  return (
+    <div
+      className={`message-in ${right ? "flex justify-end" : ""}`}
+      style={style}
+    >
+      <div className={right ? "max-w-[85%]" : undefined}>
+        <p className="text-gray-900 wrap-break-word">
+          <span className="font-bold" style={{ color: nameColour(colour) }}>
+            {name}:
+          </span>{" "}
+          {text}
+        </p>
+
+        <p className={`text-xs text-gray-600 ${right ? "text-right" : ""}`}>
+          {time}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function ShowRecommendation() {
   const params = useParams();
   const id = params.id?.toString();
@@ -26,33 +83,29 @@ export default function ShowRecommendation() {
   const [addingToCollection, setAddingToCollection] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const [skipDelays, setSkipDelays] = useState(false);
+  const [replyTime, setReplyTime] = useState(() => new Date());
 
   useEffect(() => {
     if (!id) return;
 
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setTimeout> | undefined;
 
     const loadData = async () => {
       const currentUserId = await getCurrentUserId();
+      if (!currentUserId) return;
 
-      if (!currentUserId) {
-        return;
-      }
+      const [currentUserData, recommendationData, otherUserData] =
+        await Promise.all([
+          getUserById(currentUserId),
+          getUserRecommendationById(id),
+          getUserById(id),
+        ]);
 
-      const currentUserData = await getUserById(currentUserId);
+      const alreadyAdded = recommendationData
+        ? await isInCollection(recommendationData.id)
+        : false;
 
-      const [recommendationData, otherUserData] = await Promise.all([
-        getUserRecommendationById(id),
-        getUserById(id),
-      ]);
-
-      let alreadyAdded = false;
-
-      if (recommendationData) {
-        alreadyAdded = await isInCollection(recommendationData.id);
-        setAddedToCollection(alreadyAdded);
-      }
-
+      setAddedToCollection(alreadyAdded);
       setRecommendation(recommendationData);
       setOtherUser(otherUserData);
       setCurrentUser(currentUserData);
@@ -62,31 +115,24 @@ export default function ShowRecommendation() {
         setSkipDelays(true);
         setShowActions(true);
       } else {
-        timer = setTimeout(() => {
-          setShowActions(true);
-        }, 6000);
+        timer = setTimeout(() => setShowActions(true), 6000);
       }
     };
 
     loadData();
 
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
+    return () => clearTimeout(timer);
   }, [id]);
 
   const handleAddToCollection = async () => {
-    if (!recommendation?.id || addingToCollection || addedToCollection) {
-      return;
-    }
+    if (!recommendation?.id || addingToCollection || addedToCollection) return;
 
     setAddingToCollection(true);
 
     const result = await addToCollection(recommendation.id);
 
     if (result.success) {
+      setReplyTime(new Date());
       setAddedToCollection(true);
     } else {
       console.error(result.error);
@@ -97,11 +143,19 @@ export default function ShowRecommendation() {
 
   if (!otherUser || !recommendation || checkingCollection) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center text-2xl font-bold cursor-wait">
+      <div className="flex min-h-screen w-full items-center justify-center font-heading text-2xl font-bold cursor-wait">
         Loading...
       </div>
     );
   }
+
+  const messages = [
+    "Hi!",
+    `${recommendation.prompt} is...`,
+    `${recommendation.song_name} by ${recommendation.song_artist} (｡•̀ᴗ-)✧`,
+    recommendation.message,
+    "Give it a listen and tell me what you think!",
+  ];
 
   // When already added, skip message animations
   const getMessageStyle = (delay: number) => ({
@@ -113,6 +167,7 @@ export default function ShowRecommendation() {
     <div className="flex min-h-screen w-full items-center justify-center p-6 pb-10 sm:p-12">
       <Window
         title="MeloMessenger"
+        icon={<i className="hn hn-message-solid"></i>}
         footer={
           <div className="flex w-full items-center justify-between gap-3">
             <Button label="Back" href="/plaza" />
@@ -120,145 +175,23 @@ export default function ShowRecommendation() {
         }
       >
         <div className="flex flex-col md:flex-row w-full h-full gap-4">
-
-          {/* Left side (chat window) */}
-          <div className="flex flex-col border-2 border-gray-300 overflow-y-auto min-h-100 md:h-full w-full md:flex-1 rounded-sm p-4 gap-4 min-w-0">
-
-            {/* Message 1 */}
-            <div
-              className="message-in"
-              style={getMessageStyle(0)}
-            >
-              <p>
-                <span
-                  className="font-bold"
-                  style={{ color: otherUser.colour }}
-                >
-                  {otherUser.display_name}:
-                </span>{" "}
-                Hi!
-              </p>
-
-              <p className="text-xs text-gray-500">
-                {new Date(recommendation.created_at).toLocaleString("en-AU", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
-
-            {/* Message 2 */}
-            <div
-              className="message-in"
-              style={getMessageStyle(1000)}
-            >
-              <p>
-                <span
-                  className="font-bold"
-                  style={{ color: otherUser.colour }}
-                >
-                  {otherUser.display_name}:
-                </span>{" "}
-                {recommendation.prompt} is...
-              </p>
-
-              <p className="text-xs text-gray-500">
-                {new Date(recommendation.created_at).toLocaleString("en-AU", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
-
-            {/* Message 3 */}
-            <div
-              className="message-in"
-              style={getMessageStyle(2000)}
-            >
-              <p>
-                <span
-                  className="font-bold"
-                  style={{ color: otherUser.colour }}
-                >
-                  {otherUser.display_name}:
-                </span>{" "}
-                {recommendation.song_name} by {recommendation.song_artist}{" "}
-                (｡•̀ᴗ-)✧
-              </p>
-
-              <p className="text-xs text-gray-500">
-                {new Date(recommendation.created_at).toLocaleString("en-AU", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
-
-            {/* Message 4 */}
-            <div
-              className="message-in"
-              style={getMessageStyle(3000)}
-            >
-              <p>
-                <span
-                  className="font-bold"
-                  style={{ color: otherUser.colour }}
-                >
-                  {otherUser.display_name}:
-                </span>{" "}
-                {recommendation.message}
-              </p>
-
-              <p className="text-xs text-gray-500">
-                {new Date(recommendation.created_at).toLocaleString("en-AU", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
-
-            {/* Message 5 */}
-            <div
-              className="message-in"
-              style={getMessageStyle(4000)}
-            >
-              <p>
-                <span
-                  className="font-bold"
-                  style={{ color: otherUser.colour }}
-                >
-                  {otherUser.display_name}:
-                </span>{" "}
-                Give it a listen and tell me what you think!
-              </p>
-
-              <p className="text-xs text-gray-500">
-                {new Date(recommendation.created_at).toLocaleString("en-AU", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
+          {/* Chat */}
+          <div className="flex flex-col overflow-y-auto min-h-100 md:h-full w-full md:flex-1 min-w-0 p-4 gap-4 rounded-sm bg-white border-2 border-t-win-border-dark border-l-win-border-dark border-b-win-border-alt border-r-win-border-alt">
+            {messages.map((text, i) => (
+              <ChatLine
+                key={i}
+                name={otherUser.display_name}
+                colour={otherUser.colour}
+                text={text}
+                time={formatTime(recommendation.created_at)}
+                style={getMessageStyle(i * 1000)}
+              />
+            ))}
 
             {/* Song preview */}
             <div
               className="message-in py-4"
-              style={getMessageStyle(5000)}
+              style={getMessageStyle(messages.length * 1000)}
             >
               <MusicPlayer
                 songId={recommendation.song_id}
@@ -267,88 +200,43 @@ export default function ShowRecommendation() {
               />
             </div>
 
-            {/* Current user response */}
-            {addedToCollection && (
-              <>
-                <div className="flex justify-end message-out">
-                  <div className="max-w-[85%]">
-                    <p>
-                      <span
-                        className="font-bold"
-                        style={{ color: currentUser?.colour }}
-                      >
-                        {currentUser?.display_name}:
-                      </span>{" "}
-                      Thanks for the recommendation!
-                    </p>
-
-                    <p className="text-xs text-gray-500 text-right">
-                      {new Date().toLocaleString("en-AU", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex justify-end message-out">
-                  <div className="max-w-[85%]">
-                    <p>
-                      <span
-                        className="font-bold"
-                        style={{ color: currentUser?.colour }}
-                      >
-                        {currentUser?.display_name}:
-                      </span>{" "}
-                      I've added it to my collection ♡
-                    </p>
-
-                    <p className="text-xs text-gray-500 text-right">
-                      {new Date().toLocaleString("en-AU", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                </div>
-              </>
-            )}
+            {/* Current user's replies */}
+            {addedToCollection &&
+              REPLIES.map((text) => (
+                <ChatLine
+                  key={text}
+                  align="right"
+                  name={currentUser?.display_name}
+                  colour={currentUser?.colour}
+                  text={text}
+                  time={formatTime(replyTime)}
+                />
+              ))}
           </div>
 
           {/* Right side */}
           <div className="flex flex-col justify-center gap-4 w-full md:w-40 shrink-0 pb-4 md:pb-0">
-
             {/* Profile */}
             <div className="flex flex-col items-center gap-2">
-              <div className="flex items-center justify-center w-40 h-40 border-2 border-gray-300 rounded-sm">
+              <div className="flex items-center justify-center w-40 h-40 bg-white border-2 border-win-border-alt rounded-sm">
                 <Avatar
                   colour={otherUser.colour}
                   faceIndex={otherUser.face_index}
                 />
               </div>
 
-              <p className="font-bold text-center w-full max-w-40 break-words whitespace-normal">
+              <p className="font-bold text-center text-gray-900 w-full max-w-40 wrap-break-word">
                 {otherUser.display_name}
               </p>
             </div>
 
             {/* Add to collection */}
             <div
-              className={`
-                w-full
-                transition-all duration-500
-                ${
-                  showActions
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-3 pointer-events-none"
-                }
-              `}
+              className={`w-full transition-all duration-500 ${
+                showActions
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-3 pointer-events-none"
+              }`}
             >
               <div className="flex flex-col items-center w-full">
                 <SecondaryButton

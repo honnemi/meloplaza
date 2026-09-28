@@ -85,7 +85,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
   const face = new Text({
     text: AVATAR_FACES[data.faceIndex],
     style: {
-      fontFamily: "Geist Pixel",
+      fontFamily: "M PLUS Rounded 1c",
       fontSize: 12,
     },
   });
@@ -135,7 +135,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
   const speechText = new Text({
     text: randomMessage,
     style: {
-      fontFamily: "Geist Pixel",
+      fontFamily: "M PLUS Rounded 1c",
       fontSize: 11,
       fill: 0x000000,
       align: "center",
@@ -155,7 +155,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
   const name = new Text({
     text: data.displayName,
     style: {
-      fontFamily: "Geist Pixel",
+      fontFamily: "M PLUS Rounded 1c",
       fontSize: 12,
       fill: 0x000000,
     },
@@ -170,7 +170,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
   const hoverIcon = new Text({
     text: "♫",
     style: {
-      fontFamily: "Geist Pixel",
+      fontFamily: "M PLUS Rounded 1c",
       fontSize: 18,
       fill: 0x000000,
     },

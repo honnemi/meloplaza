@@ -32,20 +32,14 @@ export default function ConfirmNewUserPage() {
         await supabase.auth.signInAnonymously();
 
       if (anonError) {
-        console.error(
-          "Supabase Anonymous Sign-In Error:",
-          anonError
-        );
+        console.error("Supabase Anonymous Sign-In Error:", anonError);
         throw new Error(`Auth failed: ${anonError.message}`);
       }
 
-      const userId =
-        data?.user?.id || data?.session?.user?.id;
+      const userId = data?.user?.id || data?.session?.user?.id;
 
       if (!userId) {
-        throw new Error(
-          "Failed to retrieve user ID after anonymous sign-in."
-        );
+        throw new Error("Failed to retrieve user ID after anonymous sign-in.");
       }
 
       // Post to API route
@@ -63,9 +57,7 @@ export default function ConfirmNewUserPage() {
       if (!res.ok) {
         const errorData = await res.json();
 
-        throw new Error(
-          errorData.error || "Failed to save profile."
-        );
+        throw new Error(errorData.error || "Failed to save profile.");
       }
 
       clearForm();
@@ -73,9 +65,7 @@ export default function ConfirmNewUserPage() {
     } catch (err: any) {
       console.error("Submission catch block:", err);
 
-      setError(
-        err.message || "An unexpected error occurred."
-      );
+      setError(err.message || "An unexpected error occurred.");
 
       setLoading(false);
     }
@@ -84,7 +74,7 @@ export default function ConfirmNewUserPage() {
   // Show the plain loading screen while submitting
   if (loading) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center text-2xl font-bold cursor-wait">
+      <div className="flex min-h-screen w-full items-center justify-center font-heading text-2xl font-bold cursor-wait">
         Loading...
       </div>
     );
@@ -96,11 +86,7 @@ export default function ConfirmNewUserPage() {
         title="Ready to enter?"
         footer={
           <div className="flex justify-between w-full items-center gap-3">
-            <Button
-              label="Back"
-              href="/add-message"
-              disabled={loading}
-            />
+            <Button label="Back" href="/add-message" disabled={loading} />
 
             <SecondaryButton
               label="Confirm"
@@ -110,59 +96,55 @@ export default function ConfirmNewUserPage() {
           </div>
         }
       >
-        <h1 className="text-lg font-bold mb-4 text-center text-gray-800">
-          Double-check your profile:
+        <h1 className="text-lg font-bold mb-4 text-center text-gray-700">
+          Make sure you're happy with what you've chosen!
         </h1>
 
         {error && (
-          <div className="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded-sm border border-red-300 text-center">
+          <div className="mb-4 p-3 text-sm text-[#a80f35] bg-[#ffe3ea] rounded-sm border-2 border-[#ff9bb0] text-center">
             {error}
           </div>
         )}
 
-        <div className="space-y-4 max-h-96 pr-2 text-gray-700">
-          {/* Profile */}
-          <div className="border-2 border-gray-300 p-3 rounded-sm bg-gray-50">
-            <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide mb-1">
+        <div className="space-y-3 pr-2 text-gray-900 overflow-y-hidden">
+          {/* Avatar */}
+          <div className="border-2 border-win-border-alt p-3 rounded-sm bg-white">
+            <h2 className="font-semibold text-xs text-gray-600 uppercase tracking-wide mb-2">
               Avatar
             </h2>
 
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 overflow-hidden shrink-0">
-                <div className="scale-[0.35] transform origin-center">
-                  <Avatar
-                    colour={formData.colour || "#3b82f6"}
-                    faceIndex={formData.faceIndex}
-                  />
-                </div>
-              </div>
+              <Avatar
+                colour={formData.colour || "#00c3d0"}
+                faceIndex={formData.faceIndex}
+                size="size-14"
+                textSize="text-l"
+              />
 
-              <p className="font-bold text-gray-800">
+              <p className="font-bold text-gray-900 wrap-break-word min-w-0">
                 {formData.displayName || "Anonymous"}
               </p>
             </div>
           </div>
 
-          {/* Selected Prompt */}
-          <div className="border-2 border-gray-300 p-3 rounded-sm bg-gray-50">
-            <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide mb-1">
+          {/* Selected prompt */}
+          <div className="border-2 border-win-border-alt p-3 rounded-sm bg-white">
+            <h2 className="font-semibold text-xs text-gray-600 uppercase tracking-wide mb-1">
               Prompt
             </h2>
 
             {formData.prompt ? (
-              <p className="italic text-gray-800">
+              <p className="italic text-gray-900 wrap-break-word">
                 "{formData.prompt}"
               </p>
             ) : (
-              <p className="text-gray-400">
-                No prompt selected
-              </p>
+              <p className="italic text-gray-500">No prompt selected</p>
             )}
           </div>
 
-          {/* Chosen Song */}
-          <div className="border-2 border-gray-300 p-3 rounded-sm bg-gray-50">
-            <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide mb-2">
+          {/* Chosen song */}
+          <div className="border-2 border-win-border-alt p-3 rounded-sm bg-white">
+            <h2 className="font-semibold text-xs text-gray-600 uppercase tracking-wide mb-2">
               Song
             </h2>
 
@@ -171,57 +153,49 @@ export default function ConfirmNewUserPage() {
                 {formData.songAlbumCover ? (
                   <img
                     src={formData.songAlbumCover}
-                    alt={
-                      formData.songAlbum || "Album cover"
-                    }
-                    className="w-14 h-14 rounded object-cover border border-gray-200 shrink-0"
+                    alt={formData.songAlbum || "Album cover"}
+                    className="w-14 h-14 rounded object-cover border border-gray-300 shrink-0"
                   />
                 ) : (
-                  <div className="w-14 h-14 rounded bg-gray-200 flex items-center justify-center text-gray-400 text-xs shrink-0">
+                  <div className="w-14 h-14 rounded bg-gray-100 border border-gray-300 flex items-center justify-center text-gray-600 text-xs shrink-0">
                     No Cover
                   </div>
                 )}
 
-                <div>
-                  <p className="font-bold text-gray-800">
+                <div className="min-w-0 flex-1">
+                  <p className="text-gray-900 wrap-break-word">
                     {formData.songName}
                   </p>
 
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-700 wrap-break-word">
                     {formData.songArtist}{" "}
-                    {formData.songYear
-                      ? `(${formData.songYear})`
-                      : ""}
+                    {formData.songYear ? `(${formData.songYear})` : ""}
                   </p>
 
                   {formData.songAlbum && (
-                    <p className="text-xs text-gray-500 italic">
+                    <p className="text-xs text-gray-600 italic wrap-break-word">
                       {formData.songAlbum}
                     </p>
                   )}
                 </div>
               </div>
             ) : (
-              <p className="text-gray-400">
-                No song selected
-              </p>
+              <p className="italic text-gray-500">No song selected</p>
             )}
           </div>
 
-          {/* Personal Message */}
-          <div className="border-2 border-gray-300 p-3 rounded-sm bg-gray-50">
-            <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide mb-1">
+          {/* Personal message */}
+          <div className="border-2 border-win-border-alt p-3 rounded-sm bg-white">
+            <h2 className="font-semibold text-xs text-gray-600 uppercase tracking-wide mb-1">
               Message
             </h2>
 
             {formData.message ? (
-              <p className="text-gray-800 whitespace-pre-wrap">
+              <p className="text-gray-900 whitespace-pre-wrap wrap-break-word">
                 {formData.message}
               </p>
             ) : (
-              <p className="text-gray-400">
-                No message added
-              </p>
+              <p className="italic text-gray-500">No message added</p>
             )}
           </div>
         </div>

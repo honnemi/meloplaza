@@ -48,7 +48,7 @@ export default async function PrintCollection() {
   return (
     <div className="print-page min-h-screen flex items-center justify-center">
       <div className="receipt-container font-mono bg-white text-center flex flex-col gap-4 w-full max-w-sm mx-auto p-4 border shadow-sm">
-        <h1 className="font-bold text-xl">meloplaza</h1>
+        <div className="font-bold text-xl">meloplaza</div>
 
         <hr />
 
@@ -119,12 +119,9 @@ export default async function PrintCollection() {
         <hr />
 
         {/* Thank you + logo */}
-        <h2 className="font-bold text-xl">
+        <div className="font-bold text-xl">
           THANKS FOR VISITING!
-          <div className="flex flex-col items-center mt-4">
-            <img className="w-50 h-50" src="/assets/logo-dithered.svg" />
-          </div>
-        </h2>
+        </div>
       </div>
 
       {/* Print action */}
@@ -134,9 +131,8 @@ export default async function PrintCollection() {
 
       {/* Back button */}
       <div className="fixed top-6 left-6 z-50">
-        <Button label="Back" href="/collection"/>
+        <Button label="Back" href="/collection" />
       </div>
-
     </div>
   );
 }

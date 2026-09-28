@@ -1,44 +1,54 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import '@hackernoon/pixel-icon-library/fonts/iconfont.css';
+@import "@hackernoon/pixel-icon-library/fonts/iconfont.css";
 
+/* Ties shadcn's dark: classes to a .dark class instead of the OS setting */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-sans: var(--font-m-plus), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-gruppo), sans-serif;
+
+  --color-win: var(--win-bg);
+  --color-win-alt: var(--win-bg-alt);
+  --color-win-border: var(--win-border);
+  --color-win-border-dark: var(--win-border-dark);
+  --color-win-border-alt: var(--win-border-alt);
+
+  --color-gray-50: #f0fbfc;
+  --color-gray-100: #dcf3f6;
+  --color-gray-200: #bfe8ed;
+  --color-gray-300: #98d6de;
+  --color-gray-400: #5fb8c4;
+  --color-gray-500: #2f9aa9;
+  --color-gray-600: #1f7a88;
+  --color-gray-700: #175f6b;
+  --color-gray-800: #114753;
+  --color-gray-900: #0b333d;
+  --color-gray-950: #062229;
+
+  --color-black: #082f38;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-pixel: var(--font-geist-pixel);
-  --font-mono: var(--font-roboto-mono);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,6 +59,20 @@
 }
 
 :root {
+  /* windows */
+  --win-bg: #eaf8fb;
+  --win-bg-alt: #d5f0f5;
+  --win-border: #5fb4c2;
+  --win-border-dark: #2f8a99;
+  --win-border-alt: #bfe6ec;
+  --win-titlebar: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #9fe6ee 45%,
+    #00c3d0 100%
+  );
+
+  /* shadcn */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -67,121 +91,93 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  html {
-    font-family: var(--font-geist-pixel);
-  }
-
-  body {
-    @apply bg-background text-foreground;
-    font-family: var(--font-geist-pixel);
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-gruppo), sans-serif;
+    letter-spacing: 0.08em;
   }
 }
-
 
 /* TEXT INPUT */
 .text-input {
   width: 100%;
-  background-color: white;
-
-  border: 2px solid #6b7280;
-  border-top-color: #4b5563;
-  border-left-color: #4b5563;
-  border-bottom-color: #d1d5db;
-  border-right-color: #d1d5db;
-
-  border-radius: 0.125rem;
-
   padding: 0.5rem 0.75rem;
-
+  background: white;
   color: black;
-
   outline: none;
 
-  box-shadow: inset 2px 2px 3px rgba(0, 0, 0, 0.35);
+  border: 2px solid;
+  /* top right bottom left */
+  border-color: var(--win-border-dark) var(--win-border-alt)
+    var(--win-border-alt) var(--win-border-dark);
+  border-radius: 6px;
+
+  box-shadow: inset 2px 2px 3px rgba(0, 90, 100, 0.3);
+  transition:
+    box-shadow 100ms,
+    border-color 100ms;
 }
 
+.text-input::placeholder {
+  color: var(--color-gray-500);
+}
 
-/* MESSAGE ANIMATIONS (RECOMMENDATION SCREEN) */
+input.text-input:focus,
+textarea.text-input:focus {
+  border-color: var(--win-border-dark) #00c3d0 #00c3d0 var(--win-border-dark);
+  box-shadow:
+    inset 2px 2px 3px rgba(0, 90, 100, 0.3),
+    0 0 0 2px rgba(0, 195, 208, 0.35);
+  outline: none;
+}
+
+.text-input:-webkit-autofill,
+.text-input:-webkit-autofill:hover,
+.text-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #0b333d;
+  caret-color: #0b333d;
+  /* first shadow keeps your inset bevel, second paints over the autofill colour */
+  box-shadow:
+    inset 2px 2px 3px rgba(0, 90, 100, 0.3),
+    inset 0 0 0 1000px white;
+  transition: background-color 9999s ease-out;
+}
+
+textarea.text-input {
+  resize: vertical; /* stops horizontal resizing from breaking the window layout */
+  min-height: 5rem;
+  line-height: 1.4;
+}
+
+/* ANIMATIONS */
 @keyframes message-in {
   from {
     opacity: 0;
     transform: translateY(8px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.message-in {
-  opacity: 0;
-  animation: message-in 0.35s ease-out forwards;
-}
-
-
-/* SCREEN TRANSITIONS */
-::view-transition-old(root) {
-  animation: window-out 300ms ease both;
-}
-
-::view-transition-new(root) {
-  animation: window-in 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+@keyframes popup-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes window-out {
@@ -195,11 +191,28 @@
     transform: scale(0.96);
     opacity: 0;
   }
-
   to {
     transform: scale(1);
     opacity: 1;
   }
+}
+
+.message-in {
+  opacity: 0;
+  animation: message-in 0.35s ease-out forwards;
+}
+
+.animate-popup-in {
+  animation: popup-in 300ms ease-out;
+}
+
+/* SCREEN TRANSITIONS */
+::view-transition-old(root) {
+  animation: window-out 300ms ease both;
+}
+
+::view-transition-new(root) {
+  animation: window-in 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* SCROLLBAR */
@@ -208,14 +221,13 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #d1d5db;
-  border-left: 1px solid #9ca3af;
+  background: var(--win-bg-alt);
+  border-left: 1px solid var(--win-border);
 }
 
 ::-webkit-scrollbar-thumb {
-  border: 2px solid #2563eb;
+  border: 2px solid #0097a7;
   border-radius: 999px;
-
   background-image:
     linear-gradient(
       to bottom,
@@ -223,113 +235,60 @@
       rgba(255, 255, 255, 0.3) 25%,
       transparent 45%
     ),
-    linear-gradient(
-      to bottom,
-      #2563eb 0%,
-      #93b4f5 45%,
-      #ffffff 100%
-    );
-
+    linear-gradient(to bottom, #00c3d0 0%, #7ee3ea 45%, #ffffff 100%);
   box-shadow:
     inset 0 1px 1px rgba(255, 255, 255, 0.9),
-    inset 0 -2px 3px rgba(0, 60, 160, 0.4),
+    inset 0 -2px 3px rgba(0, 90, 100, 0.4),
     0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-image:
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.5) 0%, transparent 40%),
+    linear-gradient(to bottom, #0097a7 0%, #5fd3dc 45%, #f4fcfd 100%);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 90, 100, 0.5),
+    0 1px 1px rgba(0, 0, 0, 0.2);
 }
 
 ::-webkit-scrollbar-thumb:hover {
   filter: brightness(1.1);
 }
 
-::-webkit-scrollbar-thumb:active {
-  background-image:
-    linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.5) 0%,
-      transparent 40%
-    ),
-    linear-gradient(
-      to bottom,
-      #1d4ed8 0%,
-      #7da8f0 45%,
-      #f5f5f5 100%
-    );
-
-  box-shadow:
-    inset 0 2px 4px rgba(0, 60, 160, 0.5),
-    0 1px 1px rgba(0, 0, 0, 0.2);
+hr {
+  border-bottom: 1px dashed black !important;
 }
 
-
-/* DETAILS MODAL ANIMATION */
-@keyframes popup-in {
-from {
-opacity: 0;
-transform: translateY(12px) scale(0.94);
-}
-
-to {
-opacity: 1;
-transform: translateY(0) scale(1);
-}
-}
-
-.animate-popup-in {
-animation: popup-in 300ms ease-out;
-}
-
-
-/* RECEIPT STYLING */
+/* RECEIPT PRINTING */
 @media print {
   @page {
     size: 80mm auto;
     margin: 0;
   }
 
-  /* Hide absolutely everything */
+  /* Hide everything except the receipt */
   body * {
     visibility: hidden !important;
   }
 
-  /* Show only the receipt */
   .receipt-container,
   .receipt-container * {
     visibility: visible !important;
   }
 
-  /* Put the receipt at the very top-left of the paper */
   .receipt-container {
     position: absolute;
     top: 0;
     left: 0;
-
     width: 72mm;
     max-width: 72mm;
-
     margin: 0;
     padding: 4mm;
-
     border: none !important;
     box-shadow: none !important;
-
     background: white !important;
     color: black !important;
-
     font-family: monospace;
-  }
-
-  /* Remove the screen layout from the print */
-  .print-page {
-    display: block;
-    min-height: 0;
-    width: 80mm;
-    margin: 0;
-    padding: 0;
-  }
-
-  /* Don't print interactive elements */
-  button,
-  a {
-    display: none !important;
   }
 
   .receipt-container,
@@ -338,12 +297,22 @@ animation: popup-in 300ms ease-out;
     page-break-inside: avoid;
   }
 
-  hr {
-    border-bottom: 1px dashed black !important;
-    border-top: 0 !important;
+  .print-page {
+    display: block;
+    min-height: 0;
+    width: 80mm;
+    margin: 0;
+    padding: 0;
+  }
+
+  button,
+  a {
+    display: none !important;
   }
 }
 
 hr {
-  border-bottom: 1px dashed black !important;
+  border: 0 !important;
+  border-top: 1px dashed #000 !important;
+  margin: 8px 0;
 }

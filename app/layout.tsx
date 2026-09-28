@@ -1,19 +1,22 @@
 // app/layout.tsx
 import ShapeGrid from "@/components/GridBg";
 import type { Metadata } from "next";
-import { Geist_Pixel, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { FormProvider } from "@/app/context/FormContext";
 import { ViewTransitions } from "next-view-transitions";
 
-const geistPixel = Geist_Pixel({
-  variable: "--font-geist-pixel",
+import { Gruppo, M_PLUS_Rounded_1c } from "next/font/google";
+
+const mPlus = M_PLUS_Rounded_1c({
+  variable: "--font-m-plus",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
-const robotoMono = Roboto_Mono({
-  variable: "--font-roboto-mono",
+const gruppo = Gruppo({
+  variable: "--font-gruppo",
   subsets: ["latin"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -28,17 +31,15 @@ export default function RootLayout({
 }) {
   return (
     <ViewTransitions>
-      <html lang="en">
-        <body
-          className={`${geistPixel.variable} ${robotoMono.variable} antialiased min-h-screen bg-slate-50 text-black m-0 p-0`}
-        >
+      <html lang="en" className={`${mPlus.variable} ${gruppo.variable}`}>
+        <body className="font-sans antialiased min-h-screen bg-slate-50 text-black m-0 p-0">
           {/* Fixed background layer */}
           <div className="fixed inset-0 z-0 pointer-events-none">
             <ShapeGrid
               speed={0.1}
               squareSize={50}
               direction="down"
-              borderColor="#cff4fc"
+              borderColor="#ffd9e3"
               shape="square"
             />
           </div>

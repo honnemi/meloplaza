@@ -24,47 +24,6 @@ export async function getCurrentUserId() {
   return userId;
 }
 
-export async function createUser(
-  colour: string,
-  faceIndex: number,
-  displayName: string
-) {
-  const supabase = await createClient();
-
-  // Anonymous sign in
-  const { data: authData, error: authError } =
-    await supabase.auth.signInAnonymously();
-
-  if (authError) {
-    console.error("Anonymous login failed:", authError.message);
-    return { error: `Authentication failed: ${authError.message}` };
-  }
-
-  // Capture new user ID
-  const userId = authData.user?.id;
-
-  // Add user data to DB
-  const { error: dbError } = await supabase.from("Recommendations").insert({
-    user_id: userId,
-    colour: colour,
-    face_index: faceIndex,
-    display_name: displayName,
-  });
-
-  if (dbError) {
-    console.error("Error inserting data:", dbError.message);
-    return { error: dbError.message };
-  }
-
-  const headerList = await headers();
-  const currentPath = headerList.get("x-pathname") || "/";
-
-  // 4. Refresh Next.js route data safely
-  revalidatePath(currentPath);
-
-  return { success: true };
-}
-
 interface RecommendationProps {
   prompt: string;
   songName: string;
@@ -85,7 +44,7 @@ export async function createRecommendation({
   songYear,
   message,
   songId,
-  songDuration
+  songDuration,
 }: RecommendationProps) {
   const supabase = await createClient();
   const currentUserId = await getCurrentUserId();
@@ -161,7 +120,7 @@ export async function getUserRecommendationById(userId: string) {
   const { data, error } = await supabase
     .from("Recommendations")
     .select(
-      "id, created_by, created_at, prompt, song_name, song_artist, song_album, song_year, message, song_id, song_album_cover, song_duration"
+      "id, created_by, created_at, prompt, song_name, song_artist, song_album, song_year, message, song_id, song_album_cover, song_duration",
     )
     .eq("created_by", userId)
     .limit(1)
@@ -252,7 +211,8 @@ export async function getUserCollection() {
 
   const { data, error } = await supabase
     .from("CollectionItems")
-    .select(`
+    .select(
+      `
       recommendation,
       Recommendations (
         id,
@@ -267,7 +227,8 @@ export async function getUserCollection() {
         message,
         created_by
       )
-    `)
+    `,
+    )
     .eq("added_by", userId);
 
   if (error) {
@@ -277,7 +238,7 @@ export async function getUserCollection() {
 
   const formattedData = data.map((item) => {
     const rawRecommendations = item.Recommendations;
-    
+
     return {
       ...item,
       Recommendations: Array.isArray(rawRecommendations)

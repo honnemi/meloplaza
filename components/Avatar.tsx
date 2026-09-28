@@ -45,9 +45,7 @@ export default function Avatar({
         />
 
         {/* Face */}
-        <span className="relative z-10">
-          {AVATAR_FACES[faceIndex]}
-        </span>
+        <span className="relative z-10">{AVATAR_FACES[faceIndex]}</span>
       </div>
     </div>
   );

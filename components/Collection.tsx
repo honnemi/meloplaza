@@ -66,6 +66,7 @@ export default function Collection({ collection }: CollectionProps) {
     <div className="w-full min-h-screen flex items-center justify-center p-6 sm:p-12">
       <Window
         title="My Collection"
+        icon={<i className="hn hn-disc-solid"></i>}
         footer={
           <div className="flex justify-between w-full">
             <Button label="Back" href="/plaza" />
@@ -101,7 +102,7 @@ export default function Collection({ collection }: CollectionProps) {
                   className="
                     flex
                     flex-col
-                    gap-2
+                    gap-3
                     items-center
                     text-center
                     min-w-0
@@ -145,13 +146,14 @@ export default function Collection({ collection }: CollectionProps) {
                         w-full
                         h-full
                         object-cover
+                        shadow-[0_4px_6px_rgba(0,90,100,0.3),inset_0_1px_0px_rgba(255,255,255,0.9)]
                       "
                     />
                   </div>
 
                   {/* Song name + artist */}
                   <div className="min-w-0 w-full max-w-40">
-                    <p className="text-sm font-semibold truncate">
+                    <p className="text-sm font-bold truncate">
                       {recommendation.song_name}
                     </p>
 
@@ -175,12 +177,12 @@ export default function Collection({ collection }: CollectionProps) {
         {selectedSong && (
           <div className="flex flex-col">
             {/* Song details */}
-            <section className="flex flex-col gap-3 pb-5 border-b-2 border-gray-300">
-              <h2 className="font-semibold text-xs text-gray-500 uppercase tracking-wide">
+            <section className="flex flex-col gap-3 pb-5 border-b border-gray-300">
+              <div className="font-heading font-semibold text-xs text-gray-600 uppercase tracking-wide">
                 SONG
-              </h2>
+              </div>
 
-              <div className="flex flex-row gap-4 items-center">
+              <div className="flex flex-row gap-4 items-start">
                 <img
                   src={selectedSong.song_album_cover}
                   alt={selectedSong.song_name}
@@ -188,15 +190,15 @@ export default function Collection({ collection }: CollectionProps) {
                 />
 
                 <div className="min-w-0">
-                  <h2 className="text-lg font-bold truncate">
+                  <p className="text-lg font-bold text-gray-900">
                     {selectedSong.song_name}
-                  </h2>
+                  </p>
 
-                  <p className="text-sm text-gray-600 truncate">
+                  <p className="text-sm text-gray-700">
                     {selectedSong.song_artist}
                   </p>
 
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-xs text-gray-600 mt-1">
                     {selectedSong.song_album} · {selectedSong.song_year}
                   </p>
                 </div>
@@ -204,9 +206,11 @@ export default function Collection({ collection }: CollectionProps) {
             </section>
 
             {/* Recommended by */}
-            <section className="flex flex-col gap-3 py-5 border-b-2 border-gray-300">
+            <section className="flex flex-col gap-3 py-5 border-b border-gray-300">
               {loadingUser ? (
-                <p className="text-sm text-gray-500">Loading user...</p>
+                <p className="text-sm text-gray-500">
+                  Loading user...
+                </p>
               ) : selectedUser ? (
                 <div className="flex flex-row items-center gap-3">
                   <div className="flex items-center justify-center w-12 h-12 shrink-0">
@@ -226,7 +230,7 @@ export default function Collection({ collection }: CollectionProps) {
                       {selectedUser.display_name}
                     </p>
 
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-700">
                       shared this song with you
                     </p>
                   </div>
@@ -242,21 +246,21 @@ export default function Collection({ collection }: CollectionProps) {
             <section className="flex flex-col gap-3 pt-5">
               <div className="flex flex-col gap-4">
                 <div>
-                  <p className="text-xs font-semibold text-gray-500 mb-1">
+                  <p className="font-heading text-xs font-semibold text-gray-600 mb-1">
                     PROMPT
                   </p>
 
-                  <p className="text-sm text-gray-700 leading-5">
+                  <p className="text-sm text-gray-900 leading-5">
                     {selectedSong.prompt}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-xs font-semibold text-gray-500 mb-1">
+                  <p className="font-heading text-xs font-semibold text-gray-600 mb-1">
                     MESSAGE
                   </p>
 
-                  <p className="text-sm text-gray-700 leading-5">
+                  <p className="text-sm text-gray-900 leading-5">
                     {selectedSong.message}
                   </p>
                 </div>

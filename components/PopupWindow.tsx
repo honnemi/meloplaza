@@ -53,7 +53,7 @@ export default function Popup({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 backdrop-blur-[1px]"
+        className="absolute inset-0 backdrop-blur-[1px] bg-[rgba(0,90,100,0.08)]"
         onClick={onClose}
       />
 
@@ -70,8 +70,8 @@ export default function Popup({
           overflow-hidden
           rounded-md
           border-2
-          border-gray-500
-          shadow-[4px_4px_0px_rgba(0,0,0,0.3)]
+          border-win-border-dark
+          shadow-[4px_4px_0px_rgba(0,90,100,0.3)]
           animate-popup-in
         "
       >
@@ -83,9 +83,9 @@ export default function Popup({
             items-center
             justify-center
             shrink-0
-            bg-gray-300
+            bg-(image:--win-titlebar)
             border-b-2
-            border-gray-500
+            border-win-border-dark
             p-3
             text-lg
             font-bold
@@ -93,18 +93,6 @@ export default function Popup({
             select-none
             shadow-[inset_0_1px_0px_rgba(255,255,255,0.9)]
           "
-          style={{
-            backgroundImage: `
-              linear-gradient(
-                180deg,
-                #dce0e4 0%,
-                #d1d5db 35%,
-                #c9cdd2 50%,
-                #d1d5db 65%,
-                #c5c9ce 100%
-              )
-            `,
-          }}
         >
           {/* Close button */}
           <button
@@ -113,25 +101,25 @@ export default function Popup({
             aria-label="Close popup"
             className="
               absolute
-              left-2
+              right-2
               top-1/2
               -translate-y-1/2
               w-5
               h-5
               rounded-full
               border-2
-              border-red-700
+              border-[#D91E45]
               transition-[filter,transform,box-shadow]
               duration-100
-              shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),inset_0_-2px_3px_rgba(120,0,0,0.4),0_2px_2px_rgba(0,0,0,0.25)]
+              shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),inset_0_-2px_3px_rgba(180,0,40,0.4),0_2px_2px_rgba(0,0,0,0.25)]
               hover:-translate-y-[calc(50%+1px)]
               hover:brightness-110
               active:translate-y-[calc(-50%+1px)]
               active:brightness-95
               cursor-pointer
             "
-            style={{
-              backgroundImage: `
+                        style={{
+                          backgroundImage: `
                 linear-gradient(
                   to bottom,
                   rgba(255,255,255,0.85) 0%,
@@ -140,25 +128,25 @@ export default function Popup({
                 ),
                 linear-gradient(
                   to bottom,
-                  #ef4444 0%,
-                  #fca5a5 45%,
-                  #ffffff 100%
+                  #FF2D55 0%,
+                  #FF6B88 45%,
+                  #FFD1DA 100%
                 )
               `,
             }}
           >
-            <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-red-900" />
+            <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-red-900"></span>
           </button>
 
           {/* Title */}
-          <span>{title}</span>
+          <span className="font-heading leading-none">{title}</span>
         </div>
 
         {/* Main content */}
         <div
           className="
             flex-1
-            bg-gray-200
+            bg-win
             p-2
             min-h-0
             relative
@@ -167,23 +155,23 @@ export default function Popup({
           "
           style={{
             backgroundImage:
-              "repeating-linear-gradient(135deg, transparent 0px, transparent 3px, rgba(255,255,255,0.12) 3px, rgba(255,255,255,0.12) 5px)",
+              "repeating-linear-gradient(135deg, transparent 0px, transparent 3px, rgba(255,255,255,0.35) 3px, rgba(255,255,255,0.35) 5px)",
           }}
         >
           <div
             className="
               h-full
-              bg-gray-50
+              bg-white/60
               p-6
               text-black
               rounded-sm
               border-2
-              border-gray-300
+              border-win-border
               overflow-y-auto
               relative
               z-10
               scroll-smooth
-              shadow-[inset_1px_1px_0px_rgba(0,0,0,0.18),inset_-1px_-1px_0px_rgba(255,255,255,0.9)]
+              shadow-[inset_1px_1px_0px_rgba(0,90,100,0.25),inset_-1px_-1px_0px_rgba(255,255,255,0.9)]
             "
           >
             {children}

@@ -22,16 +22,16 @@ export const AVATAR_FACES = [
   "^_^",
   ">//<",
   "e_e",
-  "3_3"
+  "3_3",
 ];
 
 export const AVATAR_COLOURS = [
-  "#E8403B",
-  "#EEAA3C",
-  "#E7E040",
-  "#89E743",
-  "#56CBF9",
-  "#0088FF",
-  "#694AE8",
-  "#FF6BA1",
+  "#FF2D55", // logo pink-red
+  "#FF9F45", // warm orange
+  "#FFCC00", // logo yellow
+  "#4FE3A0", // mint
+  "#00C3D0", // logo cyan
+  "#3B9CFF", // sky blue
+  "#8E7CFF", // periwinkle
+  "#FF8FC7", // bubblegum pink
 ];

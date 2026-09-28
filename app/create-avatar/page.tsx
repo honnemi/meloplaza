@@ -62,7 +62,7 @@ export default function AvatarCreation() {
           <div className="flex flex-col flex-1 w-full gap-4">
             {/* Display name */}
             <div className="w-full">
-              <h3 className="text-sm font-bold text-gray-700 mb-2">
+              <h3 className="text-sm font-bold text-gray-800 mb-2">
                 Display Name
               </h3>
 
@@ -90,7 +90,7 @@ export default function AvatarCreation() {
 
             {/* Colours */}
             <div>
-              <h3 className="text-sm font-bold text-gray-700 mb-2">
+              <h3 className="text-sm font-bold text-gray-800 mb-2">
                 Colour Select
               </h3>
 
@@ -106,14 +106,14 @@ export default function AvatarCreation() {
 
           {/* Right side */}
           <div className="flex flex-col flex-1 w-full items-center justify-center gap-4">
-          {/* Avatar preview */}
-          <div className="flex flex-col w-60 h-60 items-center justify-center border-2 border-gray-300 p-5 sm:p-6 rounded-sm gap-3">
-            <span className="text-sm font-bold text-gray-800 text-center max-w-45 min-h-10 leading-5 wrap-break-word">
-              {displayName || "Anonymous"}
-            </span>
+            {/* Avatar preview */}
+            <div className="bg-white flex flex-col w-60 h-60 items-center justify-center border-2 border-win-border-alt p-5 sm:p-6 rounded-sm gap-3">
+              <span className="text-sm font-bold text-gray-800 text-center max-w-45 min-h-10 leading-5 wrap-break-word">
+                {displayName || "Anonymous"}
+              </span>
 
-            <Avatar colour={colour} faceIndex={faceIndex} />
-          </div>
+              <Avatar colour={colour} faceIndex={faceIndex} />
+            </div>
 
             {/* Randomise button */}
             <div className="flex justify-center">
@@ -124,7 +124,6 @@ export default function AvatarCreation() {
               />
             </div>
           </div>
-          
         </div>
       </Window>
     </div>

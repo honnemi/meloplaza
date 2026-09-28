@@ -19,22 +19,28 @@ export default function Button({
   disabled = false,
 }: ButtonProps) {
   const baseStyles =
-    "inline-flex items-center justify-center gap-2 border-2 border-blue-600 rounded-full px-6 py-2 text-black transition-[filter,transform,box-shadow] duration-100 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),inset_0_-2px_3px_rgba(0,60,160,0.4),0_2px_2px_rgba(0,0,0,0.25)]";
+    "font-heading font-bold tracking-[0.08em] leading-none inline-flex items-center justify-center gap-2 border-2 border-[#0097A7] rounded-full px-6 py-2 text-black transition-[filter,transform,box-shadow] duration-100 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),inset_0_-2px_3px_rgba(0,90,100,0.4),0_2px_2px_rgba(0,0,0,0.25)]";
 
   const activeStyles =
-    "hover:-translate-y-0.5 hover:brightness-110 active:translate-y-[1px] active:brightness-95 active:shadow-[inset_0_2px_4px_rgba(0,60,160,0.5),0_1px_1px_rgba(0,0,0,0.2)] cursor-pointer";
-
-  const disabledStyles = "opacity-50 cursor-not-allowed pointer-events-none";
+    "hover:-translate-y-0.5 hover:brightness-110 active:translate-y-[1px] active:brightness-95 active:shadow-[inset_0_2px_4px_rgba(0,90,100,0.5),0_1px_1px_rgba(0,0,0,0.2)] cursor-pointer";
 
   const styleObj = {
     backgroundImage:
-      "linear-gradient(to bottom, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.3) 25%, transparent 45%), linear-gradient(to bottom, #2563EB 0%, #93B4F5 45%, #ffffff 100%)",
+      "linear-gradient(to bottom, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.3) 25%, transparent 45%), linear-gradient(to bottom, #00C3D0 0%, #7EE3EA 45%, #ffffff 100%)",
   };
+
+  const disabledStyles =
+    "opacity-50 cursor-not-allowed pointer-events-none";
 
   const content = (
     <>
-      {icon && <span>{icon}</span>}
-      <span>{label}</span>
+      {icon && (
+        <span className="inline-flex h-4 w-4 items-center justify-center leading-none">
+          {icon}
+        </span>
+      )}
+
+      <span className="leading-none">{label}</span>
     </>
   );
 
@@ -56,9 +62,7 @@ export default function Button({
       type={type}
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      className={`${baseStyles} ${
-        disabled ? disabledStyles : activeStyles
-      }`}
+      className={`${baseStyles} ${disabled ? disabledStyles : activeStyles}`}
       style={styleObj}
     >
       {content}
@@ -75,22 +79,28 @@ export function SecondaryButton({
   disabled = false,
 }: ButtonProps) {
   const baseStyles =
-    "inline-flex items-center justify-center gap-2 border-2 border-green-700 rounded-full px-6 py-2 text-black transition-[filter,transform,box-shadow] duration-100 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),inset_0_-2px_3px_rgba(0,100,40,0.4),0_2px_2px_rgba(0,0,0,0.25)]";
+    "font-heading font-bold tracking-[0.08em] leading-none inline-flex items-center justify-center gap-2 border-2 border-[#2BB37A] rounded-full px-6 py-2 text-black transition-[filter,transform,box-shadow] duration-100 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),inset_0_-2px_3px_rgba(0,110,70,0.4),0_2px_2px_rgba(0,0,0,0.25)]";
 
   const activeStyles =
-    "hover:-translate-y-0.5 hover:brightness-110 active:translate-y-[1px] active:brightness-95 active:shadow-[inset_0_2px_4px_rgba(0,100,40,0.5),0_1px_1px_rgba(0,0,0,0.2)] cursor-pointer";
-
-  const disabledStyles = "opacity-50 cursor-not-allowed pointer-events-none";
+    "hover:-translate-y-0.5 hover:brightness-110 active:translate-y-[1px] active:brightness-95 active:shadow-[inset_0_2px_4px_rgba(0,110,70,0.5),0_1px_1px_rgba(0,0,0,0.2)] cursor-pointer";
 
   const styleObj = {
     backgroundImage:
-      "linear-gradient(to bottom, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.3) 25%, transparent 45%), linear-gradient(to bottom, #22C55E 0%, #86EFAC 45%, #ffffff 100%)",
+      "linear-gradient(to bottom, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.3) 25%, transparent 45%), linear-gradient(to bottom, #4FE3A0 0%, #A6F3CF 45%, #ffffff 100%)",
   };
+
+  const disabledStyles =
+    "opacity-50 cursor-not-allowed pointer-events-none";
 
   const content = (
     <>
-      {icon && <span>{icon}</span>}
-      <span>{label}</span>
+      {icon && (
+        <span className="inline-flex h-4 w-4 items-center justify-center leading-none">
+          {icon}
+        </span>
+      )}
+
+      <span className="leading-none">{label}</span>
     </>
   );
 
@@ -112,9 +122,7 @@ export function SecondaryButton({
       type={type}
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      className={`${baseStyles} ${
-        disabled ? disabledStyles : activeStyles
-      }`}
+      className={`${baseStyles} ${disabled ? disabledStyles : activeStyles}`}
       style={styleObj}
     >
       {content}
@@ -138,7 +146,7 @@ export function ColourButton({
       type="button"
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      className={`w-24 h-24 rounded-sm border-2 border-gray-500 border-t-gray-600 border-l-gray-600 border-b-gray-300 border-r-gray-300 ${
+      className={`w-24 h-24 rounded-sm border-2 border-t-win-border-dark border-l-win-border-dark border-b-win-border-alt border-r-win-border-alt ${
         disabled
           ? "opacity-50 cursor-not-allowed pointer-events-none"
           : "cursor-pointer"

@@ -23,7 +23,6 @@ export default function AddMessage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row">
-
       {/* Show choices from previous pages */}
       <ProfilePreview />
 
@@ -34,10 +33,7 @@ export default function AddMessage() {
             <Button label="Back" href="/select-song" />
 
             {message.trim().length !== 0 && (
-              <Button
-                label="Next"
-                href="/confirm-new-user"
-              />
+              <Button label="Next" href="/confirm-new-user" />
             )}
           </div>
         }
@@ -48,7 +44,7 @@ export default function AddMessage() {
 
         {/* Text input */}
         <textarea
-          className="w-full rounded-sm p-4 text-black focus:outline-none border-2 border-gray-500 border-t-gray-600 border-l-gray-600 border-b-gray-300 border-r-gray-300 transition-all duration-150 focus:border-blue-500"
+          className="text-input w-full rounded-sm p-4 focus:outline-none border-2 border-gray-500 border-t-gray-600 border-l-gray-600 border-b-gray-300 border-r-gray-300 transition-all duration-150 focus:border-blue-500"
           rows={8}
           placeholder="Enter message..."
           value={message}
@@ -61,7 +57,7 @@ export default function AddMessage() {
           <span
             className={`text-sm transition-all duration-150 ${
               message.length >= characterLimit
-                ? "text-red-500"
+                ? "text-[#FF2D55]"
                 : "text-gray-600"
             }`}
           >

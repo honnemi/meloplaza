@@ -9,15 +9,14 @@ export default function ProfilePreview() {
 
   return (
     <Window
-      title="Your Profile"
+      title="Your ID"
       className="w-[60%] h-auto"
       contentClassName="p-3"
     >
       <div className="flex flex-col items-center md:flex-row md:items-start gap-3 w-full">
-
         {/* Avatar preview */}
-        <div className="w-30 h-30 shrink-0 flex flex-col items-center justify-center border-2 border-gray-300 rounded-sm gap-2">
-          <span className="text-[10px] font-bold text-gray-800 text-center max-w-20 wrap-break-word">
+        <div className="bg-white w-30 h-30 shrink-0 flex flex-col items-center justify-center border-2 border-win-border-alt rounded-sm gap-2">
+          <span className="text-[10px] font-bold text-gray-900 text-center max-w-20 wrap-break-word">
             {formData.displayName || "Anonymous"}
           </span>
 
@@ -31,28 +30,25 @@ export default function ProfilePreview() {
 
         {/* Profile information */}
         <div className="w-full min-w-0 flex-1">
-          <div className="space-y-2 text-gray-700">
-
+          <div className="space-y-2 text-gray-900">
             {/* Selected prompt */}
-            <div className="border-2 border-gray-300 p-2 rounded-sm bg-gray-50">
-              <h2 className="font-semibold text-[9px] text-gray-500 uppercase tracking-wide mb-0.5">
+            <div className="border-2 border-win-border-alt p-2 rounded-sm bg-white">
+              <h2 className="font-semibold text-[9px] text-gray-600 uppercase tracking-wide mb-0.5">
                 Prompt
               </h2>
 
               {formData.prompt ? (
-                <p className="text-xs italic text-gray-800 wrap-break-word">
+                <p className="text-xs italic text-gray-900 wrap-break-word">
                   "{formData.prompt}"
                 </p>
               ) : (
-                <p className="text-xs text-gray-400">
-                  No prompt selected
-                </p>
+                <p className="text-xs italic text-gray-500">No prompt selected</p>
               )}
             </div>
 
             {/* Chosen song */}
-            <div className="border-2 border-gray-300 p-2 rounded-sm bg-gray-50">
-              <h2 className="font-semibold text-[9px] text-gray-500 uppercase tracking-wide mb-1">
+            <div className="border-2 border-win-border-alt p-2 rounded-sm bg-white">
+              <h2 className="font-semibold text-[9px] text-gray-600 uppercase tracking-wide mb-1">
                 Song
               </h2>
 
@@ -62,57 +58,50 @@ export default function ProfilePreview() {
                     <img
                       src={formData.songAlbumCover}
                       alt={formData.songAlbum || "Album cover"}
-                      className="w-8 h-8 rounded object-cover border border-gray-200 shrink-0"
+                      className="w-8 h-8 rounded object-cover border border-gray-300 shrink-0"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center text-gray-400 text-[8px] shrink-0">
+                    <div className="w-8 h-8 rounded bg-gray-100 border border-gray-300 flex items-center justify-center text-gray-600 text-[8px] shrink-0">
                       No Cover
                     </div>
                   )}
 
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-gray-800 wrap-break-word">
+                    <p className="text-xs text-gray-900 wrap-break-word">
                       {formData.songName}
                     </p>
 
-                    <p className="text-[10px] text-gray-600 wrap-break-word">
+                    <p className="text-[10px] text-gray-700 wrap-break-word">
                       {formData.songArtist}{" "}
-                      {formData.songYear
-                        ? `(${formData.songYear})`
-                        : ""}
+                      {formData.songYear ? `(${formData.songYear})` : ""}
                     </p>
 
                     {formData.songAlbum && (
-                      <p className="text-[10px] text-gray-500 italic wrap-break-word">
+                      <p className="text-[10px] text-gray-600 italic wrap-break-word">
                         {formData.songAlbum}
                       </p>
                     )}
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-gray-400">
-                  No song selected
-                </p>
+                <p className="text-xs italic text-gray-500">No song selected</p>
               )}
             </div>
 
             {/* Personal message */}
-            <div className="border-2 border-gray-300 p-2 rounded-sm bg-gray-50">
-              <h2 className="font-semibold text-[9px] text-gray-500 uppercase tracking-wide mb-0.5">
+            <div className="border-2 border-win-border-alt p-2 rounded-sm bg-white">
+              <h2 className="font-semibold text-[9px] text-gray-600 uppercase tracking-wide mb-0.5">
                 Message
               </h2>
 
               {formData.message ? (
-                <p className="text-xs text-gray-800 whitespace-pre-wrap wrap-break-word">
+                <p className="text-xs text-gray-900 whitespace-pre-wrap wrap-break-word">
                   {formData.message}
                 </p>
               ) : (
-                <p className="text-xs text-gray-400">
-                  No message
-                </p>
+                <p className="text-xs italic text-gray-500">No message</p>
               )}
             </div>
-
           </div>
         </div>
       </div>

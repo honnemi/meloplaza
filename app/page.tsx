@@ -11,9 +11,10 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full">
       <main className="flex flex-col items-center justify-center w-full">
+        <img src="/assets/logo.svg"/>
         <SplitText
           text="meloplaza"
-          className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-semibold text-center"
+          className="font-heading text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-semibold text-center"
           delay={50}
           duration={1.25}
           ease="power3.out"
