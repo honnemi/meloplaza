@@ -59,11 +59,9 @@ export default function ShowRecommendation() {
       setCheckingCollection(false);
 
       if (alreadyAdded) {
-        // Already collected: show everything immediately
         setSkipDelays(true);
         setShowActions(true);
       } else {
-        // New recommendation: keep the normal reveal delay
         timer = setTimeout(() => {
           setShowActions(true);
         }, 6000);
@@ -105,8 +103,7 @@ export default function ShowRecommendation() {
     );
   }
 
-  // When already added, remove all message animation delays.
-  // Otherwise keep the normal 0–5000ms sequence.
+  // When already added, skip message animations
   const getMessageStyle = (delay: number) => ({
     animationDelay: skipDelays ? "0ms" : `${delay}ms`,
     animationDuration: skipDelays ? "0ms" : undefined,
@@ -124,10 +121,10 @@ export default function ShowRecommendation() {
       >
         <div className="flex flex-col md:flex-row w-full h-full gap-4">
 
-          {/* CHAT */}
+          {/* Left side (chat window) */}
           <div className="flex flex-col border-2 border-gray-300 overflow-y-auto min-h-100 md:h-full w-full md:flex-1 rounded-sm p-4 gap-4 min-w-0">
 
-            {/* MESSAGE 1 */}
+            {/* Message 1 */}
             <div
               className="message-in"
               style={getMessageStyle(0)}
@@ -153,7 +150,7 @@ export default function ShowRecommendation() {
               </p>
             </div>
 
-            {/* MESSAGE 2 */}
+            {/* Message 2 */}
             <div
               className="message-in"
               style={getMessageStyle(1000)}
@@ -179,7 +176,7 @@ export default function ShowRecommendation() {
               </p>
             </div>
 
-            {/* MESSAGE 3 */}
+            {/* Message 3 */}
             <div
               className="message-in"
               style={getMessageStyle(2000)}
@@ -206,7 +203,7 @@ export default function ShowRecommendation() {
               </p>
             </div>
 
-            {/* MESSAGE 4 */}
+            {/* Message 4 */}
             <div
               className="message-in"
               style={getMessageStyle(3000)}
@@ -232,7 +229,7 @@ export default function ShowRecommendation() {
               </p>
             </div>
 
-            {/* MESSAGE 5 */}
+            {/* Message 5 */}
             <div
               className="message-in"
               style={getMessageStyle(4000)}
@@ -258,7 +255,7 @@ export default function ShowRecommendation() {
               </p>
             </div>
 
-            {/* MUSIC PLAYER */}
+            {/* Song preview */}
             <div
               className="message-in py-4"
               style={getMessageStyle(5000)}
@@ -270,7 +267,7 @@ export default function ShowRecommendation() {
               />
             </div>
 
-            {/* CURRENT USER MESSAGES */}
+            {/* Current user response */}
             {addedToCollection && (
               <>
                 <div className="flex justify-end message-out">
@@ -324,10 +321,10 @@ export default function ShowRecommendation() {
             )}
           </div>
 
-          {/* PROFILE + ACTIONS */}
+          {/* Right side */}
           <div className="flex flex-col justify-center gap-4 w-full md:w-40 shrink-0 pb-4 md:pb-0">
 
-            {/* PROFILE */}
+            {/* Profile */}
             <div className="flex flex-col items-center gap-2">
               <div className="flex items-center justify-center w-40 h-40 border-2 border-gray-300 rounded-sm">
                 <Avatar
@@ -341,7 +338,7 @@ export default function ShowRecommendation() {
               </p>
             </div>
 
-            {/* ACTIONS */}
+            {/* Add to collection */}
             <div
               className={`
                 w-full

@@ -149,12 +149,3 @@ export function ColourButton({
     />
   );
 }
-
-export function PrintButton() {
-    return (
-        <SecondaryButton
-            label="Print"
-            onClick={() => window.print()}
-        />
-    );
-}

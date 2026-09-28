@@ -6,7 +6,7 @@ import CD from "@/components/CD";
 import Avatar from "@/components/Avatar";
 import Popup from "@/components/PopupWindow";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { getUserById } from "@/app/actions";
 
 export interface CollectionItem {
@@ -37,11 +37,11 @@ export interface SelectedUser {
 }
 
 export default function Collection({ collection }: CollectionProps) {
-  const [selectedSong, setSelectedSong] =
-    useState<CollectionItem["Recommendations"] | null>(null);
+  const [selectedSong, setSelectedSong] = useState<
+    CollectionItem["Recommendations"] | null
+  >(null);
 
-  const [selectedUser, setSelectedUser] =
-    useState<SelectedUser | null>(null);
+  const [selectedUser, setSelectedUser] = useState<SelectedUser | null>(null);
 
   const [loadingUser, setLoadingUser] = useState(false);
 
@@ -107,7 +107,7 @@ export default function Collection({ collection }: CollectionProps) {
                     min-w-0
                   "
                 >
-                  {/* Album */}
+                  {/* Album (song) */}
                   <div
                     className="
                       relative
@@ -205,11 +205,8 @@ export default function Collection({ collection }: CollectionProps) {
 
             {/* Recommended by */}
             <section className="flex flex-col gap-3 py-5 border-b-2 border-gray-300">
-
               {loadingUser ? (
-                <p className="text-sm text-gray-500">
-                  Loading user...
-                </p>
+                <p className="text-sm text-gray-500">Loading user...</p>
               ) : selectedUser ? (
                 <div className="flex flex-row items-center gap-3">
                   <div className="flex items-center justify-center w-12 h-12 shrink-0">

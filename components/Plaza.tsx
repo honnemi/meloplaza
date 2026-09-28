@@ -22,6 +22,7 @@ interface AnimatedContainer extends Container {
   isDragging: boolean;
   speechBubble: Container;
   hoverIcon: Text;
+  shadow: Graphics;
 }
 
 const AVATAR_RADIUS = 24;
@@ -34,6 +35,7 @@ const DRAG_MESSAGES = [
   "weeeee",
   "ow",
   "ouch",
+  "wah!",
   "unhand me",
   "let me go!",
 ];
@@ -45,49 +47,41 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
   avatar.targetY = 0;
   avatar.isDragging = false;
 
-  // SHADOW
+  // Avatar shadow
   const shadow = new Graphics();
 
-  shadow
-    .ellipse(0, 25, 20, 5)
-    .fill({
-      color: 0x000000,
-      alpha: 0.2,
-    });
+  shadow.ellipse(0, 25, 20, 5).fill({
+    color: 0x000000,
+    alpha: 0.2,
+  });
 
   avatar.addChild(shadow);
+  avatar.shadow = shadow;
 
-  // AVATAR BODY
+  // Avatar body
   const bubble = new Graphics();
 
-  const colour = parseInt(
-    data.colour.replace("#", ""),
-    16
-  );
+  const colour = parseInt(data.colour.replace("#", ""), 16);
 
-  bubble
-    .circle(0, 0, AVATAR_RADIUS)
-    .fill({
-      color: colour,
-    });
+  bubble.circle(0, 0, AVATAR_RADIUS).fill({
+    color: colour,
+  });
 
   avatar.addChild(bubble);
 
-  // HIGHLIGHT
+  // Avatar highlight
   const highlight = new Graphics();
 
-  highlight
-    .ellipse(-6, -16, 6, 3)
-    .fill({
-      color: 0xffffff,
-      alpha: 0.5,
-    });
+  highlight.ellipse(-6, -16, 6, 3).fill({
+    color: 0xffffff,
+    alpha: 0.5,
+  });
 
   highlight.rotation = (-25 * Math.PI) / 180;
 
   avatar.addChild(highlight);
 
-  // FACE
+  // Avatar face
   const face = new Text({
     text: AVATAR_FACES[data.faceIndex],
     style: {
@@ -100,7 +94,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.addChild(face);
 
-  // SPEECH BUBBLE
+  // Speech bubble
   const speechBubble = new Container();
 
   speechBubble.visible = false;
@@ -136,9 +130,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
   speechBubble.addChild(bubbleShape);
 
   const randomMessage =
-    DRAG_MESSAGES[
-      Math.floor(Math.random() * DRAG_MESSAGES.length)
-    ];
+    DRAG_MESSAGES[Math.floor(Math.random() * DRAG_MESSAGES.length)];
 
   const speechText = new Text({
     text: randomMessage,
@@ -159,7 +151,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.speechBubble = speechBubble;
 
-  // NAME
+  // Avatar name
   const name = new Text({
     text: data.displayName,
     style: {
@@ -174,7 +166,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.addChild(name);
 
-  // HOVER ICON
+  // Avatar hover
   const hoverIcon = new Text({
     text: "♫",
     style: {
@@ -193,7 +185,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.hoverIcon = hoverIcon;
 
-  // HOVER
+  // Hover logic
   avatar.on("pointerover", () => {
     if (!avatar.isDragging) {
       hoverIcon.visible = true;
@@ -237,45 +229,29 @@ export default function Plaza({ avatars }: PlazaProps) {
 
     const MOVE_THRESHOLD = 5;
 
-
-    // RESIZE
     const resize = () => {
       if (!initialized || destroyed) return;
 
-      app.renderer.resize(
-        container.clientWidth,
-        container.clientHeight
-      );
+      app.renderer.resize(container.clientWidth, container.clientHeight);
     };
 
-
-    // DRAGGING
-    const handleWindowPointerMove = (
-      event: PointerEvent
-    ) => {
+    // Drag logic (if pointer down and moving)
+    const handleWindowPointerMove = (event: PointerEvent) => {
       if (!draggedAvatar) return;
 
-      if (
-        dragPointerId !== null &&
-        event.pointerId !== dragPointerId
-      ) {
+      if (dragPointerId !== null && event.pointerId !== dragPointerId) {
         return;
       }
 
       event.preventDefault();
 
-      const dx =
-        event.clientX - startPointerX;
+      const dx = event.clientX - startPointerX;
 
-      const dy =
-        event.clientY - startPointerY;
+      const dy = event.clientY - startPointerY;
 
       if (
         !hasMoved &&
-        (
-          Math.abs(dx) > MOVE_THRESHOLD ||
-          Math.abs(dy) > MOVE_THRESHOLD
-        )
+        (Math.abs(dx) > MOVE_THRESHOLD || Math.abs(dy) > MOVE_THRESHOLD)
       ) {
         hasMoved = true;
 
@@ -283,76 +259,52 @@ export default function Plaza({ avatars }: PlazaProps) {
 
         draggedAvatar.hoverIcon.visible = false;
 
-        // Show speech bubble.
+        // Show speech bubble on drag
         draggedAvatar.speechBubble.visible = true;
+
+        draggedAvatar.shadow.visible = false;
       }
 
       if (!hasMoved) return;
 
-      const rect =
-        app.canvas.getBoundingClientRect();
+      const rect = app.canvas.getBoundingClientRect();
 
-      const scaleX =
-        app.screen.width / rect.width;
+      const scaleX = app.screen.width / rect.width;
 
-      const scaleY =
-        app.screen.height / rect.height;
+      const scaleY = app.screen.height / rect.height;
 
-      const pointerX =
-        (event.clientX - rect.left) * scaleX;
+      const pointerX = (event.clientX - rect.left) * scaleX;
 
-      const pointerY =
-        (event.clientY - rect.top) * scaleY;
+      const pointerY = (event.clientY - rect.top) * scaleY;
 
-      let newX =
-        pointerX - dragOffsetX;
+      let newX = pointerX - dragOffsetX;
 
-      let newY =
-        pointerY - dragOffsetY;
+      let newY = pointerY - dragOffsetY;
 
       const margin = AVATAR_RADIUS;
 
-      // Keep avatar inside the plaza.
-      newX = Math.max(
-        margin,
-        Math.min(
-          app.screen.width - margin,
-          newX
-        )
-      );
+      // Lock avatar movement to screen
+      newX = Math.max(margin, Math.min(app.screen.width - margin, newX));
 
-      newY = Math.max(
-        margin,
-        Math.min(
-          app.screen.height - margin,
-          newY
-        )
-      );
+      newY = Math.max(margin, Math.min(app.screen.height - margin, newY));
 
-      // Direct movement while dragging.
+      // Avatar follows mouse when dragging
       draggedAvatar.x = newX;
       draggedAvatar.y = newY;
     };
 
-
-    // POINTER UP
-    const handleWindowPointerUp = (
-      event: PointerEvent
-    ) => {
+    // On pointer up, cancel drag state
+    const handleWindowPointerUp = (event: PointerEvent) => {
       if (!draggedAvatar) return;
 
-      if (
-        dragPointerId !== null &&
-        event.pointerId !== dragPointerId
-      ) {
+      if (dragPointerId !== null && event.pointerId !== dragPointerId) {
         return;
       }
 
       const avatar = draggedAvatar;
       const avatarData = draggedAvatarData;
 
-  
-      // CLICK
+      // On click, navigate to profile
       if (!hasMoved && avatarData) {
         avatar.isDragging = false;
 
@@ -361,27 +313,23 @@ export default function Plaza({ avatars }: PlazaProps) {
 
         if (document.startViewTransition) {
           document.startViewTransition(() => {
-            router.push(
-              `/profile/${avatarData.id}`
-            );
+            router.push(`/profile/${avatarData.id}`);
           });
         } else {
-          router.push(
-            `/profile/${avatarData.id}`
-          );
+          router.push(`/profile/${avatarData.id}`);
         }
       }
 
-  
-      // DRAG RELEASE
+      // Drag release logic
       else {
-        // Keep avatar where it was dropped.
+        // Drop avatar where released
         avatar.targetX = avatar.x;
         avatar.targetY = avatar.y;
 
         avatar.isDragging = false;
 
         avatar.speechBubble.visible = false;
+        avatar.shadow.visible = true;
 
         avatar.hoverIcon.visible = false;
       }
@@ -400,23 +348,18 @@ export default function Plaza({ avatars }: PlazaProps) {
       document.body.style.cursor = "";
     };
 
-
-    // POINTER CANCEL
-    const handleWindowPointerCancel = (
-      event: PointerEvent
-    ) => {
+    // Pointer cancel logic
+    const handleWindowPointerCancel = (event: PointerEvent) => {
       if (!draggedAvatar) return;
 
-      if (
-        dragPointerId !== null &&
-        event.pointerId !== dragPointerId
-      ) {
+      if (dragPointerId !== null && event.pointerId !== dragPointerId) {
         return;
       }
 
       draggedAvatar.isDragging = false;
 
       draggedAvatar.speechBubble.visible = false;
+      draggedAvatar.shadow.visible = true;
       draggedAvatar.hoverIcon.visible = false;
 
       draggedAvatar = null;
@@ -433,26 +376,15 @@ export default function Plaza({ avatars }: PlazaProps) {
       document.body.style.cursor = "";
     };
 
-    window.addEventListener(
-      "pointermove",
-      handleWindowPointerMove,
-      {
-        passive: false,
-      }
-    );
+    window.addEventListener("pointermove", handleWindowPointerMove, {
+      passive: false,
+    });
 
-    window.addEventListener(
-      "pointerup",
-      handleWindowPointerUp
-    );
+    window.addEventListener("pointerup", handleWindowPointerUp);
 
-    window.addEventListener(
-      "pointercancel",
-      handleWindowPointerCancel
-    );
+    window.addEventListener("pointercancel", handleWindowPointerCancel);
 
-
-    // PIXI SETUP
+    // Setup PixiJS
     async function setup() {
       await app.init({
         width: container.clientWidth,
@@ -474,13 +406,10 @@ export default function Plaza({ avatars }: PlazaProps) {
 
       container.appendChild(app.canvas);
 
-      // Prevent native browser dragging.
-      app.canvas.addEventListener(
-        "dragstart",
-        (event) => {
-          event.preventDefault();
-        }
-      );
+      // Prevent native browser dragging
+      app.canvas.addEventListener("dragstart", (event) => {
+        event.preventDefault();
+      });
 
       app.canvas.style.userSelect = "none";
       app.canvas.style.webkitUserSelect = "none";
@@ -488,190 +417,127 @@ export default function Plaza({ avatars }: PlazaProps) {
 
       const margin = AVATAR_RADIUS;
 
-  
-      // CREATE AVATARS
+      // Draw avatars
       for (const avatarData of avatars) {
-        const avatar =
-          createAvatar(avatarData);
+        const avatar = createAvatar(avatarData);
 
-        avatar.x =
-          margin +
-          Math.random() *
-            (app.screen.width - margin * 2);
+        avatar.x = margin + Math.random() * (app.screen.width - margin * 2);
 
-        avatar.y =
-          margin +
-          Math.random() *
-            (app.screen.height - margin * 2);
+        avatar.y = margin + Math.random() * (app.screen.height - margin * 2);
 
         avatar.targetX =
-          margin +
-          Math.random() *
-            (app.screen.width - margin * 2);
+          margin + Math.random() * (app.screen.width - margin * 2);
 
         avatar.targetY =
-          margin +
-          Math.random() *
-            (app.screen.height - margin * 2);
+          margin + Math.random() * (app.screen.height - margin * 2);
 
         avatar.eventMode = "static";
         avatar.cursor = "pointer";
 
-    
-        // POINTER DOWN
-        avatar.on(
-          "pointerdown",
-          (event) => {
-            if (draggedAvatar) return;
+        // Pointer down logic
+        avatar.on("pointerdown", (event) => {
+          if (draggedAvatar) return;
 
-            event.stopPropagation();
+          event.stopPropagation();
 
-            draggedAvatar = avatar;
-            draggedAvatarData = avatarData;
+          draggedAvatar = avatar;
+          draggedAvatarData = avatarData;
 
-            dragPointerId =
-              event.pointerId;
+          dragPointerId = event.pointerId;
 
-            startPointerX =
-              event.global.x;
+          startPointerX = event.global.x;
 
-            startPointerY =
-              event.global.y;
+          startPointerY = event.global.y;
 
-            hasMoved = false;
+          hasMoved = false;
 
-            const localPos =
-              event.getLocalPosition(
-                app.stage
-              );
+          const localPos = event.getLocalPosition(app.stage);
 
-            dragOffsetX =
-              localPos.x - avatar.x;
+          dragOffsetX = localPos.x - avatar.x;
 
-            dragOffsetY =
-              localPos.y - avatar.y;
+          dragOffsetY = localPos.y - avatar.y;
 
-            avatar.targetX = avatar.x;
-            avatar.targetY = avatar.y;
+          avatar.targetX = avatar.x;
+          avatar.targetY = avatar.y;
 
-            // Always start with both hidden.
-            avatar.speechBubble.visible = false;
-            avatar.hoverIcon.visible = false;
+          // Always start with both hidden.
+          avatar.speechBubble.visible = false;
+          avatar.hoverIcon.visible = false;
 
-            document.body.style.userSelect =
-              "none";
+          document.body.style.userSelect = "none";
 
-            document.body.style.cursor =
-              "default";
+          document.body.style.cursor = "default";
 
-            event.preventDefault?.();
-          }
-        );
+          event.preventDefault?.();
+        });
 
         app.stage.addChild(avatar);
 
         activeAvatars.push(avatar);
       }
 
-  
-      // ANIMATION
+      // Animate random walk
       app.ticker.add((ticker) => {
         if (destroyed) return;
 
         for (const avatar of activeAvatars) {
-
           if (avatar.isDragging) continue;
 
           avatar.x +=
-            (avatar.targetX - avatar.x) *
-            AVATAR_SPEED *
-            ticker.deltaTime;
+            (avatar.targetX - avatar.x) * AVATAR_SPEED * ticker.deltaTime;
 
           avatar.y +=
-            (avatar.targetY - avatar.y) *
-            AVATAR_SPEED *
-            ticker.deltaTime;
+            (avatar.targetY - avatar.y) * AVATAR_SPEED * ticker.deltaTime;
 
           const distance = Math.hypot(
             avatar.targetX - avatar.x,
-            avatar.targetY - avatar.y
+            avatar.targetY - avatar.y,
           );
 
-          // Pick a new random destination.
+          // Pick a new random destination
           if (distance < 5) {
             avatar.targetX =
-              margin +
-              Math.random() *
-                (app.screen.width - margin * 2);
+              margin + Math.random() * (app.screen.width - margin * 2);
 
             avatar.targetY =
-              margin +
-              Math.random() *
-                (app.screen.height - margin * 2);
+              margin + Math.random() * (app.screen.height - margin * 2);
           }
         }
 
-    
-        // COLLISION
-        const minDistance =
-          AVATAR_RADIUS * 2;
+        // Collision logic
+        const minDistance = AVATAR_RADIUS * 2;
 
-        for (
-          let i = 0;
-          i < activeAvatars.length;
-          i++
-        ) {
-          for (
-            let j = i + 1;
-            j < activeAvatars.length;
-            j++
-          ) {
+        for (let i = 0; i < activeAvatars.length; i++) {
+          for (let j = i + 1; j < activeAvatars.length; j++) {
             const a = activeAvatars[i];
             const b = activeAvatars[j];
 
             const dx = b.x - a.x;
             const dy = b.y - a.y;
 
-            const distance =
-              Math.hypot(dx, dy);
+            const distance = Math.hypot(dx, dy);
 
             if (distance < minDistance) {
               const angle =
                 distance === 0
-                  ? Math.random() *
-                    Math.PI *
-                    2
-                  : Math.atan2(
-                      dy,
-                      dx
-                    );
+                  ? Math.random() * Math.PI * 2
+                  : Math.atan2(dy, dx);
 
-              const overlap =
-                minDistance - distance;
+              const overlap = minDistance - distance;
 
-              const separationX =
-                Math.cos(angle) *
-                (overlap / 2);
+              const separationX = Math.cos(angle) * (overlap / 2);
 
-              const separationY =
-                Math.sin(angle) *
-                (overlap / 2);
+              const separationY = Math.sin(angle) * (overlap / 2);
 
               if (!a.isDragging) {
                 a.x -= separationX;
                 a.y -= separationY;
 
                 a.targetX =
-                  margin +
-                  Math.random() *
-                    (app.screen.width -
-                      margin * 2);
+                  margin + Math.random() * (app.screen.width - margin * 2);
 
                 a.targetY =
-                  margin +
-                  Math.random() *
-                    (app.screen.height -
-                      margin * 2);
+                  margin + Math.random() * (app.screen.height - margin * 2);
               }
 
               if (!b.isDragging) {
@@ -679,54 +545,32 @@ export default function Plaza({ avatars }: PlazaProps) {
                 b.y += separationY;
 
                 b.targetX =
-                  margin +
-                  Math.random() *
-                    (app.screen.width -
-                      margin * 2);
+                  margin + Math.random() * (app.screen.width - margin * 2);
 
                 b.targetY =
-                  margin +
-                  Math.random() *
-                    (app.screen.height -
-                      margin * 2);
+                  margin + Math.random() * (app.screen.height - margin * 2);
               }
             }
           }
         }
       });
 
-      window.addEventListener(
-        "resize",
-        resize
-      );
+      window.addEventListener("resize", resize);
     }
 
     setup();
 
-
-    // CLEANUP
+    // Cleanup
     return () => {
       destroyed = true;
 
-      window.removeEventListener(
-        "resize",
-        resize
-      );
+      window.removeEventListener("resize", resize);
 
-      window.removeEventListener(
-        "pointermove",
-        handleWindowPointerMove
-      );
+      window.removeEventListener("pointermove", handleWindowPointerMove);
 
-      window.removeEventListener(
-        "pointerup",
-        handleWindowPointerUp
-      );
+      window.removeEventListener("pointerup", handleWindowPointerUp);
 
-      window.removeEventListener(
-        "pointercancel",
-        handleWindowPointerCancel
-      );
+      window.removeEventListener("pointercancel", handleWindowPointerCancel);
 
       document.body.style.userSelect = "";
       document.body.style.cursor = "";
@@ -740,10 +584,5 @@ export default function Plaza({ avatars }: PlazaProps) {
     };
   }, [avatars, router]);
 
-  return (
-    <div
-      ref={containerRef}
-      className="h-screen w-full overflow-hidden"
-    />
-  );
+  return <div ref={containerRef} className="h-screen w-full overflow-hidden" />;
 }

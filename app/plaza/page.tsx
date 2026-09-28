@@ -5,7 +5,7 @@ import Navigation from "@/components/Navigation"
 export default async function PlazaPage() {
   const users = await getUsers();
 
-  const avatars = users.map((user) => ({
+  const avatars = (users ?? []).map((user) => ({
     id: user.id,
     displayName: user.display_name,
     colour: user.colour,

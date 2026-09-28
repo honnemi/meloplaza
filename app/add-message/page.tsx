@@ -23,6 +23,8 @@ export default function AddMessage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row">
+
+      {/* Show choices from previous pages */}
       <ProfilePreview />
 
       <Window
@@ -44,6 +46,7 @@ export default function AddMessage() {
           Relate back to the prompt. Why this song in particular?
         </p>
 
+        {/* Text input */}
         <textarea
           className="w-full rounded-sm p-4 text-black focus:outline-none border-2 border-gray-500 border-t-gray-600 border-l-gray-600 border-b-gray-300 border-r-gray-300 transition-all duration-150 focus:border-blue-500"
           rows={8}
@@ -53,6 +56,7 @@ export default function AddMessage() {
           maxLength={characterLimit}
         />
 
+        {/* Character limit */}
         <div className="flex flex-row justify-end mt-2">
           <span
             className={`text-sm transition-all duration-150 ${

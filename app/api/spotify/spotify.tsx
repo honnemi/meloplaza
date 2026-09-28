@@ -8,7 +8,7 @@ export async function getAccessToken(): Promise<string> {
 
   if (!clientId || !clientSecret) {
     throw new Error(
-      "Missing SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET in environment variables."
+      "Missing SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET in environment variables.",
     );
   }
 
@@ -22,7 +22,7 @@ export async function getAccessToken(): Promise<string> {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
       Authorization: `Basic ${Buffer.from(
-        `${clientId}:${clientSecret}`
+        `${clientId}:${clientSecret}`,
       ).toString("base64")}`,
     },
     body: "grant_type=client_credentials",
@@ -55,7 +55,7 @@ export async function getAccessToken(): Promise<string> {
   // Spotify returns expires_in in seconds
   tokenExpiresAt = Date.now() + data.expires_in * 1000;
 
-  return cachedToken;
+  return data.access_token;
 }
 
 // Fetch tracks from Spotify
@@ -72,7 +72,7 @@ export default async function getSpotifyTracks(query: string) {
 
   const res = await fetch(
     `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-      query
+      query,
     )}&type=track&limit=10`,
     {
       headers: {
@@ -83,7 +83,7 @@ export default async function getSpotifyTracks(query: string) {
       next: {
         revalidate: 3600,
       },
-    }
+    },
   );
 
   if (!res.ok) {
@@ -97,7 +97,7 @@ export default async function getSpotifyTracks(query: string) {
     });
 
     throw new Error(
-      `Failed to fetch from Spotify (${res.status} ${res.statusText})`
+      `Failed to fetch from Spotify (${res.status} ${res.statusText})`,
     );
   }
 

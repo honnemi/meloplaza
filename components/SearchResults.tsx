@@ -15,10 +15,9 @@ export default function SearchResults({
 }: SearchResultsProps) {
   return (
     <div className="w-full mt-4">
-      {/* Align both blocks vertically in the center */}
       <div className="flex flex-col w-full gap-4 items-center justify-center">
 
-        {/* Results Block */}
+        {/* Results block */}
         <div className="w-full flex flex-col justify-center">
           <h2 className="text-lg font-semibold text-gray-800 mb-2">
             Search Results
@@ -69,7 +68,7 @@ export default function SearchResults({
           </ul>
         </div>
 
-        {/* Player Block - only appears after selecting a song */}
+        {/* Player block - only appears after selecting a song */}
         {selectedTrack && (
           <div className="w-full flex flex-col items-start justify-center">
             <h2 className="text-lg font-semibold text-gray-800 mb-2">

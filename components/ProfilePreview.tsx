@@ -33,7 +33,7 @@ export default function ProfilePreview() {
         <div className="w-full min-w-0 flex-1">
           <div className="space-y-2 text-gray-700">
 
-            {/* Selected Prompt */}
+            {/* Selected prompt */}
             <div className="border-2 border-gray-300 p-2 rounded-sm bg-gray-50">
               <h2 className="font-semibold text-[9px] text-gray-500 uppercase tracking-wide mb-0.5">
                 Prompt
@@ -50,7 +50,7 @@ export default function ProfilePreview() {
               )}
             </div>
 
-            {/* Chosen Song */}
+            {/* Chosen song */}
             <div className="border-2 border-gray-300 p-2 rounded-sm bg-gray-50">
               <h2 className="font-semibold text-[9px] text-gray-500 uppercase tracking-wide mb-1">
                 Song
@@ -96,7 +96,7 @@ export default function ProfilePreview() {
               )}
             </div>
 
-            {/* Personal Message */}
+            {/* Personal message */}
             <div className="border-2 border-gray-300 p-2 rounded-sm bg-gray-50">
               <h2 className="font-semibold text-[9px] text-gray-500 uppercase tracking-wide mb-0.5">
                 Message

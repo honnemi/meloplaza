@@ -5,7 +5,6 @@ import ProfilePreview from "@/components/ProfilePreview";
 import Button from "@/components/Button";
 import { useState } from "react";
 import { useFormStore } from "@/app/context/FormContext";
-import Avatar from "@/components/Avatar";
 
 const PROMPTS = [
   "🫣 A song I'm embarrassed to admit I love",
@@ -23,7 +22,7 @@ const PROMPTS = [
 export default function PromptSelection() {
   const { formData, updateForm } = useFormStore();
 
-  // Restore previously saved index if user navigates back
+  // Restore previously saved prompt if user navigates back 
   const initialIndex = formData.prompt
     ? PROMPTS.indexOf(formData.prompt)
     : null;
@@ -32,18 +31,12 @@ export default function PromptSelection() {
     initialIndex !== -1 ? initialIndex : null
   );
 
-  const handleNext = () => {
-    if (selectedIndex !== null) {
-      updateForm({ prompt: PROMPTS[selectedIndex] });
-    }
-  };
-
   const selectedPromptText =
     selectedIndex !== null ? PROMPTS[selectedIndex] : null;
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row">
-      {/* Show information from previous screens */}
+      {/* Show choices from previous pages */}
       <ProfilePreview />
 
       <Window

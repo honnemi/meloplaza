@@ -8,7 +8,7 @@ import { headers } from "next/headers";
 export async function getCurrentUserId() {
   const supabase = await createClient();
 
-  // Always use getUser() on the server for security
+  // Get current "signed-in" user for session
   const {
     data: { user },
     error,
@@ -19,7 +19,7 @@ export async function getCurrentUserId() {
     return null;
   }
 
-  // This is the unique string ID (UUID) for the anonymous or authenticated user
+  // Get user ID
   const userId = user.id;
   return userId;
 }
@@ -31,7 +31,7 @@ export async function createUser(
 ) {
   const supabase = await createClient();
 
-  // 1. Sign the user in anonymously
+  // Anonymous sign in
   const { data: authData, error: authError } =
     await supabase.auth.signInAnonymously();
 
@@ -40,10 +40,10 @@ export async function createUser(
     return { error: `Authentication failed: ${authError.message}` };
   }
 
-  // 2. Safely capture the newly created User ID
+  // Capture new user ID
   const userId = authData.user?.id;
 
-  // 3. Insert the profile data, embedding the user_id into the record
+  // Add user data to DB
   const { error: dbError } = await supabase.from("Recommendations").insert({
     user_id: userId,
     colour: colour,
@@ -244,7 +244,6 @@ export async function isInCollection(recommendationId: string) {
 
 export async function getUserCollection() {
   const supabase = await createClient();
-
   const userId = await getCurrentUserId();
 
   if (!userId) {
@@ -276,5 +275,16 @@ export async function getUserCollection() {
     return [];
   }
 
-  return data;
+  const formattedData = data.map((item) => {
+    const rawRecommendations = item.Recommendations;
+    
+    return {
+      ...item,
+      Recommendations: Array.isArray(rawRecommendations)
+        ? rawRecommendations[0]
+        : rawRecommendations,
+    };
+  });
+
+  return formattedData;
 }
