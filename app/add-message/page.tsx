@@ -12,7 +12,7 @@ export default function AddMessage() {
   function playTypeSound() {
     if (typeof window !== "undefined") {
       const typeAudio = new Audio("/assets/type.mp3");
-      typeAudio.volume = 0.5;
+      typeAudio.volume = 0.3;
       typeAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
     }
   }

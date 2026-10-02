@@ -71,8 +71,6 @@ export default async function PrintCollection() {
         <div className="flex flex-row w-full text-xs font-bold">
           <div className="flex-1 text-left">ITEM</div>
 
-          <div className="w-[15%] text-right">QTY</div>
-
           <div className="w-[25%] text-right">DURATION</div>
         </div>
 
@@ -87,24 +85,17 @@ export default async function PrintCollection() {
             return (
               <li
                 key={song.id}
-                className="flex flex-row justify-between items-start w-full"
+                className="flex flex-row justify-between items-start"
               >
                 {/* Song information */}
-                <div className="flex flex-col flex-1 justify-start text-left text-sm">
-                  <p className="font-medium">{song.song_name}</p>
+                <div className="flex flex-col flex-1 justify-start text-left text-sm w-[75%]">
+                  <p className="text-md font-bold tracking-wide leading-wide">{song.song_name} · {song.song_artist}</p>
 
-                  <p className="text-xs">{song.song_artist}</p>
-
-                  <p className="text-xs">
+                  <p className="text-xs tracking-wide leading-wide mb-2">
                     Recommended by @{item.user?.display_name}
                   </p>
 
-                  <p className="text-xs">"{song.message}"</p>
-                </div>
-
-                {/* Quantity */}
-                <div className="w-[15%] text-right text-sm">
-                  <p>1</p>
+                  <p className="text-xs tracking-wide leading-wide">"{song.message}"</p>
                 </div>
 
                 {/* Duration */}

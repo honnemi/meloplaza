@@ -38,9 +38,9 @@ export default function AvatarCreation() {
   // Play sound on type
   function playTypeSound() {
     if (typeof window !== "undefined") {
-      const clickAudio = new Audio("/assets/type.mp3");
-      clickAudio.volume = 0.5;
-      clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+      const typeAudio = new Audio("/assets/type.mp3");
+      typeAudio.volume = 0.2;
+      typeAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
     }
   }
 

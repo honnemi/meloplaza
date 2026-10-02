@@ -9,7 +9,7 @@ export default function Home() {
       <main className="flex flex-col items-center justify-center w-full">
         <img src="/assets/logo.svg" />
         <TextType 
-          text={["meloplaza", "(the cool way to discover music)"]}
+          text={["meloplaza"]}
           typingSpeed={100}
           pauseDuration={5000}
           showCursor

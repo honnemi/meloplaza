@@ -1,7 +1,7 @@
 "use client";
 
 import Window from "@/components/Window";
-import Button from "@/components/Button";
+import Button, { SecondaryButton } from "@/components/Button";
 import CD from "@/components/CD";
 import Avatar from "@/components/Avatar";
 import Popup from "@/components/PopupWindow";
@@ -81,7 +81,9 @@ export default function Collection({ collection }: CollectionProps) {
         footer={
           <div className="flex justify-between w-full">
             <Button label="Back" href="/plaza" />
+            <SecondaryButton label="Print" href="/collection/print" icon={<i className="hn hn-print-solid"></i>} />
           </div>
+          
         }
       >
         {collection.length === 0 ? (
