@@ -72,7 +72,7 @@ export default function SongSelection({ tracks, query }: SongSelectionProps) {
   function playTypeSound() {
     if (typeof window !== "undefined") {
       const typeAudio = new Audio("/assets/type.mp3");
-      typeAudio.volume = 0.3;
+      typeAudio.volume = 0.2;
       typeAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
     }
   }

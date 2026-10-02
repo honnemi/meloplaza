@@ -17,7 +17,7 @@ export default function Window({
 }: WindowProps) {
   return (
     <div
-      className={`relative z-10 flex flex-col w-[60%] h-150 overflow-hidden rounded-md
+      className={`relative z-10 flex flex-col md:w-[60%] md:h-150 sm:w-full sm:h-full overflow-hidden rounded-md
         border-2 border-win-border-dark
         shadow-[3px_3px_0px_rgba(0,90,100,0.3)]
         ${className}`}

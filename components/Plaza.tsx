@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Application, Container, Graphics, Text } from "pixi.js";
 import { AVATAR_FACES } from "@/app/avatar-customisation";
 import { useRouter } from "next/navigation";
+import Popup from "@/components/PopupWindow";
 
 interface PlazaAvatar {
   id: string;
@@ -39,11 +40,6 @@ const DRAG_MESSAGES = [
   "unhand me",
   "let me go!",
 ];
-
-const ALIEN_NOISES = [
-  "/assets/alien01.mp3",
-  "/assets/alien02.mp3",
-]
 
 function createAvatar(data: PlazaAvatar): AnimatedContainer {
   const avatar = new Container() as AnimatedContainer;
@@ -206,14 +202,14 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
 export default function Plaza({ avatars }: PlazaProps) {
   // Play sound on click
-  function playClickSound() {
+  function playClickSound(file : string) {
     if (typeof window !== "undefined") {
-      const clickAudio = new Audio("/assets/alien01.mp3");
-      clickAudio.volume = 0.5;
+      const clickAudio = new Audio(file);
+      clickAudio.volume = 0.2;
       clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
     }
   }
-  
+
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -451,7 +447,7 @@ export default function Plaza({ avatars }: PlazaProps) {
         // Pointer down logic
         avatar.on("pointerdown", (event) => {
 
-          playClickSound();
+          playClickSound("/assets/alien01.mp3");
 
           if (draggedAvatar) return;
 
@@ -601,5 +597,58 @@ export default function Plaza({ avatars }: PlazaProps) {
     };
   }, [avatars, router]);
 
-  return <div ref={containerRef} className="h-screen w-full overflow-hidden" />;
+  const collectionButton = document.querySelector('#collection-button');
+  const folderIcon = document.querySelector('#folder');
+  if (collectionButton && folderIcon) {
+    collectionButton.addEventListener('mouseenter', () => {
+      folderIcon.setAttribute('src', '/assets/folder-open.png');
+    });
+
+    collectionButton.addEventListener('mouseleave', () => {
+      folderIcon.setAttribute('src', '/assets/folder-closed.png');
+    });
+  }
+
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  useEffect(() => {
+      const hasSeenPopup = localStorage.getItem("meloplaza-welcome-seen");
+
+      if (!hasSeenPopup) {
+        setIsPopupOpen(true);
+      }
+    }, []);
+
+  const closePopup = () => {
+      setIsPopupOpen(false);
+      localStorage.setItem("meloplaza-welcome-seen", "true");
+      playClickSound("/assets/click.mp3");
+    };
+
+  return (
+    <>
+      <div ref={containerRef} className="h-screen w-full overflow-hidden">
+        <div id="welcome-popup">
+        <Popup title="Welcome!" isOpen={isPopupOpen} onClose={closePopup}>
+          <div className="flex flex-col gap-4 text-center">
+            <p className="text-lg font-bold">About</p>
+            <p className="text-sm"><b>meloplaza</b> is a music recommendation platform which allows you to introduce songs to strangers in a meaningful way.</p>
+            <p className="text-sm mb-2">By exploring recommendations at your own pace instead of relying on heavily-algorithmed streaming services, you might discover new music you would never have heard otherwise!</p>
+            <p className="font-bold">How to Play:</p>
+            <ul className="list-disc list-inside text-left text-sm mb-2">
+              <li>Try dragging and clicking on avatars to interact with them.</li>
+              <li>Add songs you like to your collection.</li>
+              <li>Print your collection to take home as a memento.</li>
+            </ul>
+            <p className="text-lg font-bold text-center">That's all, have fun!</p>
+            <p className="text-lg font-bold text-center">ヽ(・∀・)ﾉ</p>
+          </div>
+        </Popup>
+        </div>
+        <div id="collection-button" className="flex flex-col items-center justify-center fixed bottom-8 right-8 hover:cursor-pointer" onClick={() => { router.push("/collection"); playClickSound("/assets/click.mp3"); }}> 
+          <img id="folder" className="w-30 h-30" src="/assets/folder-closed.png" />
+          <h1 className="font-bold text-lg -mt-4">Go to Collection</h1>
+        </div>
+      </div>
+    </>
+  );
 }

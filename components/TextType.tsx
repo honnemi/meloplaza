@@ -105,6 +105,15 @@ const TextType = ({
     const currentText = textArray[currentTextIndex];
     const processedText = reverseMode ? currentText.split('').reverse().join('') : currentText;
 
+    // Play sound on type
+    function playTypeSound() {
+      if (typeof window !== "undefined") {
+        const typeAudio = new Audio("/assets/type.mp3");
+        typeAudio.volume = 0.2;
+        typeAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+      }
+    }
+
     const executeTypingAnimation = () => {
       if (isDeleting) {
         if (displayedText === '') {
@@ -123,6 +132,7 @@ const TextType = ({
         } else {
           timeout = setTimeout(() => {
             setDisplayedText(prev => prev.slice(0, -1));
+            playTypeSound();
           }, deletingSpeed);
         }
       } else {
@@ -131,6 +141,7 @@ const TextType = ({
             () => {
               setDisplayedText(prev => prev + processedText[currentCharIndex]);
               setCurrentCharIndex(prev => prev + 1);
+              playTypeSound();
             },
             variableSpeed ? getRandomSpeed() : typingSpeed
           );
