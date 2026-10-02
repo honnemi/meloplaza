@@ -36,7 +36,7 @@ export default function AvatarCreation() {
   };
 
   // Enforce character limit for display name
-  const characterLimit = 30;
+  const characterLimit = 20;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
@@ -62,7 +62,7 @@ export default function AvatarCreation() {
           <div className="flex flex-col flex-1 w-full gap-4">
             {/* Display name */}
             <div className="w-full">
-              <h3 className="text-sm font-bold text-gray-800 mb-2">
+              <h3 className="text-sm font-bold text-gray-600 mb-2">
                 Display Name
               </h3>
 
@@ -79,7 +79,7 @@ export default function AvatarCreation() {
                 <span
                   className={`text-sm transition-all duration-150 ${
                     displayName.length >= characterLimit
-                      ? "text-red-500"
+                      ? "text-[#FF2D55]"
                       : "text-gray-600"
                   }`}
                 >
@@ -90,7 +90,7 @@ export default function AvatarCreation() {
 
             {/* Colours */}
             <div>
-              <h3 className="text-sm font-bold text-gray-800 mb-2">
+              <h3 className="text-sm font-bold text-gray-600 mb-2">
                 Colour Select
               </h3>
 
@@ -107,8 +107,8 @@ export default function AvatarCreation() {
           {/* Right side */}
           <div className="flex flex-col flex-1 w-full items-center justify-center gap-4">
             {/* Avatar preview */}
-            <div className="bg-white flex flex-col w-60 h-60 items-center justify-center border-2 border-win-border-alt p-5 sm:p-6 rounded-sm gap-3">
-              <span className="text-sm font-bold text-gray-800 text-center max-w-45 min-h-10 leading-5 wrap-break-word">
+            <div className="bg-white flex flex-col w-60 h-60 items-center justify-center border-2 border-win-border-alt p-5 sm:p-6 rounded-sm">
+              <span className="text-sm font-bold text-center max-w-45 min-h-10 leading-5 wrap-break-word text-gray-800">
                 {displayName || "Anonymous"}
               </span>
 

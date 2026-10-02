@@ -13,7 +13,7 @@ export type FormState = {
   songName: string;
   songArtist: string;
   songAlbum: string;
-  songAlbumCover: string,
+  songAlbumCover: string;
   songYear: string;
   songId: string;
   songDuration: number;

@@ -1,6 +1,7 @@
 "use client";
 
 import MusicPlayer from "@/components/MusicPlayer";
+import { useRef, useEffect } from "react";
 
 interface SearchResultsProps {
   tracks: any[];
@@ -13,17 +14,29 @@ export default function SearchResults({
   selectedTrack,
   onSelectTrack,
 }: SearchResultsProps) {
+  const playerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!selectedTrack) return;
+
+    const timer = setTimeout(() => {
+      playerRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [selectedTrack]);
+
   return (
     <div className="w-full mt-4 flex flex-col gap-4 items-center justify-center">
       {/* Results */}
       <div className="w-full flex flex-col justify-center">
-        <h2 className="text-lg font-semibold text-gray-700 mb-2">
+        <h2 className="text-lg font-semibold text-gray-600 mb-2">
           Search Results
         </h2>
 
         <ul className="w-full h-64 overflow-y-auto border-2 border-t-win-border-dark border-l-win-border-dark border-b-win-border-alt border-r-win-border-alt rounded-sm bg-white">
           {tracks.length === 0 ? (
-            <li className="p-3 text-sm italic text-gray-600 text-center">
+            <li className="p-3 text-sm italic text-gray-400 text-center">
               Search above to see tracks.
             </li>
           ) : (
@@ -36,10 +49,10 @@ export default function SearchResults({
                     type="button"
                     onClick={() => onSelectTrack(track)}
                     aria-pressed={isSelected}
-                    className={`w-full py-2 px-2 flex items-center gap-4 text-left text-gray-900 cursor-pointer transition-colors duration-100
+                    className={`w-full py-2 px-2 flex items-center gap-4 text-left cursor-pointer transition-colors duration-100
                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0097a7] ${
                         isSelected
-                          ? "bg-[#7ee3ea] text-gray-950 shadow-[inset_3px_0_0_#0097a7,inset_0_1px_0_rgba(255,255,255,0.7),inset_0_-1px_0_rgba(0,90,100,0.25)]"
+                          ? "bg-[#7ee3ea] shadow-[inset_3px_0_0_#0097a7,inset_0_1px_0_rgba(255,255,255,0.7),inset_0_-1px_0_rgba(0,90,100,0.25)]"
                           : `${index % 2 === 0 ? "bg-win" : "bg-white"} hover:bg-[#c9edf2] active:bg-[#b3e6ee]`
                       }`}
                   >
@@ -69,8 +82,11 @@ export default function SearchResults({
 
       {/* Player, only after a song is selected */}
       {selectedTrack && (
-        <div className="w-full flex flex-col items-start justify-center">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">
+        <div
+          ref={playerRef}
+          className="w-full flex flex-col items-start justify-center"
+        >
+          <h2 className="text-lg font-semibold text-gray-600 mb-2">
             Selected Song
           </h2>
 

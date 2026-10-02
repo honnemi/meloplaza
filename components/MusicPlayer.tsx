@@ -92,7 +92,7 @@ export default function MusicPlayer({
           }}
         >
           <p
-            className="text-[8px] sm:text-[9px] tracking-[0.18em] uppercase font-bold"
+            className="text-[8px] sm:text-[9px] uppercase font-bold"
             style={{
               color: "#7ee3ea",
               textShadow: "0 0 4px rgba(0,195,208,0.6)",

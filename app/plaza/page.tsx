@@ -1,6 +1,6 @@
 import Plaza from "@/components/Plaza";
 import { getUsers } from "@/lib/supabase/server";
-import Navigation from "@/components/Navigation"
+import Navigation from "@/components/Navigation";
 
 export default async function PlazaPage() {
   const users = await getUsers();
@@ -16,7 +16,6 @@ export default async function PlazaPage() {
     <>
       <Navigation />
       <Plaza avatars={avatars} />
-      
     </>
   );
 }

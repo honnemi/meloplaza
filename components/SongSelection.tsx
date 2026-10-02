@@ -12,10 +12,7 @@ interface SongSelectionProps {
   query?: string;
 }
 
-export default function SongSelection({
-  tracks,
-  query,
-}: SongSelectionProps) {
+export default function SongSelection({ tracks, query }: SongSelectionProps) {
   const { formData, updateForm } = useFormStore();
 
   const [selectedTrack, setSelectedTrack] = useState<any>(null);
@@ -26,7 +23,7 @@ export default function SongSelection({
       setSelectedTrack({
         id: formData.songId,
         name: formData.songName,
-        duration_ms: formData.songDuration, 
+        duration_ms: formData.songDuration,
         artists: [
           {
             name: formData.songArtist,
@@ -48,9 +45,7 @@ export default function SongSelection({
     setSelectedTrack(track);
 
     const albumCoverUrl =
-      track.album?.images?.[0]?.url ||
-      track.albumCover ||
-      "";
+      track.album?.images?.[0]?.url || track.albumCover || "";
 
     updateForm({
       songId: track.id,
@@ -59,7 +54,7 @@ export default function SongSelection({
       songAlbum: track.album?.name || "",
       songYear: track.album?.release_date?.slice(0, 4) || "",
       songAlbumCover: albumCoverUrl,
-      songDuration: track.duration_ms || 0 
+      songDuration: track.duration_ms || 0,
     });
   };
 
@@ -70,12 +65,7 @@ export default function SongSelection({
         <div className="flex justify-between items-center w-full">
           <Button label="Back" href="/select-prompt" />
 
-          {selectedTrack && (
-            <Button
-              label="Next"
-              href="/add-message"
-            />
-          )}
+          {selectedTrack && <Button label="Next" href="/add-message" />}
         </div>
       }
     >
@@ -112,4 +102,3 @@ export default function SongSelection({
     </Window>
   );
 }
-

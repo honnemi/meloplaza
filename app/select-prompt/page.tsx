@@ -40,7 +40,7 @@ export default function PromptSelection() {
       <ProfilePreview />
 
       <Window
-        title="Which prompt catches your eye?"
+        title="Select a prompt"
         footer={
           <div className="flex justify-between w-full">
             <Button label="Back" href="/create-avatar" />
@@ -60,10 +60,10 @@ export default function PromptSelection() {
                 setSelectedIndex(index);
                 updateForm({ prompt: promptText });
               }}
-              className={`w-full text-left text-base p-2 text-gray-900 cursor-pointer transition-colors duration-100
+              className={`w-full text-left text-base p-2 cursor-pointer transition-colors duration-100
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0097a7] ${
           selectedIndex === index
-            ? "bg-[#7ee3ea] font-medium text-gray-950 shadow-[inset_3px_0_0_#0097a7,inset_0_1px_0_rgba(255,255,255,0.7),inset_0_-1px_0_rgba(0,90,100,0.25)]"
+            ? "bg-[#7ee3ea] font-medium shadow-[inset_3px_0_0_#0097a7,inset_0_1px_0_rgba(255,255,255,0.7),inset_0_-1px_0_rgba(0,90,100,0.25)]"
             : `${index % 2 === 0 ? "bg-win" : "bg-white"} hover:bg-[#c9edf2] active:bg-[#b3e6ee]`
         }`}
             >
@@ -73,11 +73,11 @@ export default function PromptSelection() {
         </div>
         {selectedPromptText !== null && (
           <div className="flex flex-col items-center justify-center h-25">
-            <h1 className="text-lg font-bold mt-4 mb-2 text-center text-gray-700">
+            <h1 className="text-lg font-bold mt-4 mb-2 text-center text-gray-600">
               Selected Prompt
             </h1>
 
-            <p className="text-base italic text-center text-gray-900 min-h-6">
+            <p className="text-base italic text-center min-h-6">
               "{selectedPromptText}"
             </p>
           </div>

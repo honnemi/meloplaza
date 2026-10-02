@@ -24,22 +24,24 @@ export default function Navigation() {
         border-b-2 border-win-border-dark
         shadow-[0_4px_6px_rgba(0,90,100,0.3),inset_0_1px_0px_rgba(255,255,255,0.9)]"
     >
-      <span className="font-bold font-heading">meloplaza</span>
+      <span className="text-xl font-bold font-heading">meloplaza</span>
 
       <div className="flex flex-row items-center gap-10">
         <Link
           href={`/profile/${currentUser}`}
           className="relative flex flex-row gap-2 items-center hover:cursor-pointer"
         >
-          <i className="text-xs hn hn-user-solid "></i>
-          <span className="text-xs font-bold font-heading">My Recommendation</span>
+          <i className="text-xs hn hn-disc-solid "></i>
+          <span className="text-xs font-bold font-heading">
+            My Recommendation
+          </span>
         </Link>
 
         <Link
           href="/collection"
           className="relative flex flex-row gap-2 items-center hover:cursor-pointer"
         >
-          <i className="text-xs hn hn-disc-solid"></i>
+          <i className="text-xs hn hn-folder-solid"></i>
           <span className="text-xs font-bold font-heading">My Collection</span>
         </Link>
 

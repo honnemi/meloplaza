@@ -3,13 +3,5 @@
 import { SecondaryButton } from "@/components/Button";
 
 export default function PrintButton() {
-    return (
-        <SecondaryButton
-            label="Print"
-            onClick={() => window.print()}
-        />
-    );
+  return <SecondaryButton label="Print" onClick={() => window.print()} />;
 }
-
-
-

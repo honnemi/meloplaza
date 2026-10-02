@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import {
   getUserById,
@@ -19,6 +19,10 @@ const REPLIES = [
   "I've added it to my collection ♡",
 ];
 
+// Number of entries in the `messages` array built in the component.
+// The music player's animation delay is MESSAGE_COUNT * 1000ms.
+const MESSAGE_COUNT = 5;
+
 const formatTime = (date: string | Date) =>
   new Date(date).toLocaleString("en-AU", {
     day: "numeric",
@@ -28,7 +32,6 @@ const formatTime = (date: string | Date) =>
     minute: "2-digit",
   });
 
-// Avatar colours are pastel, so darken them to keep names readable on white
 const nameColour = (colour?: string) => colour;
 
 interface ChatLineProps {
@@ -85,6 +88,16 @@ export default function ShowRecommendation() {
   const [skipDelays, setSkipDelays] = useState(false);
   const [replyTime, setReplyTime] = useState(() => new Date());
 
+  const chatRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    const el = chatRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  };
+
+  const ready = !!otherUser && !!recommendation && !checkingCollection;
+
   useEffect(() => {
     if (!id) return;
 
@@ -123,6 +136,24 @@ export default function ShowRecommendation() {
 
     return () => clearTimeout(timer);
   }, [id]);
+
+  // Scroll to the bottom when the music player appears
+  useEffect(() => {
+    if (!ready) return;
+
+    const delay = skipDelays ? 0 : MESSAGE_COUNT * 1000 + 100;
+    const t = setTimeout(scrollToBottom, delay);
+
+    return () => clearTimeout(t);
+  }, [ready, skipDelays]);
+
+  // Scroll to the bottom when the song is added to the collection
+  useEffect(() => {
+    if (!addedToCollection) return;
+
+    const raf = requestAnimationFrame(scrollToBottom);
+    return () => cancelAnimationFrame(raf);
+  }, [addedToCollection]);
 
   const handleAddToCollection = async () => {
     if (!recommendation?.id || addingToCollection || addedToCollection) return;
@@ -176,7 +207,10 @@ export default function ShowRecommendation() {
       >
         <div className="flex flex-col md:flex-row w-full h-full gap-4">
           {/* Chat */}
-          <div className="flex flex-col overflow-y-auto min-h-100 md:h-full w-full md:flex-1 min-w-0 p-4 gap-4 rounded-sm bg-white border-2 border-t-win-border-dark border-l-win-border-dark border-b-win-border-alt border-r-win-border-alt">
+          <div
+            ref={chatRef}
+            className="flex flex-col overflow-y-auto min-h-100 md:h-full w-full md:flex-1 min-w-0 p-4 gap-4 rounded-sm bg-white border-2 border-t-win-border-dark border-l-win-border-dark border-b-win-border-alt border-r-win-border-alt"
+          >
             {messages.map((text, i) => (
               <ChatLine
                 key={i}

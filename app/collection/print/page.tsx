@@ -48,7 +48,7 @@ export default async function PrintCollection() {
   return (
     <div className="print-page min-h-screen flex items-center justify-center">
       <div className="receipt-container font-mono bg-white text-center flex flex-col gap-4 w-full max-w-sm mx-auto p-4 border shadow-sm">
-        <div className="font-bold text-xl">meloplaza</div>
+        <div className="font-bold text-xl">meloplaza 𝄢</div>
 
         <hr />
 
@@ -119,9 +119,7 @@ export default async function PrintCollection() {
         <hr />
 
         {/* Thank you + logo */}
-        <div className="font-bold text-xl">
-          THANKS FOR VISITING!
-        </div>
+        <div className="font-bold text-xl">THANKS FOR VISITING!</div>
       </div>
 
       {/* Print action */}

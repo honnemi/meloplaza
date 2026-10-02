@@ -1,9 +1,11 @@
 // app/layout.tsx
+
 import ShapeGrid from "@/components/GridBg";
 import type { Metadata } from "next";
 import "./globals.css";
 import { FormProvider } from "@/app/context/FormContext";
 import { ViewTransitions } from "next-view-transitions";
+import BackgroundMusic from "@/components/BgMusic";
 
 import { Gruppo, M_PLUS_Rounded_1c } from "next/font/google";
 
@@ -20,7 +22,7 @@ const gruppo = Gruppo({
 });
 
 export const metadata: Metadata = {
-  title: "melotown",
+  title: "meloplaza",
   description: "A social music discovery platform free of algorithms.",
 };
 
@@ -46,6 +48,9 @@ export default function RootLayout({
 
           <div className="relative z-10 min-h-screen w-full">
             <FormProvider>{children}</FormProvider>
+          </div>
+          <div className="fixed bottom-4 left-4 z-50">
+          <BackgroundMusic />
           </div>
         </body>
       </html>

@@ -27,7 +27,7 @@ export default function Window({
         className="shrink-0
           bg-(image:--win-titlebar)
           border-b-2 border-win-border-dark
-          p-3 text-lg font-bold text-black
+          p-3 text-lg font-bold 
           select-none
           shadow-[inset_0_1px_0px_rgba(255,255,255,0.9)]
           flex items-center justify-center gap-2"
@@ -51,7 +51,7 @@ export default function Window({
         }}
       >
         <div
-          className={`h-full bg-white/60 p-6 text-black
+          className={`h-full bg-white/60 p-6 
             rounded-sm
             border-2 border-win-border
             overflow-y-auto relative z-10 scroll-smooth

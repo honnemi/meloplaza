@@ -6,9 +6,7 @@ interface PageProps {
   searchParams: Promise<{ q?: string }>;
 }
 
-export default async function SelectSong({
-  searchParams,
-}: PageProps) {
+export default async function SelectSong({ searchParams }: PageProps) {
   const { q: query } = await searchParams;
 
   const data = query ? await getSpotifyTracks(query) : null;
@@ -17,7 +15,7 @@ export default async function SelectSong({
   const tracks = rawTracks.map((track: any) => ({
     id: track.id,
     name: track.name,
-    duration_ms: track.duration_ms || 0, 
+    duration_ms: track.duration_ms || 0,
     artists: track.artists?.map((a: any) => ({ name: a.name })) || [],
     album: {
       name: track.album?.name || "",

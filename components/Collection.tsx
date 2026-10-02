@@ -66,7 +66,7 @@ export default function Collection({ collection }: CollectionProps) {
     <div className="w-full min-h-screen flex items-center justify-center p-6 sm:p-12">
       <Window
         title="My Collection"
-        icon={<i className="hn hn-disc-solid"></i>}
+        icon={<i className="hn hn-folder-solid"></i>}
         footer={
           <div className="flex justify-between w-full">
             <Button label="Back" href="/plaza" />
@@ -75,7 +75,7 @@ export default function Collection({ collection }: CollectionProps) {
       >
         {collection.length === 0 ? (
           <div className="h-full flex items-center justify-center">
-            <p className="text-center text-gray-500">
+            <p className="text-center text-gray-400">
               Your collection is empty.
             </p>
           </div>
@@ -178,7 +178,7 @@ export default function Collection({ collection }: CollectionProps) {
           <div className="flex flex-col">
             {/* Song details */}
             <section className="flex flex-col gap-3 pb-5 border-b border-gray-300">
-              <div className="font-heading font-semibold text-xs text-gray-600 uppercase tracking-wide">
+              <div className="font-heading font-semibold text-xs text-gray-600 uppercase">
                 SONG
               </div>
 
@@ -190,11 +190,11 @@ export default function Collection({ collection }: CollectionProps) {
                 />
 
                 <div className="min-w-0">
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-lg font-bold">
                     {selectedSong.song_name}
                   </p>
 
-                  <p className="text-sm text-gray-700">
+                  <p className="text-sm text-gray-600">
                     {selectedSong.song_artist}
                   </p>
 
@@ -208,9 +208,7 @@ export default function Collection({ collection }: CollectionProps) {
             {/* Recommended by */}
             <section className="flex flex-col gap-3 py-5 border-b border-gray-300">
               {loadingUser ? (
-                <p className="text-sm text-gray-500">
-                  Loading user...
-                </p>
+                <p className="text-sm text-gray-400">Loading user...</p>
               ) : selectedUser ? (
                 <div className="flex flex-row items-center gap-3">
                   <div className="flex items-center justify-center w-12 h-12 shrink-0">
@@ -230,13 +228,13 @@ export default function Collection({ collection }: CollectionProps) {
                       {selectedUser.display_name}
                     </p>
 
-                    <p className="text-xs text-gray-700">
+                    <p className="text-xs text-gray-600">
                       shared this song with you
                     </p>
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-400">
                   User information unavailable.
                 </p>
               )}
@@ -250,7 +248,7 @@ export default function Collection({ collection }: CollectionProps) {
                     PROMPT
                   </p>
 
-                  <p className="text-sm text-gray-900 leading-5">
+                  <p className="text-sm leading-5">
                     {selectedSong.prompt}
                   </p>
                 </div>
@@ -260,7 +258,7 @@ export default function Collection({ collection }: CollectionProps) {
                     MESSAGE
                   </p>
 
-                  <p className="text-sm text-gray-900 leading-5">
+                  <p className="text-sm leading-5">
                     {selectedSong.message}
                   </p>
                 </div>

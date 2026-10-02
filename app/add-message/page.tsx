@@ -39,7 +39,7 @@ export default function AddMessage() {
         }
       >
         <p className="text-md italic text-center mb-4 text-gray-600 min-h-6">
-          Relate back to the prompt. Why this song in particular?
+          Think back to the prompt. Why this song in particular?
         </p>
 
         {/* Text input */}

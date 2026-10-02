@@ -96,9 +96,9 @@ export default function ConfirmNewUserPage() {
           </div>
         }
       >
-        <h1 className="text-lg font-bold mb-4 text-center text-gray-700">
-          Make sure you're happy with what you've chosen!
-        </h1>
+        <div className="text-lg italic mb-4 text-center text-gray-600">
+          Make sure you're happy with everything first!
+        </div>
 
         {error && (
           <div className="mb-4 p-3 text-sm text-[#a80f35] bg-[#ffe3ea] rounded-sm border-2 border-[#ff9bb0] text-center">
@@ -106,10 +106,10 @@ export default function ConfirmNewUserPage() {
           </div>
         )}
 
-        <div className="space-y-3 pr-2 text-gray-900 overflow-y-hidden">
+        <div className="space-y-3 pr-2 overflow-y-hidden">
           {/* Avatar */}
           <div className="border-2 border-win-border-alt p-3 rounded-sm bg-white">
-            <h2 className="font-semibold text-xs text-gray-600 uppercase tracking-wide mb-2">
+            <h2 className="font-semibold text-xs text-gray-600 uppercase mb-2">
               Avatar
             </h2>
 
@@ -121,7 +121,7 @@ export default function ConfirmNewUserPage() {
                 textSize="text-l"
               />
 
-              <p className="font-bold text-gray-900 wrap-break-word min-w-0">
+              <p className="font-bold text-gray-800 wrap-break-word min-w-0">
                 {formData.displayName || "Anonymous"}
               </p>
             </div>
@@ -129,22 +129,22 @@ export default function ConfirmNewUserPage() {
 
           {/* Selected prompt */}
           <div className="border-2 border-win-border-alt p-3 rounded-sm bg-white">
-            <h2 className="font-semibold text-xs text-gray-600 uppercase tracking-wide mb-1">
+            <h2 className="font-semibold text-xs text-gray-600 uppercase mb-1">
               Prompt
             </h2>
 
             {formData.prompt ? (
-              <p className="italic text-gray-900 wrap-break-word">
+              <p className="italic wrap-break-word">
                 "{formData.prompt}"
               </p>
             ) : (
-              <p className="italic text-gray-500">No prompt selected</p>
+              <p className="italic text-gray-400">No prompt selected</p>
             )}
           </div>
 
           {/* Chosen song */}
           <div className="border-2 border-win-border-alt p-3 rounded-sm bg-white">
-            <h2 className="font-semibold text-xs text-gray-600 uppercase tracking-wide mb-2">
+            <h2 className="font-semibold text-xs text-gray-600 uppercase mb-2">
               Song
             </h2>
 
@@ -163,11 +163,11 @@ export default function ConfirmNewUserPage() {
                 )}
 
                 <div className="min-w-0 flex-1">
-                  <p className="text-gray-900 wrap-break-word">
+                  <p className="wrap-break-word">
                     {formData.songName}
                   </p>
 
-                  <p className="text-sm text-gray-700 wrap-break-word">
+                  <p className="text-sm text-gray-600 wrap-break-word">
                     {formData.songArtist}{" "}
                     {formData.songYear ? `(${formData.songYear})` : ""}
                   </p>
@@ -180,22 +180,22 @@ export default function ConfirmNewUserPage() {
                 </div>
               </div>
             ) : (
-              <p className="italic text-gray-500">No song selected</p>
+              <p className="italic text-gray-400">No song selected</p>
             )}
           </div>
 
           {/* Personal message */}
           <div className="border-2 border-win-border-alt p-3 rounded-sm bg-white">
-            <h2 className="font-semibold text-xs text-gray-600 uppercase tracking-wide mb-1">
+            <h2 className="font-semibold text-xs text-gray-600 uppercase mb-1">
               Message
             </h2>
 
             {formData.message ? (
-              <p className="text-gray-900 whitespace-pre-wrap wrap-break-word">
+              <p className="whitespace-pre-wrap wrap-break-word">
                 {formData.message}
               </p>
             ) : (
-              <p className="italic text-gray-500">No message added</p>
+              <p className="italic text-gray-400">No message added</p>
             )}
           </div>
         </div>

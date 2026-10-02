@@ -118,8 +118,8 @@ export default function Popup({
               active:brightness-95
               cursor-pointer
             "
-                        style={{
-                          backgroundImage: `
+            style={{
+              backgroundImage: `
                 linear-gradient(
                   to bottom,
                   rgba(255,255,255,0.85) 0%,
@@ -135,7 +135,6 @@ export default function Popup({
               `,
             }}
           >
-            <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-red-900"></span>
           </button>
 
           {/* Title */}
@@ -163,7 +162,6 @@ export default function Popup({
               h-full
               bg-white/60
               p-6
-              text-black
               rounded-sm
               border-2
               border-win-border
