@@ -40,6 +40,11 @@ const DRAG_MESSAGES = [
   "let me go!",
 ];
 
+const ALIEN_NOISES = [
+  "/assets/alien01.mp3",
+  "/assets/alien02.mp3",
+]
+
 function createAvatar(data: PlazaAvatar): AnimatedContainer {
   const avatar = new Container() as AnimatedContainer;
 
@@ -200,6 +205,15 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 }
 
 export default function Plaza({ avatars }: PlazaProps) {
+  // Play sound on click
+  function playClickSound() {
+    if (typeof window !== "undefined") {
+      const clickAudio = new Audio("/assets/alien01.mp3");
+      clickAudio.volume = 0.5;
+      clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+    }
+  }
+  
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -436,6 +450,9 @@ export default function Plaza({ avatars }: PlazaProps) {
 
         // Pointer down logic
         avatar.on("pointerdown", (event) => {
+
+          playClickSound();
+
           if (draggedAvatar) return;
 
           event.stopPropagation();

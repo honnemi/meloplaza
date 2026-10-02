@@ -8,10 +8,20 @@ import ProfilePreview from "@/components/ProfilePreview";
 export default function AddMessage() {
   const { formData, updateForm } = useFormStore();
 
+  // Play sound on type
+  function playTypeSound() {
+    if (typeof window !== "undefined") {
+      const typeAudio = new Audio("/assets/type.mp3");
+      typeAudio.volume = 0.5;
+      typeAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+    }
+  }
+
   const characterLimit = 300;
   const message = formData.message || "";
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    playTypeSound();
     const inputValue = e.target.value;
 
     if (inputValue.length <= characterLimit) {
@@ -19,6 +29,8 @@ export default function AddMessage() {
         message: inputValue,
       });
     }
+
+
   };
 
   return (

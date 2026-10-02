@@ -7,6 +7,15 @@ import { getCurrentUserId } from "@/app/actions";
 export default function Navigation() {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
 
+  // Play sound on click
+  function playClickSound() {
+    if (typeof window !== "undefined") {
+      const clickAudio = new Audio("/assets/click.mp3");
+      clickAudio.volume = 0.5;
+      clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+    }
+  }
+
   useEffect(() => {
     const loadUserProfile = async () => {
       const user = await getCurrentUserId();
@@ -30,6 +39,7 @@ export default function Navigation() {
         <Link
           href={`/profile/${currentUser}`}
           className="relative flex flex-row gap-2 items-center hover:cursor-pointer"
+          onClick={() => playClickSound()}
         >
           <i className="text-xs hn hn-disc-solid "></i>
           <span className="text-xs font-bold font-heading">
@@ -40,6 +50,7 @@ export default function Navigation() {
         <Link
           href="/collection"
           className="relative flex flex-row gap-2 items-center hover:cursor-pointer"
+          onClick={() => playClickSound()}
         >
           <i className="text-xs hn hn-folder-solid"></i>
           <span className="text-xs font-bold font-heading">My Collection</span>
@@ -48,6 +59,7 @@ export default function Navigation() {
         <Link
           href="/"
           className="relative flex flex-row gap-2 items-center hover:cursor-pointer"
+          onClick={() => playClickSound()}
         >
           <i className="text-xs hn hn-logout-solid"></i>
           <span className="text-xs font-bold font-heading">Exit</span>

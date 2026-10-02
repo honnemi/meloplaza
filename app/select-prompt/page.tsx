@@ -34,6 +34,15 @@ export default function PromptSelection() {
   const selectedPromptText =
     selectedIndex !== null ? PROMPTS[selectedIndex] : null;
 
+  // Play sound on click
+  function playClickSound() {
+    if (typeof window !== "undefined") {
+      const clickAudio = new Audio("/assets/click.mp3");
+      clickAudio.volume = 0.5;
+      clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+    }
+  }
+
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row">
       {/* Show choices from previous pages */}
@@ -57,6 +66,7 @@ export default function PromptSelection() {
               key={index}
               type="button"
               onClick={() => {
+                playClickSound();
                 setSelectedIndex(index);
                 updateForm({ prompt: promptText });
               }}

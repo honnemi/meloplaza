@@ -14,6 +14,22 @@ import Button, { SecondaryButton } from "@/components/Button";
 import Avatar from "@/components/Avatar";
 import MusicPlayer from "@/components/MusicPlayer";
 
+function playMessageSoundIn() {
+    if (typeof window !== "undefined") {
+      const messageAudio = new Audio("/assets/msg-receive.mp3");
+      messageAudio.volume = 0.5;
+      messageAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+    }
+  }
+
+  function playMessageSoundOut() {
+    if (typeof window !== "undefined") {
+      const messageAudio = new Audio("/assets/msg-send.mp3");
+      messageAudio.volume = 0.5;
+      messageAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+    }
+  }
+
 const REPLIES = [
   "Thanks for the recommendation!",
   "I've added it to my collection ♡",
@@ -41,6 +57,7 @@ interface ChatLineProps {
   time: string;
   align?: "left" | "right";
   style?: React.CSSProperties;
+  onAnimationStart?: () => void;
 }
 
 function ChatLine({
@@ -57,6 +74,7 @@ function ChatLine({
     <div
       className={`message-in ${right ? "flex justify-end" : ""}`}
       style={style}
+      onAnimationStart={playMessageSoundIn}
     >
       <div className={right ? "max-w-[85%]" : undefined}>
         <p className="text-gray-900 wrap-break-word">
@@ -226,6 +244,7 @@ export default function ShowRecommendation() {
             <div
               className="message-in py-4"
               style={getMessageStyle(messages.length * 1000)}
+              onAnimationStart={playMessageSoundIn}
             >
               <MusicPlayer
                 songId={recommendation.song_id}
@@ -244,6 +263,7 @@ export default function ShowRecommendation() {
                   colour={currentUser?.colour}
                   text={text}
                   time={formatTime(replyTime)}
+                  onAnimationStart={playMessageSoundOut}
                 />
               ))}
           </div>

@@ -45,11 +45,21 @@ export default function Collection({ collection }: CollectionProps) {
 
   const [loadingUser, setLoadingUser] = useState(false);
 
+  // Play sound on click
+  function playClickSound() {
+    if (typeof window !== "undefined") {
+      const clickAudio = new Audio("/assets/click.mp3");
+      clickAudio.volume = 0.5;
+      clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+    }
+  }
+
   const openPopup = async (
     recommendation: CollectionItem["Recommendations"],
   ) => {
     setSelectedSong(recommendation);
     setLoadingUser(true);
+    playClickSound();
 
     const user = await getUserById(recommendation.created_by);
 
@@ -60,6 +70,7 @@ export default function Collection({ collection }: CollectionProps) {
   const closePopup = () => {
     setSelectedSong(null);
     setSelectedUser(null);
+    playClickSound();
   };
 
   return (

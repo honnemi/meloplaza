@@ -40,9 +40,19 @@ export default function SongSelection({ tracks, query }: SongSelectionProps) {
     }
   }, [formData.songId]);
 
+  // Play sound on click
+  function playClickSound() {
+    if (typeof window !== "undefined") {
+      const clickAudio = new Audio("/assets/click.mp3");
+      clickAudio.volume = 0.5;
+      clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+    }
+  }
+
   // Save the selected song to the shared form state
   const handleSelectTrack = (track: any) => {
     setSelectedTrack(track);
+    playClickSound();
 
     const albumCoverUrl =
       track.album?.images?.[0]?.url || track.albumCover || "";
@@ -57,6 +67,15 @@ export default function SongSelection({ tracks, query }: SongSelectionProps) {
       songDuration: track.duration_ms || 0,
     });
   };
+
+  // Play sound on type
+  function playTypeSound() {
+    if (typeof window !== "undefined") {
+      const clickAudio = new Audio("/assets/type.mp3");
+      clickAudio.volume = 0.5;
+      clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+    }
+  }
 
   return (
     <Window
@@ -77,10 +96,11 @@ export default function SongSelection({ tracks, query }: SongSelectionProps) {
         >
           <input
             name="q"
-            type="text"
+            type="search"
             placeholder="Search tracks, artists..."
             className="text-input"
             defaultValue={query || ""}
+            onChange={() => playTypeSound()}
           />
 
           <SecondaryButton

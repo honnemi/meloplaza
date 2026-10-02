@@ -119,7 +119,13 @@ export default async function PrintCollection() {
         <hr />
 
         {/* Thank you + logo */}
-        <div className="font-bold text-xl">THANKS FOR VISITING!</div>
+        <div className="flex flex-col items-center justify-center gap-4 py-4">
+          <div className="font-bold text-xl">THANKS FOR VISITING!</div>
+          <img className="w-50 h-50" src="/assets/qr-code.png" alt="QR Code to meloplaza" />
+          <p className="text-sm text-center w-50">
+            Scan the QR code above to visit meloplaza again!
+          </p>
+        </div>
       </div>
 
       {/* Print action */}

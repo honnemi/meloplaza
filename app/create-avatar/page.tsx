@@ -35,10 +35,20 @@ export default function AvatarCreation() {
     });
   };
 
+  // Play sound on type
+  function playTypeSound() {
+    if (typeof window !== "undefined") {
+      const clickAudio = new Audio("/assets/type.mp3");
+      clickAudio.volume = 0.5;
+      clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+    }
+  }
+
   // Enforce character limit for display name
   const characterLimit = 20;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    playTypeSound();
     const inputValue = e.target.value;
 
     if (inputValue.length <= characterLimit) {
