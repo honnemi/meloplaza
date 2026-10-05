@@ -5,6 +5,7 @@ import { Application, Container, Graphics, Text } from "pixi.js";
 import { AVATAR_FACES } from "@/app/avatar-customisation";
 import { useRouter } from "next/navigation";
 import Popup from "@/components/PopupWindow";
+import { getCurrentUserId } from "@/app/actions";
 
 interface PlazaAvatar {
   id: string;
@@ -26,10 +27,26 @@ interface AnimatedContainer extends Container {
   shadow: Graphics;
 }
 
+// ============================================================
+// CONSTANTS
+// ============================================================
+
 const AVATAR_RADIUS = 24;
 const NAME_OFFSET = 40;
 const AVATAR_SPEED = 0.001;
 
+// Size of the explorable world
+const WORLD_WIDTH = 3000;
+const WORLD_HEIGHT = 2000;
+
+// Camera edge scrolling
+const EDGE_SCROLL_SIZE = 100;
+const EDGE_SCROLL_SPEED = 8;
+
+// Camera drag sensitivity
+const CAMERA_DRAG_SPEED = 1;
+
+// Messages that avatars can say when dragged
 const DRAG_MESSAGES = [
   "hey!",
   "put me down!",
@@ -41,6 +58,10 @@ const DRAG_MESSAGES = [
   "let me go!",
 ];
 
+// ============================================================
+// CREATE AVATAR
+// ============================================================
+
 function createAvatar(data: PlazaAvatar): AnimatedContainer {
   const avatar = new Container() as AnimatedContainer;
 
@@ -48,7 +69,10 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
   avatar.targetY = 0;
   avatar.isDragging = false;
 
+  // ----------------------------------------------------------
   // Avatar shadow
+  // ----------------------------------------------------------
+
   const shadow = new Graphics();
 
   shadow.ellipse(0, 25, 20, 5).fill({
@@ -59,7 +83,10 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
   avatar.addChild(shadow);
   avatar.shadow = shadow;
 
+  // ----------------------------------------------------------
   // Avatar body
+  // ----------------------------------------------------------
+
   const bubble = new Graphics();
 
   const colour = parseInt(data.colour.replace("#", ""), 16);
@@ -70,7 +97,10 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.addChild(bubble);
 
+  // ----------------------------------------------------------
   // Avatar highlight
+  // ----------------------------------------------------------
+
   const highlight = new Graphics();
 
   highlight.ellipse(-6, -16, 6, 3).fill({
@@ -82,7 +112,10 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.addChild(highlight);
 
+  // ----------------------------------------------------------
   // Avatar face
+  // ----------------------------------------------------------
+
   const face = new Text({
     text: AVATAR_FACES[data.faceIndex],
     style: {
@@ -95,7 +128,10 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.addChild(face);
 
+  // ----------------------------------------------------------
   // Speech bubble
+  // ----------------------------------------------------------
+
   const speechBubble = new Container();
 
   speechBubble.visible = false;
@@ -130,6 +166,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   speechBubble.addChild(bubbleShape);
 
+  // Random message
   const randomMessage =
     DRAG_MESSAGES[Math.floor(Math.random() * DRAG_MESSAGES.length)];
 
@@ -152,7 +189,10 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.speechBubble = speechBubble;
 
-  // Avatar name
+  // ----------------------------------------------------------
+  // Display name
+  // ----------------------------------------------------------
+
   const name = new Text({
     text: data.displayName,
     style: {
@@ -167,7 +207,10 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.addChild(name);
 
-  // Avatar hover
+  // ----------------------------------------------------------
+  // Hover icon
+  // ----------------------------------------------------------
+
   const hoverIcon = new Text({
     text: "♫",
     style: {
@@ -186,7 +229,10 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.hoverIcon = hoverIcon;
 
-  // Hover logic
+  // ----------------------------------------------------------
+  // Avatar hover
+  // ----------------------------------------------------------
+
   avatar.on("pointerover", () => {
     if (!avatar.isDragging) {
       hoverIcon.visible = true;
@@ -200,31 +246,78 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
   return avatar;
 }
 
+// ============================================================
+// PLAZA
+// ============================================================
+
 export default function Plaza({ avatars }: PlazaProps) {
-  // Play sound on click
-  function playClickSound(file : string) {
+  const router = useRouter();
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // ----------------------------------------------------------
+  // Collection button
+  // ----------------------------------------------------------
+
+  const [isCollectionHovered, setIsCollectionHovered] = useState(false);
+
+  // ----------------------------------------------------------
+  // Welcome popup
+  // ----------------------------------------------------------
+
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  // ----------------------------------------------------------
+  // Play sound
+  // ----------------------------------------------------------
+
+  function playClickSound(file: string) {
     if (typeof window !== "undefined") {
       const clickAudio = new Audio(file);
+
       clickAudio.volume = 0.2;
-      clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+
+      clickAudio
+        .play()
+        .catch((err) => console.error("Audio blocked by browser:", err));
     }
   }
 
-  const router = useRouter();
-  const containerRef = useRef<HTMLDivElement>(null);
+  // ==========================================================
+  // PIXI + CAMERA
+  // ==========================================================
 
   useEffect(() => {
-    if (!containerRef.current) return;
-
     const container = containerRef.current;
+
+    if (!container) return;
+
     const app = new Application();
+
+    // --------------------------------------------------------
+    // State
+    // --------------------------------------------------------
 
     let destroyed = false;
     let initialized = false;
 
     const activeAvatars: AnimatedContainer[] = [];
 
+    // --------------------------------------------------------
+    // World
+    // --------------------------------------------------------
+
+    const world = new Container();
+
+    let cameraX = 0;
+    let cameraY = 0;
+
+    // --------------------------------------------------------
+    // Avatar dragging
+    // --------------------------------------------------------
+
     let draggedAvatar: AnimatedContainer | null = null;
+
     let draggedAvatarData: PlazaAvatar | null = null;
 
     let dragPointerId: number | null = null;
@@ -239,15 +332,89 @@ export default function Plaza({ avatars }: PlazaProps) {
 
     const MOVE_THRESHOLD = 5;
 
-    const resize = () => {
-      if (!initialized || destroyed) return;
+    // --------------------------------------------------------
+    // Camera panning
+    // --------------------------------------------------------
 
-      app.renderer.resize(container.clientWidth, container.clientHeight);
+    let isPanning = false;
+
+    let panPointerId: number | null = null;
+
+    let panStartX = 0;
+    let panStartY = 0;
+
+    let panStartCameraX = 0;
+    let panStartCameraY = 0;
+
+    // ========================================================
+    // CAMERA HELPERS
+    // ========================================================
+
+    const clampCamera = () => {
+      if (!initialized) return;
+
+      const maxCameraX = Math.max(0, WORLD_WIDTH - app.screen.width);
+
+      const maxCameraY = Math.max(0, WORLD_HEIGHT - app.screen.height);
+
+      cameraX = Math.max(0, Math.min(maxCameraX, cameraX));
+
+      cameraY = Math.max(0, Math.min(maxCameraY, cameraY));
+
+      world.x = -cameraX;
+      world.y = -cameraY;
     };
 
-    // Drag logic (if pointer down and moving)
+    // ========================================================
+    // RESIZE
+    // ========================================================
+
+    const resize = () => {
+      if (!initialized || destroyed) {
+        return;
+      }
+
+      app.renderer.resize(container.clientWidth, container.clientHeight);
+
+      clampCamera();
+    };
+
+    // ========================================================
+    // POINTER MOVE
+    // ========================================================
+
     const handleWindowPointerMove = (event: PointerEvent) => {
-      if (!draggedAvatar) return;
+      if (destroyed) return;
+
+      // ------------------------------------------------------
+      // Camera dragging
+      // ------------------------------------------------------
+
+      if (
+        isPanning &&
+        panPointerId !== null &&
+        event.pointerId === panPointerId
+      ) {
+        const dx = event.clientX - panStartX;
+
+        const dy = event.clientY - panStartY;
+
+        cameraX = panStartCameraX - dx * CAMERA_DRAG_SPEED;
+
+        cameraY = panStartCameraY - dy * CAMERA_DRAG_SPEED;
+
+        clampCamera();
+
+        return;
+      }
+
+      // ------------------------------------------------------
+      // Avatar dragging
+      // ------------------------------------------------------
+
+      if (!draggedAvatar) {
+        return;
+      }
 
       if (dragPointerId !== null && event.pointerId !== dragPointerId) {
         return;
@@ -259,6 +426,8 @@ export default function Plaza({ avatars }: PlazaProps) {
 
       const dy = event.clientY - startPointerY;
 
+      // Determine whether the avatar
+      // has actually been dragged
       if (
         !hasMoved &&
         (Math.abs(dx) > MOVE_THRESHOLD || Math.abs(dy) > MOVE_THRESHOLD)
@@ -269,13 +438,18 @@ export default function Plaza({ avatars }: PlazaProps) {
 
         draggedAvatar.hoverIcon.visible = false;
 
-        // Show speech bubble on drag
         draggedAvatar.speechBubble.visible = true;
 
         draggedAvatar.shadow.visible = false;
       }
 
-      if (!hasMoved) return;
+      if (!hasMoved) {
+        return;
+      }
+
+      // ------------------------------------------------------
+      // Convert screen position to world position
+      // ------------------------------------------------------
 
       const rect = app.canvas.getBoundingClientRect();
 
@@ -283,68 +457,111 @@ export default function Plaza({ avatars }: PlazaProps) {
 
       const scaleY = app.screen.height / rect.height;
 
-      const pointerX = (event.clientX - rect.left) * scaleX;
+      const screenX = (event.clientX - rect.left) * scaleX;
 
-      const pointerY = (event.clientY - rect.top) * scaleY;
+      const screenY = (event.clientY - rect.top) * scaleY;
+
+      // Add camera offset
+      const pointerX = screenX + cameraX;
+
+      const pointerY = screenY + cameraY;
 
       let newX = pointerX - dragOffsetX;
 
       let newY = pointerY - dragOffsetY;
 
-      const margin = AVATAR_RADIUS;
+      // ------------------------------------------------------
+      // Keep avatar inside world
+      // ------------------------------------------------------
 
-      // Lock avatar movement to screen
-      newX = Math.max(margin, Math.min(app.screen.width - margin, newX));
+      newX = Math.max(
+        AVATAR_RADIUS,
+        Math.min(WORLD_WIDTH - AVATAR_RADIUS, newX),
+      );
 
-      newY = Math.max(margin, Math.min(app.screen.height - margin, newY));
+      newY = Math.max(
+        AVATAR_RADIUS,
+        Math.min(WORLD_HEIGHT - AVATAR_RADIUS, newY),
+      );
 
-      // Avatar follows mouse when dragging
       draggedAvatar.x = newX;
+
       draggedAvatar.y = newY;
     };
 
-    // On pointer up, cancel drag state
+    // ========================================================
+    // POINTER UP
+    // ========================================================
+
     const handleWindowPointerUp = (event: PointerEvent) => {
-      if (!draggedAvatar) return;
+      if (destroyed) return;
+
+      // ------------------------------------------------------
+      // Finish camera panning
+      // ------------------------------------------------------
+
+      if (
+        isPanning &&
+        panPointerId !== null &&
+        event.pointerId === panPointerId
+      ) {
+        isPanning = false;
+        panPointerId = null;
+
+        document.body.style.cursor = "";
+
+        return;
+      }
+
+      // ------------------------------------------------------
+      // Finish avatar interaction
+      // ------------------------------------------------------
+
+      if (!draggedAvatar) {
+        return;
+      }
 
       if (dragPointerId !== null && event.pointerId !== dragPointerId) {
         return;
       }
 
       const avatar = draggedAvatar;
+
       const avatarData = draggedAvatarData;
 
-      // On click, navigate to profile
+      // ------------------------------------------------------
+      // Avatar clicked
+      // ------------------------------------------------------
+
       if (!hasMoved && avatarData) {
         avatar.isDragging = false;
 
         avatar.speechBubble.visible = false;
+
         avatar.hoverIcon.visible = false;
 
-        if (document.startViewTransition) {
-          document.startViewTransition(() => {
-            router.push(`/profile/${avatarData.id}`);
-          });
-        } else {
-          router.push(`/profile/${avatarData.id}`);
-        }
+        router.push(`/recommendation/${avatarData.id}`);
       }
 
-      // Drag release logic
+      // ------------------------------------------------------
+      // Avatar dragged
+      // ------------------------------------------------------
       else {
-        // Drop avatar where released
         avatar.targetX = avatar.x;
+
         avatar.targetY = avatar.y;
 
         avatar.isDragging = false;
 
         avatar.speechBubble.visible = false;
+
         avatar.shadow.visible = true;
 
         avatar.hoverIcon.visible = false;
       }
 
       draggedAvatar = null;
+
       draggedAvatarData = null;
 
       dragPointerId = null;
@@ -355,12 +572,34 @@ export default function Plaza({ avatars }: PlazaProps) {
       hasMoved = false;
 
       document.body.style.userSelect = "";
+
       document.body.style.cursor = "";
     };
 
-    // Pointer cancel logic
+    // ========================================================
+    // POINTER CANCEL
+    // ========================================================
+
     const handleWindowPointerCancel = (event: PointerEvent) => {
-      if (!draggedAvatar) return;
+      if (destroyed) return;
+
+      // Cancel camera pan
+      if (
+        isPanning &&
+        panPointerId !== null &&
+        event.pointerId === panPointerId
+      ) {
+        isPanning = false;
+        panPointerId = null;
+
+        document.body.style.cursor = "";
+
+        return;
+      }
+
+      if (!draggedAvatar) {
+        return;
+      }
 
       if (dragPointerId !== null && event.pointerId !== dragPointerId) {
         return;
@@ -369,7 +608,9 @@ export default function Plaza({ avatars }: PlazaProps) {
       draggedAvatar.isDragging = false;
 
       draggedAvatar.speechBubble.visible = false;
+
       draggedAvatar.shadow.visible = true;
+
       draggedAvatar.hoverIcon.visible = false;
 
       draggedAvatar = null;
@@ -383,8 +624,13 @@ export default function Plaza({ avatars }: PlazaProps) {
       hasMoved = false;
 
       document.body.style.userSelect = "";
+
       document.body.style.cursor = "";
     };
+
+    // ========================================================
+    // WINDOW EVENTS
+    // ========================================================
 
     window.addEventListener("pointermove", handleWindowPointerMove, {
       passive: false,
@@ -394,186 +640,324 @@ export default function Plaza({ avatars }: PlazaProps) {
 
     window.addEventListener("pointercancel", handleWindowPointerCancel);
 
-    // Setup PixiJS
+    // ========================================================
+    // PIXI SETUP
+    // ========================================================
+
     async function setup() {
-      await app.init({
-        width: container.clientWidth,
-        height: container.clientHeight,
-        backgroundAlpha: 0,
-        resolution: window.devicePixelRatio,
-        antialias: true,
-        autoDensity: true,
-      });
+      const container = containerRef.current;
 
-      await document.fonts.ready;
+      if (!container) return;
 
-      if (destroyed) {
-        app.destroy();
-        return;
-      }
+      try {
+        await app.init({
+          width: container.clientWidth,
 
-      initialized = true;
+          height: container.clientHeight,
 
-      container.appendChild(app.canvas);
+          backgroundAlpha: 0,
 
-      // Prevent native browser dragging
-      app.canvas.addEventListener("dragstart", (event) => {
-        event.preventDefault();
-      });
+          resolution: window.devicePixelRatio,
 
-      app.canvas.style.userSelect = "none";
-      app.canvas.style.webkitUserSelect = "none";
-      app.canvas.style.touchAction = "none";
+          antialias: true,
 
-      const margin = AVATAR_RADIUS;
-
-      // Draw avatars
-      for (const avatarData of avatars) {
-        const avatar = createAvatar(avatarData);
-
-        avatar.x = margin + Math.random() * (app.screen.width - margin * 2);
-
-        avatar.y = margin + Math.random() * (app.screen.height - margin * 2);
-
-        avatar.targetX =
-          margin + Math.random() * (app.screen.width - margin * 2);
-
-        avatar.targetY =
-          margin + Math.random() * (app.screen.height - margin * 2);
-
-        avatar.eventMode = "static";
-        avatar.cursor = "pointer";
-
-        // Pointer down logic
-        avatar.on("pointerdown", (event) => {
-
-          playClickSound("/assets/alien01.mp3");
-
-          if (draggedAvatar) return;
-
-          event.stopPropagation();
-
-          draggedAvatar = avatar;
-          draggedAvatarData = avatarData;
-
-          dragPointerId = event.pointerId;
-
-          startPointerX = event.global.x;
-
-          startPointerY = event.global.y;
-
-          hasMoved = false;
-
-          const localPos = event.getLocalPosition(app.stage);
-
-          dragOffsetX = localPos.x - avatar.x;
-
-          dragOffsetY = localPos.y - avatar.y;
-
-          avatar.targetX = avatar.x;
-          avatar.targetY = avatar.y;
-
-          // Always start with both hidden.
-          avatar.speechBubble.visible = false;
-          avatar.hoverIcon.visible = false;
-
-          document.body.style.userSelect = "none";
-
-          document.body.style.cursor = "default";
-
-          event.preventDefault?.();
+          autoDensity: true,
         });
 
-        app.stage.addChild(avatar);
+        await document.fonts.ready;
 
-        activeAvatars.push(avatar);
-      }
-
-      // Animate random walk
-      app.ticker.add((ticker) => {
-        if (destroyed) return;
-
-        for (const avatar of activeAvatars) {
-          if (avatar.isDragging) continue;
-
-          avatar.x +=
-            (avatar.targetX - avatar.x) * AVATAR_SPEED * ticker.deltaTime;
-
-          avatar.y +=
-            (avatar.targetY - avatar.y) * AVATAR_SPEED * ticker.deltaTime;
-
-          const distance = Math.hypot(
-            avatar.targetX - avatar.x,
-            avatar.targetY - avatar.y,
-          );
-
-          // Pick a new random destination
-          if (distance < 5) {
-            avatar.targetX =
-              margin + Math.random() * (app.screen.width - margin * 2);
-
-            avatar.targetY =
-              margin + Math.random() * (app.screen.height - margin * 2);
-          }
+        // Component was unmounted
+        // while Pixi was loading
+        if (destroyed) {
+          app.destroy(true, {
+            children: true,
+            texture: true,
+          });
+          return;
         }
 
-        // Collision logic
-        const minDistance = AVATAR_RADIUS * 2;
+        initialized = true;
 
-        for (let i = 0; i < activeAvatars.length; i++) {
-          for (let j = i + 1; j < activeAvatars.length; j++) {
-            const a = activeAvatars[i];
-            const b = activeAvatars[j];
+        // ----------------------------------------------------
+        // Canvas
+        // ----------------------------------------------------
 
-            const dx = b.x - a.x;
-            const dy = b.y - a.y;
+        container.appendChild(app.canvas);
 
-            const distance = Math.hypot(dx, dy);
+        app.canvas.addEventListener("dragstart", (event) => {
+          event.preventDefault();
+        });
 
-            if (distance < minDistance) {
-              const angle =
-                distance === 0
-                  ? Math.random() * Math.PI * 2
-                  : Math.atan2(dy, dx);
+        app.canvas.style.userSelect = "none";
 
-              const overlap = minDistance - distance;
+        app.canvas.style.touchAction = "none";
 
-              const separationX = Math.cos(angle) * (overlap / 2);
+        // ----------------------------------------------------
+        // World
+        // ----------------------------------------------------
 
-              const separationY = Math.sin(angle) * (overlap / 2);
+        app.stage.addChild(world);
 
-              if (!a.isDragging) {
-                a.x -= separationX;
-                a.y -= separationY;
+        world.x = 0;
+        world.y = 0;
 
-                a.targetX =
-                  margin + Math.random() * (app.screen.width - margin * 2);
+        // ----------------------------------------------------
+        // Ground pointer events
+        //
+        // Clicking empty ground starts
+        // camera dragging.
+        // ----------------------------------------------------
 
-                a.targetY =
-                  margin + Math.random() * (app.screen.height - margin * 2);
-              }
+        app.canvas.addEventListener("pointerdown", (event) => {
+          // If an avatar is being interacted
+          // with, don't start camera movement.
+          if (draggedAvatar) {
+            return;
+          }
 
-              if (!b.isDragging) {
-                b.x += separationX;
-                b.y += separationY;
+          isPanning = true;
 
-                b.targetX =
-                  margin + Math.random() * (app.screen.width - margin * 2);
+          panPointerId = event.pointerId;
 
-                b.targetY =
-                  margin + Math.random() * (app.screen.height - margin * 2);
+          panStartX = event.clientX;
+
+          panStartY = event.clientY;
+
+          panStartCameraX = cameraX;
+
+          panStartCameraY = cameraY;
+
+          app.canvas.setPointerCapture(event.pointerId);
+
+          document.body.style.cursor = "grabbing";
+        });
+
+        // ----------------------------------------------------
+        // Create avatars
+        // ----------------------------------------------------
+
+        const margin = AVATAR_RADIUS;
+
+        for (const avatarData of avatars) {
+          if (destroyed) {
+            return;
+          }
+
+          const avatar = createAvatar(avatarData);
+
+          // Initial position
+          avatar.x = margin + Math.random() * (WORLD_WIDTH - margin * 2);
+
+          avatar.y = margin + Math.random() * (WORLD_HEIGHT - margin * 2);
+
+          // Target position
+          avatar.targetX = margin + Math.random() * (WORLD_WIDTH - margin * 2);
+
+          avatar.targetY = margin + Math.random() * (WORLD_HEIGHT - margin * 2);
+
+          avatar.eventMode = "static";
+
+          avatar.cursor = "pointer";
+
+          // --------------------------------------------------
+          // Avatar pointer down
+          // --------------------------------------------------
+
+          avatar.on("pointerdown", (event) => {
+            playClickSound("/assets/alien01.mp3");
+
+            if (draggedAvatar || isPanning) {
+              return;
+            }
+
+            event.stopPropagation();
+
+            draggedAvatar = avatar;
+
+            draggedAvatarData = avatarData;
+
+            dragPointerId = event.pointerId;
+
+            startPointerX = event.global.x;
+
+            startPointerY = event.global.y;
+
+            hasMoved = false;
+
+            // Get position in world
+            const localPos = event.getLocalPosition(world);
+
+            dragOffsetX = localPos.x - avatar.x;
+
+            dragOffsetY = localPos.y - avatar.y;
+
+            avatar.targetX = avatar.x;
+
+            avatar.targetY = avatar.y;
+
+            avatar.speechBubble.visible = false;
+
+            avatar.hoverIcon.visible = false;
+
+            document.body.style.userSelect = "none";
+
+            document.body.style.cursor = "default";
+
+            event.preventDefault?.();
+          });
+
+          // Put avatar inside world
+          world.addChild(avatar);
+
+          activeAvatars.push(avatar);
+        }
+
+        // ====================================================
+        // TICKER
+        // ====================================================
+
+        app.ticker.add((ticker) => {
+          if (destroyed) {
+            return;
+          }
+
+          // ------------------------------------------------
+          // EDGE SCROLLING
+          // ------------------------------------------------
+
+          if (!isPanning && !draggedAvatar) {
+            const pointer = app.renderer.events.pointer.global;
+
+            const mouseX = pointer.x;
+
+            const mouseY = pointer.y;
+
+            if (mouseX < EDGE_SCROLL_SIZE) {
+              cameraX -= EDGE_SCROLL_SPEED * ticker.deltaTime;
+            }
+
+            if (mouseX > app.screen.width - EDGE_SCROLL_SIZE) {
+              cameraX += EDGE_SCROLL_SPEED * ticker.deltaTime;
+            }
+
+            if (mouseY < EDGE_SCROLL_SIZE) {
+              cameraY -= EDGE_SCROLL_SPEED * ticker.deltaTime;
+            }
+
+            if (mouseY > app.screen.height - EDGE_SCROLL_SIZE) {
+              cameraY += EDGE_SCROLL_SPEED * ticker.deltaTime;
+            }
+
+            clampCamera();
+          }
+
+          // ------------------------------------------------
+          // AVATAR MOVEMENT
+          // ------------------------------------------------
+
+          for (const avatar of activeAvatars) {
+            if (avatar.isDragging) {
+              continue;
+            }
+
+            avatar.x +=
+              (avatar.targetX - avatar.x) * AVATAR_SPEED * ticker.deltaTime;
+
+            avatar.y +=
+              (avatar.targetY - avatar.y) * AVATAR_SPEED * ticker.deltaTime;
+
+            const distance = Math.hypot(
+              avatar.targetX - avatar.x,
+              avatar.targetY - avatar.y,
+            );
+
+            // New random target
+            if (distance < 5) {
+              avatar.targetX =
+                margin + Math.random() * (WORLD_WIDTH - margin * 2);
+
+              avatar.targetY =
+                margin + Math.random() * (WORLD_HEIGHT - margin * 2);
+            }
+          }
+
+          // ------------------------------------------------
+          // AVATAR COLLISIONS
+          // ------------------------------------------------
+
+          const minDistance = AVATAR_RADIUS * 2;
+
+          for (let i = 0; i < activeAvatars.length; i++) {
+            for (let j = i + 1; j < activeAvatars.length; j++) {
+              const a = activeAvatars[i];
+
+              const b = activeAvatars[j];
+
+              const dx = b.x - a.x;
+
+              const dy = b.y - a.y;
+
+              const distance = Math.hypot(dx, dy);
+
+              if (distance < minDistance) {
+                const angle =
+                  distance === 0
+                    ? Math.random() * Math.PI * 2
+                    : Math.atan2(dy, dx);
+
+                const overlap = minDistance - distance;
+
+                const separationX = Math.cos(angle) * (overlap / 2);
+
+                const separationY = Math.sin(angle) * (overlap / 2);
+
+                if (!a.isDragging) {
+                  a.x -= separationX;
+
+                  a.y -= separationY;
+
+                  a.targetX =
+                    margin + Math.random() * (WORLD_WIDTH - margin * 2);
+
+                  a.targetY =
+                    margin + Math.random() * (WORLD_HEIGHT - margin * 2);
+                }
+
+                if (!b.isDragging) {
+                  b.x += separationX;
+
+                  b.y += separationY;
+
+                  b.targetX =
+                    margin + Math.random() * (WORLD_WIDTH - margin * 2);
+
+                  b.targetY =
+                    margin + Math.random() * (WORLD_HEIGHT - margin * 2);
+                }
               }
             }
           }
-        }
-      });
+        });
 
-      window.addEventListener("resize", resize);
+        // ----------------------------------------------------
+        // Resize listener
+        // ----------------------------------------------------
+
+        window.addEventListener("resize", resize);
+
+        // Initial camera clamp
+        clampCamera();
+      } catch (error) {
+        console.error("Failed to initialise Plaza:", error);
+      }
     }
 
     setup();
 
-    // Cleanup
+    // ========================================================
+    // CLEANUP
+    // ========================================================
+
     return () => {
       destroyed = true;
 
@@ -586,66 +970,142 @@ export default function Plaza({ avatars }: PlazaProps) {
       window.removeEventListener("pointercancel", handleWindowPointerCancel);
 
       document.body.style.userSelect = "";
+
       document.body.style.cursor = "";
 
-      if (!initialized) return;
-
-      app.destroy(true, {
-        children: true,
-        texture: true,
-      });
+      if (initialized) {
+        try {
+          app.destroy(true, {
+            children: true,
+            texture: true,
+          });
+        } catch (error) {
+          console.error("Error destroying Plaza Pixi app:", error);
+        }
+      }
     };
   }, [avatars, router]);
 
-  const collectionButton = document.querySelector('#collection-button');
-  const folderIcon = document.querySelector('#folder');
-  if (collectionButton && folderIcon) {
-    collectionButton.addEventListener('mouseenter', () => {
-      folderIcon.setAttribute('src', '/assets/folder-open.png');
-    });
+  // ==========================================================
+  // WELCOME POPUP
+  // ==========================================================
 
-    collectionButton.addEventListener('mouseleave', () => {
-      folderIcon.setAttribute('src', '/assets/folder-closed.png');
-    });
-  }
-
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
   useEffect(() => {
-      const hasSeenPopup = localStorage.getItem("meloplaza-welcome-seen");
+    let cancelled = false;
+
+    const checkPopup = async () => {
+      const userId = await getCurrentUserId();
+
+      if (cancelled || !userId) {
+        return;
+      }
+
+      const hasSeenPopup = localStorage.getItem(
+        `meloplaza-welcome-seen-${userId}`,
+      );
 
       if (!hasSeenPopup) {
         setIsPopupOpen(true);
       }
-    }, []);
-
-  const closePopup = () => {
-      setIsPopupOpen(false);
-      localStorage.setItem("meloplaza-welcome-seen", "true");
-      playClickSound("/assets/click.mp3");
     };
+
+    checkPopup();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // ==========================================================
+  // CLOSE POPUP
+  // ==========================================================
+
+  const closePopup = async () => {
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      return;
+    }
+
+    setIsPopupOpen(false);
+
+    localStorage.setItem(`meloplaza-welcome-seen-${userId}`, "true");
+
+    playClickSound("/assets/click.mp3");
+  };
+
+  // ==========================================================
+  // RENDER
+  // ==========================================================
 
   return (
     <>
-      <div ref={containerRef} className="h-screen w-full overflow-hidden">
+      <div ref={containerRef} className="fixed inset-0 overflow-hidden">
+        {/* Welcome popup */}
         <div id="welcome-popup">
-        <Popup title="Welcome!" isOpen={isPopupOpen} onClose={closePopup}>
-          <div className="flex flex-col gap-4 text-center">
-            <p className="text-lg font-bold">About</p>
-            <p className="text-sm"><b>meloplaza</b> is a music recommendation platform which allows you to introduce songs to strangers in a meaningful way.</p>
-            <p className="text-sm mb-2">By exploring recommendations at your own pace instead of relying on heavily-algorithmed streaming services, you might discover new music you would never have heard otherwise!</p>
-            <p className="font-bold">How to Play:</p>
-            <ul className="list-disc list-inside text-left text-sm mb-2">
-              <li>Try dragging and clicking on avatars to interact with them.</li>
-              <li>Add songs you like to your collection.</li>
-              <li>Print your collection to take home as a memento.</li>
-            </ul>
-            <p className="text-lg font-bold text-center">That's all, have fun!</p>
-            <p className="text-lg font-bold text-center">ヽ(・∀・)ﾉ</p>
-          </div>
-        </Popup>
+          <Popup title="Welcome!" isOpen={isPopupOpen} onClose={closePopup}>
+            <div className="flex flex-col gap-4 text-center">
+              <p className="text-lg font-bold">About</p>
+
+              <p className="text-sm">
+                <b>meloplaza</b> is a music recommendation platform which allows
+                you to introduce songs to strangers in a meaningful way.
+              </p>
+
+              <p className="text-sm mb-2">
+                By exploring recommendations at your own pace instead of relying
+                on heavily- algorithmed streaming services, you might discover
+                new music you would never have heard otherwise!
+              </p>
+
+              <p className="font-bold">How to Play:</p>
+
+              <ul className="list-disc list-inside text-left text-sm mb-2">
+                <li>
+                  Move your mouse to the edge of the screen or drag the ground
+                  to move the camera.
+                </li>
+                <li>
+                  Try dragging and clicking on avatars to interact with them.
+                </li>
+
+                <li>Add songs you like to your collection.</li>
+
+                <li>Print your collection to take home as a memento.</li>
+              </ul>
+
+              <p className="text-lg font-bold text-center">
+                That's all, have fun!
+              </p>
+
+              <p className="text-lg font-bold text-center">ヽ(・∀・)ﾉ</p>
+            </div>
+          </Popup>
         </div>
-        <div id="collection-button" className="flex flex-col items-center justify-center fixed bottom-8 right-8 hover:cursor-pointer" onClick={() => { router.push("/collection"); playClickSound("/assets/click.mp3"); }}> 
-          <img id="folder" className="w-30 h-30" src="/assets/folder-closed.png" />
+
+        {/* Collection button */}
+        <div
+          id="collection-button"
+          className="fixed bottom-8 right-8 flex flex-col items-center justify-center hover:cursor-pointer"
+          onMouseEnter={() => setIsCollectionHovered(true)}
+          onMouseLeave={() => setIsCollectionHovered(false)}
+          onClick={() => {
+            playClickSound("/assets/click.mp3");
+
+            router.push("/collection");
+          }}
+        >
+          <img
+            id="folder"
+            className="w-30 h-30"
+            src={
+              isCollectionHovered
+                ? "/assets/folder-open.png"
+                : "/assets/folder-closed.png"
+            }
+            alt="Collection"
+          />
+
           <h1 className="font-bold text-lg -mt-4">Go to Collection</h1>
         </div>
       </div>

@@ -22,7 +22,7 @@ const PROMPTS = [
 export default function PromptSelection() {
   const { formData, updateForm } = useFormStore();
 
-  // Restore previously saved prompt if user navigates back
+  // Restore previously saved prompt if available
   const initialIndex = formData.prompt
     ? PROMPTS.indexOf(formData.prompt)
     : null;
@@ -31,6 +31,7 @@ export default function PromptSelection() {
     initialIndex !== -1 ? initialIndex : null,
   );
 
+  // Get selected prompt text based on selected index and display it below list of prompts
   const selectedPromptText =
     selectedIndex !== null ? PROMPTS[selectedIndex] : null;
 
@@ -45,7 +46,7 @@ export default function PromptSelection() {
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row">
-      {/* Show choices from previous pages */}
+      {/* Show profile preview */}
       <ProfilePreview />
 
       <Window
@@ -60,6 +61,7 @@ export default function PromptSelection() {
           </div>
         }
       >
+        {/* List of prompts */}
         <div className="w-full max-h-70 overflow-y-auto border-2 border-t-win-border-dark border-l-win-border-dark border-b-win-border-alt border-r-win-border-alt rounded-sm bg-white">
           {PROMPTS.map((promptText, index) => (
             <button
@@ -81,6 +83,7 @@ export default function PromptSelection() {
             </button>
           ))}
         </div>
+        {/* Display selected prompt text below the list of prompts, otherwise, display nothing */}
         {selectedPromptText !== null && (
           <div className="flex flex-col items-center justify-center h-25">
             <h1 className="text-lg font-bold mt-4 mb-2 text-center text-gray-600">

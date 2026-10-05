@@ -9,6 +9,7 @@ import BackgroundMusic from "@/components/BgMusic";
 
 import { Gruppo, M_PLUS_Rounded_1c } from "next/font/google";
 
+// Load Google fonts
 const mPlus = M_PLUS_Rounded_1c({
   variable: "--font-m-plus",
   subsets: ["latin"],
@@ -21,6 +22,7 @@ const gruppo = Gruppo({
   weight: "400",
 });
 
+// Metadata for the application
 export const metadata: Metadata = {
   title: "meloplaza",
   description: "A social music discovery platform free of algorithms.",
@@ -32,6 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    // Wrap in ViewTransitions for smooth page transitions
     <ViewTransitions>
       <html lang="en" className={`${mPlus.variable} ${gruppo.variable}`}>
         <body className="font-sans antialiased min-h-screen bg-slate-50 text-black m-0 p-0">
@@ -47,10 +50,12 @@ export default function RootLayout({
           </div>
 
           <div className="relative z-10 min-h-screen w-full">
+            {/* Wrap in FormProvider to provide form context (carry state between pages) */}
             <FormProvider>{children}</FormProvider>
           </div>
           <div className="fixed bottom-4 left-4 z-50">
-          <BackgroundMusic />
+            {/* Play background music */}
+            <BackgroundMusic />
           </div>
         </body>
       </html>

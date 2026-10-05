@@ -17,7 +17,7 @@ export default function SongSelection({ tracks, query }: SongSelectionProps) {
 
   const [selectedTrack, setSelectedTrack] = useState<any>(null);
 
-  // Restore previously selected song when coming back to this page
+  // Restore selected song from form data if available
   useEffect(() => {
     if (formData.songId && !selectedTrack) {
       setSelectedTrack({
@@ -45,11 +45,13 @@ export default function SongSelection({ tracks, query }: SongSelectionProps) {
     if (typeof window !== "undefined") {
       const clickAudio = new Audio("/assets/click.mp3");
       clickAudio.volume = 0.5;
-      clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+      clickAudio
+        .play()
+        .catch((err) => console.error("Audio blocked by browser:", err));
     }
   }
 
-  // Save the selected song to the shared form state
+  // Save selected song to form data and update state
   const handleSelectTrack = (track: any) => {
     setSelectedTrack(track);
     playClickSound();
@@ -73,7 +75,9 @@ export default function SongSelection({ tracks, query }: SongSelectionProps) {
     if (typeof window !== "undefined") {
       const typeAudio = new Audio("/assets/type.mp3");
       typeAudio.volume = 0.2;
-      typeAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+      typeAudio
+        .play()
+        .catch((err) => console.error("Audio blocked by browser:", err));
     }
   }
 

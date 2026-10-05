@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFormStore } from "@/app/context/FormContext";
 import { createClient } from "@/lib/supabase/client";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function ConfirmNewUserPage() {
   const router = useRouter();
@@ -24,10 +25,10 @@ export default function ConfirmNewUserPage() {
     try {
       const supabase = createClient();
 
-      // Force a clean session so testing multiple users generates distinct IDs
+      // Force clean session
       await supabase.auth.signOut();
 
-      // Execute anonymous sign-in to get a fresh user session
+      // Execute anonymous sign-in
       const { data, error: anonError } =
         await supabase.auth.signInAnonymously();
 
@@ -36,13 +37,14 @@ export default function ConfirmNewUserPage() {
         throw new Error(`Auth failed: ${anonError.message}`);
       }
 
+      // Get new user ID
       const userId = data?.user?.id || data?.session?.user?.id;
 
       if (!userId) {
         throw new Error("Failed to retrieve user ID after anonymous sign-in.");
       }
 
-      // Post to API route
+      // Post to API route then redirect to plaza
       const res = await fetch("/api/users", {
         method: "POST",
         headers: {
@@ -71,12 +73,11 @@ export default function ConfirmNewUserPage() {
     }
   };
 
-  // Show the plain loading screen while submitting
+  // Show loading screen while submitting
   if (loading) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center font-heading text-2xl font-bold cursor-wait">
-        Loading...
-      </div>
+      <LoadingScreen
+      />
     );
   }
 
@@ -134,15 +135,13 @@ export default function ConfirmNewUserPage() {
             </h2>
 
             {formData.prompt ? (
-              <p className="italic wrap-break-word">
-                "{formData.prompt}"
-              </p>
+              <p className="italic wrap-break-word">"{formData.prompt}"</p>
             ) : (
               <p className="italic text-gray-400">No prompt selected</p>
             )}
           </div>
 
-          {/* Chosen song */}
+          {/* Selected song */}
           <div className="border-2 border-win-border-alt p-3 rounded-sm bg-white">
             <h2 className="font-semibold text-xs text-gray-600 uppercase mb-2">
               Song
@@ -163,9 +162,7 @@ export default function ConfirmNewUserPage() {
                 )}
 
                 <div className="min-w-0 flex-1">
-                  <p className="wrap-break-word">
-                    {formData.songName}
-                  </p>
+                  <p className="wrap-break-word">{formData.songName}</p>
 
                   <p className="text-sm text-gray-600 wrap-break-word">
                     {formData.songArtist}{" "}

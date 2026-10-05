@@ -17,9 +17,11 @@ export default function AddMessage() {
     }
   }
 
+  // Enforce character limit for message input
   const characterLimit = 300;
   const message = formData.message || "";
 
+  // Handle message input change and update form data 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     playTypeSound();
     const inputValue = e.target.value;
@@ -29,13 +31,11 @@ export default function AddMessage() {
         message: inputValue,
       });
     }
-
-
   };
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row">
-      {/* Show choices from previous pages */}
+      {/* Show profile preview */}
       <ProfilePreview />
 
       <Window

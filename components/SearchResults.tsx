@@ -16,6 +16,7 @@ export default function SearchResults({
 }: SearchResultsProps) {
   const playerRef = useRef<HTMLDivElement>(null);
 
+  // Scroll to music player when a song is selected
   useEffect(() => {
     if (!selectedTrack) return;
 
@@ -28,7 +29,7 @@ export default function SearchResults({
 
   return (
     <div className="w-full mt-4 flex flex-col gap-4 items-center justify-center">
-      {/* Results */}
+      {/* Track list */}
       <div className="w-full flex flex-col justify-center">
         <h2 className="text-lg font-semibold text-gray-600 mb-2">
           Search Results
@@ -80,7 +81,7 @@ export default function SearchResults({
         </ul>
       </div>
 
-      {/* Player, only after a song is selected */}
+      {/* Display music player after a song is selected */}
       {selectedTrack && (
         <div
           ref={playerRef}

@@ -89,7 +89,6 @@ export default function Popup({
             p-3
             text-lg
             font-bold
-            text-black
             select-none
             shadow-[inset_0_1px_0px_rgba(255,255,255,0.9)]
           "
@@ -134,8 +133,7 @@ export default function Popup({
                 )
               `,
             }}
-          >
-          </button>
+          ></button>
 
           {/* Title */}
           <span className="font-heading leading-none">{title}</span>

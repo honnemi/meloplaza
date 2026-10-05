@@ -1,18 +1,18 @@
-'use client'; 
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 export default function BackgroundMusic() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    // Initialize the audio
-    audioRef.current = new Audio('/assets/bg-music.mp3');
+    // Load the audio file
+    audioRef.current = new Audio("/assets/bg-music.mp3");
     audioRef.current.loop = true;
     audioRef.current.volume = 0.1;
 
-    // Define what happens on the user's first interaction
+    // Play audio on first user interaction (click, keydown, or touchstart)
     const handleFirstInteraction = async () => {
       if (!audioRef.current) return;
 
@@ -30,15 +30,15 @@ export default function BackgroundMusic() {
     };
 
     const cleanupListeners = () => {
-      window.removeEventListener('click', handleFirstInteraction);
-      window.removeEventListener('keydown', handleFirstInteraction);
-      window.removeEventListener('touchstart', handleFirstInteraction);
+      window.removeEventListener("click", handleFirstInteraction);
+      window.removeEventListener("keydown", handleFirstInteraction);
+      window.removeEventListener("touchstart", handleFirstInteraction);
     };
 
     // Attach listeners to common user interactions
-    window.addEventListener('click', handleFirstInteraction);
-    window.addEventListener('keydown', handleFirstInteraction);
-    window.addEventListener('touchstart', handleFirstInteraction);
+    window.addEventListener("click", handleFirstInteraction);
+    window.addEventListener("keydown", handleFirstInteraction);
+    window.addEventListener("touchstart", handleFirstInteraction);
 
     // Clean up audio and listeners if component unmounts
     return () => {
@@ -50,6 +50,7 @@ export default function BackgroundMusic() {
     };
   }, []);
 
+  // Toggle music on button click
   const toggleMusic = async () => {
     if (!audioRef.current) return;
 
@@ -67,15 +68,16 @@ export default function BackgroundMusic() {
   };
 
   return (
-    <button 
+    // Toggle button for background music
+    <button
       onClick={toggleMusic}
       style={{
-        fontSize: '36px',
-        padding: '10px 15px',
-        cursor: 'pointer'
+        fontSize: "36px",
+        padding: "10px 15px",
+        cursor: "pointer",
       }}
     >
-      {isPlaying ? '🔊' : '🔇'}
+      {isPlaying ? "🔊" : "🔇"}
     </button>
   );
 }

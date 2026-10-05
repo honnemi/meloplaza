@@ -8,6 +8,7 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen w-full">
       <main className="flex flex-col items-center justify-center w-full">
         <img src="/assets/logo.svg" />
+        {/* Animated text typing effect for Meloplaza*/}
         <TextType 
           text={["meloplaza"]}
           typingSpeed={100}
@@ -18,6 +19,7 @@ export default function Home() {
           cursorBlinkDuration={0.5}
         />
         <div className="scale-125 sm:scale-150 md:scale-[2] transform origin-center mt-8 sm:mt-12">
+          {/* Start button */}
           <Button label="Start" href="/create-avatar" />
         </div>
       </main>

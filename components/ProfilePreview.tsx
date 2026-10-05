@@ -44,7 +44,7 @@ export default function ProfilePreview() {
               )}
             </div>
 
-            {/* Chosen song */}
+            {/* Selected song */}
             <div className="border-2 border-win-border-alt p-2 rounded-sm bg-white">
               <h2 className="font-semibold text-[9px] text-gray-600 uppercase mb-1">
                 Song

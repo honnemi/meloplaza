@@ -17,7 +17,11 @@ export default function Window({
 }: WindowProps) {
   return (
     <div
-      className={`relative z-10 flex flex-col md:w-[60%] md:h-150 sm:w-full sm:h-full overflow-hidden rounded-md
+      className={`relative z-10 flex flex-col
+        w-[calc(100%-1rem)] sm:w-full md:w-[60%]
+        max-h-[calc(100dvh-2rem)]
+        h-150
+        overflow-hidden rounded-md
         border-2 border-win-border-dark
         shadow-[3px_3px_0px_rgba(0,90,100,0.3)]
         ${className}`}
@@ -27,18 +31,18 @@ export default function Window({
         className="shrink-0
           bg-(image:--win-titlebar)
           border-b-2 border-win-border-dark
-          p-3 text-lg font-bold 
+          p-3 text-lg font-bold
           select-none
           shadow-[inset_0_1px_0px_rgba(255,255,255,0.9)]
           flex items-center justify-center gap-2"
       >
         {icon && (
-          <span className="inline-flex h-5 w-5 items-center justify-center leading-none">
+          <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center leading-none">
             {icon}
           </span>
         )}
 
-        <h1 className="leading-none">{title}</h1>
+        <h1 className="leading-none truncate">{title}</h1>
       </div>
 
       {/* Main content */}
@@ -51,7 +55,8 @@ export default function Window({
         }}
       >
         <div
-          className={`h-full bg-white/60 p-6 
+          className={`h-full bg-white/60
+            p-4 sm:p-6
             rounded-sm
             border-2 border-win-border
             overflow-y-auto relative z-10 scroll-smooth

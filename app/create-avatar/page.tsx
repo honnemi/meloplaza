@@ -10,7 +10,7 @@ import { AVATAR_FACES, AVATAR_COLOURS } from "../avatar-customisation";
 export default function AvatarCreation() {
   const { formData, updateForm } = useFormStore();
 
-  // Restore saved state from context if available, otherwise default to initial values
+  // Restore from form data if available, otherwise default to initial values
   const [faceIndex, setFaceIndex] = useState<number>(formData.faceIndex ?? 0);
   const [displayName, setDisplayName] = useState<string>(
     formData.displayName || "",
@@ -19,14 +19,13 @@ export default function AvatarCreation() {
     formData.colour || AVATAR_COLOURS[0] || "#3B82F6",
   );
 
-  // Retrieve current face string using current faceIndex
-  const face = AVATAR_FACES[faceIndex] || AVATAR_FACES[0];
-
+  // Randomise face index
   const handleRandomise = () => {
     const randomIndex = Math.floor(Math.random() * AVATAR_FACES.length);
     setFaceIndex(randomIndex);
   };
 
+  // Update form before navigating to next page
   const handleNext = () => {
     updateForm({
       faceIndex,
@@ -40,13 +39,16 @@ export default function AvatarCreation() {
     if (typeof window !== "undefined") {
       const typeAudio = new Audio("/assets/type.mp3");
       typeAudio.volume = 0.2;
-      typeAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+      typeAudio
+        .play()
+        .catch((err) => console.error("Audio blocked by browser:", err));
     }
   }
 
   // Enforce character limit for display name
   const characterLimit = 20;
 
+  // Handle display name input change and update form data
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     playTypeSound();
     const inputValue = e.target.value;
@@ -85,6 +87,7 @@ export default function AvatarCreation() {
                 className="text-input"
               />
 
+              {/* Character limit */}
               <div className="flex flex-row justify-end mt-2">
                 <span
                   className={`text-sm transition-all duration-150 ${

@@ -13,32 +13,30 @@ import Window from "@/components/Window";
 import Button, { SecondaryButton } from "@/components/Button";
 import Avatar from "@/components/Avatar";
 import MusicPlayer from "@/components/MusicPlayer";
+import LoadingScreen from "@/components/LoadingScreen";
 
-function playMessageSoundIn() {
-    if (typeof window !== "undefined") {
-      const messageAudio = new Audio("/assets/msg-receive.mp3");
-      messageAudio.volume = 0.5;
-      messageAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
-    }
+// Play sound on message animation start
+function playMessageSound() {
+  if (typeof window !== "undefined") {
+    const messageAudio = new Audio("/assets/msg.mp3");
+    messageAudio.volume = 0.5;
+    messageAudio
+      .play()
+      .catch((err) => console.error("Audio blocked by browser:", err));
   }
+}
 
-  function playMessageSoundOut() {
-    if (typeof window !== "undefined") {
-      const messageAudio = new Audio("/assets/msg-send.mp3");
-      messageAudio.volume = 0.5;
-      messageAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
-    }
-  }
-
+// Store replies to show after user adds recommendation to collection
 const REPLIES = [
   "Thanks for the recommendation!",
   "I've added it to my collection ♡",
 ];
 
-// Number of entries in the `messages` array built in the component.
-// The music player's animation delay is MESSAGE_COUNT * 1000ms.
+// Number of entries in the `messages` array built in the component
+// The music player's animation delay is MESSAGE_COUNT * 1000ms
 const MESSAGE_COUNT = 5;
 
+// Format date
 const formatTime = (date: string | Date) =>
   new Date(date).toLocaleString("en-AU", {
     day: "numeric",
@@ -48,8 +46,10 @@ const formatTime = (date: string | Date) =>
     minute: "2-digit",
   });
 
+// Make display name colour match avatar colour
 const nameColour = (colour?: string) => colour;
 
+// ChatLine component to display single chat message
 interface ChatLineProps {
   name?: string;
   colour?: string;
@@ -74,16 +74,19 @@ function ChatLine({
     <div
       className={`message-in ${right ? "flex justify-end" : ""}`}
       style={style}
-      onAnimationStart={playMessageSoundIn}
+      onAnimationStart={playMessageSound}
     >
+      {/* Display name */}
       <div className={right ? "max-w-[85%]" : undefined}>
         <p className="text-gray-900 wrap-break-word">
           <span className="font-bold" style={{ color: nameColour(colour) }}>
             {name}:
           </span>{" "}
+          {/* Message text */}
           {text}
         </p>
 
+        {/* Timestamp */}
         <p className={`text-xs text-gray-600 ${right ? "text-right" : ""}`}>
           {time}
         </p>
@@ -106,6 +109,7 @@ export default function ShowRecommendation() {
   const [skipDelays, setSkipDelays] = useState(false);
   const [replyTime, setReplyTime] = useState(() => new Date());
 
+  // Scroll to bottom of chat when new messages are added
   const chatRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -116,6 +120,25 @@ export default function ShowRecommendation() {
 
   const ready = !!otherUser && !!recommendation && !checkingCollection;
 
+  // Display messages with delays unless the recommendation has already been added to collection
+  useEffect(() => {
+    if (!ready) return;
+
+    const delay = skipDelays ? 0 : MESSAGE_COUNT * 1000 + 100;
+    const t = setTimeout(scrollToBottom, delay);
+
+    return () => clearTimeout(t);
+  }, [ready, skipDelays]);
+
+  // Scroll to bottom when recommendation is added to collection
+  useEffect(() => {
+    if (!addedToCollection) return;
+
+    const raf = requestAnimationFrame(scrollToBottom);
+    return () => cancelAnimationFrame(raf);
+  }, [addedToCollection]);
+
+  // Get recommendation and user data when component mounts
   useEffect(() => {
     if (!id) return;
 
@@ -155,24 +178,7 @@ export default function ShowRecommendation() {
     return () => clearTimeout(timer);
   }, [id]);
 
-  // Scroll to the bottom when the music player appears
-  useEffect(() => {
-    if (!ready) return;
-
-    const delay = skipDelays ? 0 : MESSAGE_COUNT * 1000 + 100;
-    const t = setTimeout(scrollToBottom, delay);
-
-    return () => clearTimeout(t);
-  }, [ready, skipDelays]);
-
-  // Scroll to the bottom when the song is added to the collection
-  useEffect(() => {
-    if (!addedToCollection) return;
-
-    const raf = requestAnimationFrame(scrollToBottom);
-    return () => cancelAnimationFrame(raf);
-  }, [addedToCollection]);
-
+  // Handle adding recommendation to collection
   const handleAddToCollection = async () => {
     if (!recommendation?.id || addingToCollection || addedToCollection) return;
 
@@ -190,14 +196,14 @@ export default function ShowRecommendation() {
     setAddingToCollection(false);
   };
 
+  // Show loading screen if data is still being fetched
   if (!otherUser || !recommendation || checkingCollection) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center font-heading text-2xl font-bold cursor-wait">
-        Loading...
-      </div>
+      <LoadingScreen />
     );
   }
 
+  // Messages to display in chat
   const messages = [
     "Hi!",
     `${recommendation.prompt} is...`,
@@ -206,7 +212,7 @@ export default function ShowRecommendation() {
     "Give it a listen and tell me what you think!",
   ];
 
-  // When already added, skip message animations
+  // When recommendation already added, skip message animations
   const getMessageStyle = (delay: number) => ({
     animationDelay: skipDelays ? "0ms" : `${delay}ms`,
     animationDuration: skipDelays ? "0ms" : undefined,
@@ -244,7 +250,7 @@ export default function ShowRecommendation() {
             <div
               className="message-in py-4"
               style={getMessageStyle(messages.length * 1000)}
-              onAnimationStart={playMessageSoundIn}
+              onAnimationStart={playMessageSound}
             >
               <MusicPlayer
                 songId={recommendation.song_id}
@@ -253,9 +259,9 @@ export default function ShowRecommendation() {
               />
             </div>
 
-            {/* Current user's replies */}
+            {/* Replies */}
             {addedToCollection &&
-              REPLIES.map((text) => (
+              REPLIES.map((text, i) => (
                 <ChatLine
                   key={text}
                   align="right"
@@ -263,7 +269,8 @@ export default function ShowRecommendation() {
                   colour={currentUser?.colour}
                   text={text}
                   time={formatTime(replyTime)}
-                  onAnimationStart={playMessageSoundOut}
+                  onAnimationStart={playMessageSound}
+                  style={getMessageStyle(i * 1000)}
                 />
               ))}
           </div>
@@ -284,7 +291,7 @@ export default function ShowRecommendation() {
               </p>
             </div>
 
-            {/* Add to collection */}
+            {/* Add to collection button*/}
             <div
               className={`w-full transition-all duration-500 ${
                 showActions

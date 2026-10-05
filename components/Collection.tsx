@@ -50,10 +50,13 @@ export default function Collection({ collection }: CollectionProps) {
     if (typeof window !== "undefined") {
       const clickAudio = new Audio("/assets/click.mp3");
       clickAudio.volume = 0.2;
-      clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+      clickAudio
+        .play()
+        .catch((err) => console.error("Audio blocked by browser:", err));
     }
   }
 
+  // Open details popup for selected song and fetch user data for that recommendation
   const openPopup = async (
     recommendation: CollectionItem["Recommendations"],
   ) => {
@@ -67,6 +70,7 @@ export default function Collection({ collection }: CollectionProps) {
     setLoadingUser(false);
   };
 
+  // Close popup and reset selected song and user
   const closePopup = () => {
     setSelectedSong(null);
     setSelectedUser(null);
@@ -81,11 +85,15 @@ export default function Collection({ collection }: CollectionProps) {
         footer={
           <div className="flex justify-between w-full">
             <Button label="Back" href="/plaza" />
-            <SecondaryButton label="Print" href="/collection/print" icon={<i className="hn hn-print-solid"></i>} />
+            <SecondaryButton
+              label="Print"
+              href="/collection/print"
+              icon={<i className="hn hn-print-solid"></i>}
+            />
           </div>
-          
         }
       >
+        {/* Diplay message if collection is empty, otherwise show grid of songs */}
         {collection.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <p className="text-center text-gray-400">
@@ -121,7 +129,7 @@ export default function Collection({ collection }: CollectionProps) {
                     min-w-0
                   "
                 >
-                  {/* Album (song) */}
+                  {/* Song */}
                   <div
                     className="
                       relative
@@ -203,9 +211,7 @@ export default function Collection({ collection }: CollectionProps) {
                 />
 
                 <div className="min-w-0">
-                  <p className="text-lg font-bold">
-                    {selectedSong.song_name}
-                  </p>
+                  <p className="text-lg font-bold">{selectedSong.song_name}</p>
 
                   <p className="text-sm text-gray-600">
                     {selectedSong.song_artist}
@@ -261,9 +267,7 @@ export default function Collection({ collection }: CollectionProps) {
                     PROMPT
                   </p>
 
-                  <p className="text-sm leading-5">
-                    {selectedSong.prompt}
-                  </p>
+                  <p className="text-sm leading-5">{selectedSong.prompt}</p>
                 </div>
 
                 <div>
@@ -271,9 +275,7 @@ export default function Collection({ collection }: CollectionProps) {
                     MESSAGE
                   </p>
 
-                  <p className="text-sm leading-5">
-                    {selectedSong.message}
-                  </p>
+                  <p className="text-sm leading-5">{selectedSong.message}</p>
                 </div>
               </div>
             </section>

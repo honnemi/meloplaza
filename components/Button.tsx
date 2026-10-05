@@ -1,5 +1,3 @@
-"use client";
-
 import { Link } from "next-view-transitions";
 import type { ReactNode } from "react";
 
@@ -17,7 +15,9 @@ function playClickSound() {
   if (typeof window !== "undefined") {
     const clickAudio = new Audio("/assets/click.mp3");
     clickAudio.volume = 0.5;
-    clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+    clickAudio
+      .play()
+      .catch((err) => console.error("Audio blocked by browser:", err));
   }
 }
 
@@ -159,7 +159,6 @@ export function ColourButton({
   onClick,
   disabled = false,
 }: ColourButtonProps) {
-  
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     playClickSound();
     if (onClick) onClick(e);

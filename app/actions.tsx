@@ -74,46 +74,6 @@ export async function createRecommendation({
   return { success: true };
 }
 
-export async function createRecommendationForUser({
-  prompt,
-  songName,
-  songArtist,
-  songAlbum,
-  songYear,
-  message,
-  songId,
-  songDuration,
-  createdFor,
-}: RecommendationProps) {
-  const supabase = await createClient();
-  const currentUserId = await getCurrentUserId();
-
-  const { error } = await supabase.from("Recommendations").insert({
-    prompt: prompt,
-    song_name: songName,
-    song_artist: songArtist,
-    song_album: songAlbum,
-    song_year: songYear,
-    message: message,
-    song_id: songId,
-    song_duration: songDuration,
-    created_by: currentUserId,
-    created_for: createdFor,
-  });
-
-  if (error) {
-    console.error("Error inserting data:", error.message);
-    return { error: error.message };
-  }
-
-  const headerList = await headers();
-  const currentPath = headerList.get("x-pathname") || "/";
-
-  revalidatePath(currentPath);
-
-  return { success: true };
-}
-
 export async function getUserRecommendationById(userId: string) {
   const supabase = await createClient();
 

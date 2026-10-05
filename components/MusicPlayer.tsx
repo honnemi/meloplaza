@@ -58,7 +58,7 @@ export default function MusicPlayer({
               style={{ border: "1px solid rgba(255,255,255,0.45)" }}
             />
 
-            {/* Spindle */}
+            {/* CD hole */}
             <div
               className="absolute rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
               style={{

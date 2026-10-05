@@ -9,9 +9,11 @@ interface PageProps {
 export default async function SelectSong({ searchParams }: PageProps) {
   const { q: query } = await searchParams;
 
+  // Fetch tracks from Spotify based on the query parameter
   const data = query ? await getSpotifyTracks(query) : null;
   const rawTracks = data?.tracks?.items || [];
 
+  // Map track data to array of objects for SongSelection component
   const tracks = rawTracks.map((track: any) => ({
     id: track.id,
     name: track.name,
@@ -26,7 +28,9 @@ export default async function SelectSong({ searchParams }: PageProps) {
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row">
+      {/* Show profile preview */}
       <ProfilePreview />
+      {/* Show song selection component */}
       <SongSelection tracks={tracks} query={query} />
     </div>
   );

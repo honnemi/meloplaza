@@ -6,6 +6,7 @@ import {
 import PrintButton from "@/components/PrintButton";
 import Button from "@/components/Button";
 
+// Format duration from ms to mm:ss
 function formatDuration(durationMs: number) {
   const totalSeconds = Math.floor(durationMs / 1000);
   const minutes = Math.floor(totalSeconds / 60);
@@ -17,10 +18,11 @@ function formatDuration(durationMs: number) {
 export default async function PrintCollection() {
   const collection = (await getUserCollection()) || [];
 
-  // Get the current logged-in user
+  // Get current logged-in user
   const currentUserId = await getCurrentUserId();
   const currentUser = currentUserId ? await getUserById(currentUserId) : null;
 
+  // Get current date and time
   const now = new Date();
   const currentDate = now.toLocaleDateString();
   const currentHour = now.getHours();
@@ -48,6 +50,7 @@ export default async function PrintCollection() {
   return (
     <div className="print-page min-h-screen flex items-center justify-center">
       <div className="receipt-container font-mono bg-white text-center flex flex-col gap-4 w-full max-w-sm mx-auto p-4 border shadow-sm">
+        {/* Header */}
         <div className="font-bold text-xl">meloplaza 𝄢</div>
 
         <hr />
@@ -76,6 +79,7 @@ export default async function PrintCollection() {
 
         <hr />
 
+        {/* Collection items (recommendations) */}
         <ul className="flex flex-col gap-3 list-none p-0 m-0 w-full">
           {collectionWithUsers.map((item) => {
             const song = item.Recommendations;
@@ -87,18 +91,22 @@ export default async function PrintCollection() {
                 key={song.id}
                 className="flex flex-row justify-between items-start"
               >
-                {/* Song information */}
+                {/* Recommendation details */}
                 <div className="flex flex-col flex-1 justify-start text-left text-sm w-[75%]">
-                  <p className="text-md font-bold tracking-wide leading-wide">{song.song_name} · {song.song_artist}</p>
+                  <p className="text-md font-bold tracking-wide leading-wide">
+                    {song.song_name} · {song.song_artist}
+                  </p>
 
                   <p className="text-xs tracking-wide leading-wide mb-2">
                     Recommended by @{item.user?.display_name}
                   </p>
 
-                  <p className="text-xs tracking-wide leading-wide">"{song.message}"</p>
+                  <p className="text-xs tracking-wide leading-wide">
+                    "{song.message}"
+                  </p>
                 </div>
 
-                {/* Duration */}
+                {/* Song duration */}
                 <div className="w-[25%] text-right text-sm">
                   <p>{formatDuration(song.song_duration)}</p>
                 </div>
@@ -109,17 +117,21 @@ export default async function PrintCollection() {
 
         <hr />
 
-        {/* Thank you + logo */}
+        {/* Thank you + QR code */}
         <div className="flex flex-col items-center justify-center gap-4 py-4">
           <div className="font-bold text-xl">THANKS FOR VISITING!</div>
-          <img className="w-30 h-30" src="/assets/qr-code.png" alt="QR Code to meloplaza" />
+          <img
+            className="w-30 h-30"
+            src="/assets/qr-code.png"
+            alt="QR Code to meloplaza"
+          />
           <p className="text-sm text-center w-50">
             Scan the QR code above to visit meloplaza again!
           </p>
         </div>
       </div>
 
-      {/* Print action */}
+      {/* Print button */}
       <div className="fixed top-6 right-6 z-50">
         <PrintButton />
       </div>
