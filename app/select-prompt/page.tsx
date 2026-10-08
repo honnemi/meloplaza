@@ -40,7 +40,9 @@ export default function PromptSelection() {
     if (typeof window !== "undefined") {
       const clickAudio = new Audio("/assets/click.mp3");
       clickAudio.volume = 0.2;
-      clickAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+      clickAudio
+        .play()
+        .catch((err) => console.error("Audio blocked by browser:", err));
     }
   }
 

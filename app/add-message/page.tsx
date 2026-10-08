@@ -12,8 +12,10 @@ export default function AddMessage() {
   function playTypeSound() {
     if (typeof window !== "undefined") {
       const typeAudio = new Audio("/assets/type.mp3");
-      typeAudio.volume = 0.3;
-      typeAudio.play().catch((err) => console.error("Audio blocked by browser:", err));
+      typeAudio.volume = 0.2;
+      typeAudio
+        .play()
+        .catch((err) => console.error("Audio blocked by browser:", err));
     }
   }
 
@@ -21,7 +23,7 @@ export default function AddMessage() {
   const characterLimit = 300;
   const message = formData.message || "";
 
-  // Handle message input change and update form data 
+  // Handle message input change and update form data
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     playTypeSound();
     const inputValue = e.target.value;

@@ -5,9 +5,12 @@ import { Application, Container, Graphics, Text } from "pixi.js";
 import { AVATAR_FACES } from "@/app/avatar-customisation";
 import { useRouter } from "next/navigation";
 import Popup from "@/components/PopupWindow";
-import { getCurrentUserId } from "@/app/actions";
+import { getCurrentUserId, getUserById } from "@/app/actions";
+import { RealtimeCursors } from "@/components/realtime-cursors";
+import { usePlazaPresence } from "@/hooks/use-plaza-presence";
+import OnlineCounter from "@/components/OnlineCounter";
 
-interface PlazaAvatar {
+export interface PlazaAvatar {
   id: string;
   displayName: string;
   colour: string;
@@ -27,9 +30,7 @@ interface AnimatedContainer extends Container {
   shadow: Graphics;
 }
 
-// ============================================================
 // CONSTANTS
-// ============================================================
 
 const AVATAR_RADIUS = 24;
 const NAME_OFFSET = 40;
@@ -58,9 +59,7 @@ const DRAG_MESSAGES = [
   "let me go!",
 ];
 
-// ============================================================
 // CREATE AVATAR
-// ============================================================
 
 function createAvatar(data: PlazaAvatar): AnimatedContainer {
   const avatar = new Container() as AnimatedContainer;
@@ -69,9 +68,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
   avatar.targetY = 0;
   avatar.isDragging = false;
 
-  // ----------------------------------------------------------
   // Avatar shadow
-  // ----------------------------------------------------------
 
   const shadow = new Graphics();
 
@@ -83,9 +80,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
   avatar.addChild(shadow);
   avatar.shadow = shadow;
 
-  // ----------------------------------------------------------
   // Avatar body
-  // ----------------------------------------------------------
 
   const bubble = new Graphics();
 
@@ -97,9 +92,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.addChild(bubble);
 
-  // ----------------------------------------------------------
   // Avatar highlight
-  // ----------------------------------------------------------
 
   const highlight = new Graphics();
 
@@ -112,9 +105,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.addChild(highlight);
 
-  // ----------------------------------------------------------
   // Avatar face
-  // ----------------------------------------------------------
 
   const face = new Text({
     text: AVATAR_FACES[data.faceIndex],
@@ -128,9 +119,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.addChild(face);
 
-  // ----------------------------------------------------------
   // Speech bubble
-  // ----------------------------------------------------------
 
   const speechBubble = new Container();
 
@@ -189,9 +178,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.speechBubble = speechBubble;
 
-  // ----------------------------------------------------------
   // Display name
-  // ----------------------------------------------------------
 
   const name = new Text({
     text: data.displayName,
@@ -207,9 +194,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.addChild(name);
 
-  // ----------------------------------------------------------
   // Hover icon
-  // ----------------------------------------------------------
 
   const hoverIcon = new Text({
     text: "♫",
@@ -229,9 +214,7 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
   avatar.hoverIcon = hoverIcon;
 
-  // ----------------------------------------------------------
   // Avatar hover
-  // ----------------------------------------------------------
 
   avatar.on("pointerover", () => {
     if (!avatar.isDragging) {
@@ -246,30 +229,22 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
   return avatar;
 }
 
-// ============================================================
 // PLAZA
-// ============================================================
 
 export default function Plaza({ avatars }: PlazaProps) {
   const router = useRouter();
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // ----------------------------------------------------------
   // Collection button
-  // ----------------------------------------------------------
 
   const [isCollectionHovered, setIsCollectionHovered] = useState(false);
 
-  // ----------------------------------------------------------
   // Welcome popup
-  // ----------------------------------------------------------
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  // ----------------------------------------------------------
   // Play sound
-  // ----------------------------------------------------------
 
   function playClickSound(file: string) {
     if (typeof window !== "undefined") {
@@ -283,9 +258,7 @@ export default function Plaza({ avatars }: PlazaProps) {
     }
   }
 
-  // ==========================================================
   // PIXI + CAMERA
-  // ==========================================================
 
   useEffect(() => {
     const container = containerRef.current;
@@ -294,27 +267,21 @@ export default function Plaza({ avatars }: PlazaProps) {
 
     const app = new Application();
 
-    // --------------------------------------------------------
     // State
-    // --------------------------------------------------------
 
     let destroyed = false;
     let initialized = false;
 
     const activeAvatars: AnimatedContainer[] = [];
 
-    // --------------------------------------------------------
     // World
-    // --------------------------------------------------------
 
     const world = new Container();
 
     let cameraX = 0;
     let cameraY = 0;
 
-    // --------------------------------------------------------
     // Avatar dragging
-    // --------------------------------------------------------
 
     let draggedAvatar: AnimatedContainer | null = null;
 
@@ -332,9 +299,7 @@ export default function Plaza({ avatars }: PlazaProps) {
 
     const MOVE_THRESHOLD = 5;
 
-    // --------------------------------------------------------
     // Camera panning
-    // --------------------------------------------------------
 
     let isPanning = false;
 
@@ -346,9 +311,7 @@ export default function Plaza({ avatars }: PlazaProps) {
     let panStartCameraX = 0;
     let panStartCameraY = 0;
 
-    // ========================================================
     // CAMERA HELPERS
-    // ========================================================
 
     const clampCamera = () => {
       if (!initialized) return;
@@ -365,9 +328,7 @@ export default function Plaza({ avatars }: PlazaProps) {
       world.y = -cameraY;
     };
 
-    // ========================================================
     // RESIZE
-    // ========================================================
 
     const resize = () => {
       if (!initialized || destroyed) {
@@ -379,16 +340,12 @@ export default function Plaza({ avatars }: PlazaProps) {
       clampCamera();
     };
 
-    // ========================================================
     // POINTER MOVE
-    // ========================================================
 
     const handleWindowPointerMove = (event: PointerEvent) => {
       if (destroyed) return;
 
-      // ------------------------------------------------------
       // Camera dragging
-      // ------------------------------------------------------
 
       if (
         isPanning &&
@@ -408,9 +365,7 @@ export default function Plaza({ avatars }: PlazaProps) {
         return;
       }
 
-      // ------------------------------------------------------
       // Avatar dragging
-      // ------------------------------------------------------
 
       if (!draggedAvatar) {
         return;
@@ -440,16 +395,18 @@ export default function Plaza({ avatars }: PlazaProps) {
 
         draggedAvatar.speechBubble.visible = true;
 
-        draggedAvatar.shadow.visible = false;
+        // Make the shadow smaller and lighter to create a lifted effect
+        draggedAvatar.shadow.visible = true;
+        draggedAvatar.shadow.scale.set(0.55, 0.65);
+        draggedAvatar.shadow.alpha = 0.35;
+        draggedAvatar.shadow.y = 30;
       }
 
       if (!hasMoved) {
         return;
       }
 
-      // ------------------------------------------------------
       // Convert screen position to world position
-      // ------------------------------------------------------
 
       const rect = app.canvas.getBoundingClientRect();
 
@@ -470,9 +427,7 @@ export default function Plaza({ avatars }: PlazaProps) {
 
       let newY = pointerY - dragOffsetY;
 
-      // ------------------------------------------------------
       // Keep avatar inside world
-      // ------------------------------------------------------
 
       newX = Math.max(
         AVATAR_RADIUS,
@@ -489,16 +444,12 @@ export default function Plaza({ avatars }: PlazaProps) {
       draggedAvatar.y = newY;
     };
 
-    // ========================================================
     // POINTER UP
-    // ========================================================
 
     const handleWindowPointerUp = (event: PointerEvent) => {
       if (destroyed) return;
 
-      // ------------------------------------------------------
       // Finish camera panning
-      // ------------------------------------------------------
 
       if (
         isPanning &&
@@ -513,9 +464,7 @@ export default function Plaza({ avatars }: PlazaProps) {
         return;
       }
 
-      // ------------------------------------------------------
       // Finish avatar interaction
-      // ------------------------------------------------------
 
       if (!draggedAvatar) {
         return;
@@ -529,9 +478,7 @@ export default function Plaza({ avatars }: PlazaProps) {
 
       const avatarData = draggedAvatarData;
 
-      // ------------------------------------------------------
       // Avatar clicked
-      // ------------------------------------------------------
 
       if (!hasMoved && avatarData) {
         avatar.isDragging = false;
@@ -543,9 +490,7 @@ export default function Plaza({ avatars }: PlazaProps) {
         router.push(`/recommendation/${avatarData.id}`);
       }
 
-      // ------------------------------------------------------
       // Avatar dragged
-      // ------------------------------------------------------
       else {
         avatar.targetX = avatar.x;
 
@@ -555,7 +500,11 @@ export default function Plaza({ avatars }: PlazaProps) {
 
         avatar.speechBubble.visible = false;
 
+        // Restore normal shadow
         avatar.shadow.visible = true;
+        avatar.shadow.scale.set(1, 1);
+        avatar.shadow.alpha = 1;
+        avatar.shadow.y = 0;
 
         avatar.hoverIcon.visible = false;
       }
@@ -576,9 +525,7 @@ export default function Plaza({ avatars }: PlazaProps) {
       document.body.style.cursor = "";
     };
 
-    // ========================================================
     // POINTER CANCEL
-    // ========================================================
 
     const handleWindowPointerCancel = (event: PointerEvent) => {
       if (destroyed) return;
@@ -609,7 +556,11 @@ export default function Plaza({ avatars }: PlazaProps) {
 
       draggedAvatar.speechBubble.visible = false;
 
+      // Restore normal shadow
       draggedAvatar.shadow.visible = true;
+      draggedAvatar.shadow.scale.set(1, 1);
+      draggedAvatar.shadow.alpha = 1;
+      draggedAvatar.shadow.y = 0;
 
       draggedAvatar.hoverIcon.visible = false;
 
@@ -628,9 +579,7 @@ export default function Plaza({ avatars }: PlazaProps) {
       document.body.style.cursor = "";
     };
 
-    // ========================================================
     // WINDOW EVENTS
-    // ========================================================
 
     window.addEventListener("pointermove", handleWindowPointerMove, {
       passive: false,
@@ -640,9 +589,7 @@ export default function Plaza({ avatars }: PlazaProps) {
 
     window.addEventListener("pointercancel", handleWindowPointerCancel);
 
-    // ========================================================
     // PIXI SETUP
-    // ========================================================
 
     async function setup() {
       const container = containerRef.current;
@@ -678,9 +625,7 @@ export default function Plaza({ avatars }: PlazaProps) {
 
         initialized = true;
 
-        // ----------------------------------------------------
         // Canvas
-        // ----------------------------------------------------
 
         container.appendChild(app.canvas);
 
@@ -692,21 +637,17 @@ export default function Plaza({ avatars }: PlazaProps) {
 
         app.canvas.style.touchAction = "none";
 
-        // ----------------------------------------------------
         // World
-        // ----------------------------------------------------
 
         app.stage.addChild(world);
 
         world.x = 0;
         world.y = 0;
 
-        // ----------------------------------------------------
         // Ground pointer events
         //
         // Clicking empty ground starts
         // camera dragging.
-        // ----------------------------------------------------
 
         app.canvas.addEventListener("pointerdown", (event) => {
           // If an avatar is being interacted
@@ -732,9 +673,7 @@ export default function Plaza({ avatars }: PlazaProps) {
           document.body.style.cursor = "grabbing";
         });
 
-        // ----------------------------------------------------
         // Create avatars
-        // ----------------------------------------------------
 
         const margin = AVATAR_RADIUS;
 
@@ -759,12 +698,10 @@ export default function Plaza({ avatars }: PlazaProps) {
 
           avatar.cursor = "pointer";
 
-          // --------------------------------------------------
           // Avatar pointer down
-          // --------------------------------------------------
 
           avatar.on("pointerdown", (event) => {
-            playClickSound("/assets/alien01.mp3");
+            playClickSound("/assets/melo.mp3");
 
             if (draggedAvatar || isPanning) {
               return;
@@ -812,18 +749,14 @@ export default function Plaza({ avatars }: PlazaProps) {
           activeAvatars.push(avatar);
         }
 
-        // ====================================================
         // TICKER
-        // ====================================================
 
         app.ticker.add((ticker) => {
           if (destroyed) {
             return;
           }
 
-          // ------------------------------------------------
           // EDGE SCROLLING
-          // ------------------------------------------------
 
           if (!isPanning && !draggedAvatar) {
             const pointer = app.renderer.events.pointer.global;
@@ -851,9 +784,7 @@ export default function Plaza({ avatars }: PlazaProps) {
             clampCamera();
           }
 
-          // ------------------------------------------------
           // AVATAR MOVEMENT
-          // ------------------------------------------------
 
           for (const avatar of activeAvatars) {
             if (avatar.isDragging) {
@@ -881,9 +812,7 @@ export default function Plaza({ avatars }: PlazaProps) {
             }
           }
 
-          // ------------------------------------------------
           // AVATAR COLLISIONS
-          // ------------------------------------------------
 
           const minDistance = AVATAR_RADIUS * 2;
 
@@ -939,9 +868,7 @@ export default function Plaza({ avatars }: PlazaProps) {
           }
         });
 
-        // ----------------------------------------------------
         // Resize listener
-        // ----------------------------------------------------
 
         window.addEventListener("resize", resize);
 
@@ -954,9 +881,7 @@ export default function Plaza({ avatars }: PlazaProps) {
 
     setup();
 
-    // ========================================================
     // CLEANUP
-    // ========================================================
 
     return () => {
       destroyed = true;
@@ -986,11 +911,32 @@ export default function Plaza({ avatars }: PlazaProps) {
     };
   }, [avatars, router]);
 
-  // ==========================================================
-  // WELCOME POPUP
-  // ==========================================================
+  // GET CURRENT USER TO BROADCAST CURSOR
+
+  const [currentUser, setCurrentUser] = useState<PlazaAvatar | null>(null);
 
   useEffect(() => {
+    const loadCurrentUser = async () => {
+      const userId = await getCurrentUserId();
+
+      if (!userId) return;
+
+      const user = await getUserById(userId);
+
+      if (user) {
+        setCurrentUser({
+          id: user.id,
+          colour: user.colour,
+          faceIndex: user.face_index,
+          displayName: user.display_name,
+        });
+      }
+    };
+
+    loadCurrentUser();
+
+    // WELCOME POPUP
+
     let cancelled = false;
 
     const checkPopup = async () => {
@@ -1016,9 +962,7 @@ export default function Plaza({ avatars }: PlazaProps) {
     };
   }, []);
 
-  // ==========================================================
   // CLOSE POPUP
-  // ==========================================================
 
   const closePopup = async () => {
     const userId = await getCurrentUserId();
@@ -1034,13 +978,20 @@ export default function Plaza({ avatars }: PlazaProps) {
     playClickSound("/assets/click.mp3");
   };
 
-  // ==========================================================
+  const { onlineCount, cursors } = usePlazaPresence({
+    user: currentUser,
+    throttleMs: 50,
+  });
+
   // RENDER
-  // ==========================================================
 
   return (
     <>
       <div ref={containerRef} className="fixed inset-0 overflow-hidden">
+        {currentUser && <RealtimeCursors cursors={cursors} />}
+
+        <OnlineCounter count={onlineCount} />
+
         {/* Welcome popup */}
         <div id="welcome-popup">
           <Popup title="Welcome!" isOpen={isPopupOpen} onClose={closePopup}>
@@ -1048,14 +999,14 @@ export default function Plaza({ avatars }: PlazaProps) {
               <p className="text-lg font-bold">About</p>
 
               <p className="text-sm">
-                <b>meloplaza</b> is a music recommendation platform which allows
-                you to introduce songs to strangers in a meaningful way.
+                <b>meloplaza</b> is a music recommendation platform which
+                allows you to introduce songs to strangers in a meaningful way.
               </p>
 
               <p className="text-sm mb-2">
-                By exploring recommendations at your own pace instead of relying
-                on heavily- algorithmed streaming services, you might discover
-                new music you would never have heard otherwise!
+                By exploring recommendations at your own pace instead of
+                relying on heavily- algorithmed streaming services, you might
+                discover new music you would never have heard otherwise!
               </p>
 
               <p className="font-bold">How to Play:</p>

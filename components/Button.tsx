@@ -14,7 +14,7 @@ type ButtonProps = {
 function playClickSound() {
   if (typeof window !== "undefined") {
     const clickAudio = new Audio("/assets/click.mp3");
-    clickAudio.volume = 0.5;
+    clickAudio.volume = 0.2;
     clickAudio
       .play()
       .catch((err) => console.error("Audio blocked by browser:", err));

@@ -19,7 +19,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 function playMessageSound() {
   if (typeof window !== "undefined") {
     const messageAudio = new Audio("/assets/msg.mp3");
-    messageAudio.volume = 0.5;
+    messageAudio.volume = 0.2;
     messageAudio
       .play()
       .catch((err) => console.error("Audio blocked by browser:", err));
@@ -178,6 +178,17 @@ export default function ShowRecommendation() {
     return () => clearTimeout(timer);
   }, [id]);
 
+  // Play success sound on add to collection
+  function playSuccessSound() {
+    if (typeof window !== "undefined") {
+      const clickAudio = new Audio("/assets/success.mp3");
+      clickAudio.volume = 0.2;
+      clickAudio
+        .play()
+        .catch((err) => console.error("Audio blocked by browser:", err));
+    }
+  }
+
   // Handle adding recommendation to collection
   const handleAddToCollection = async () => {
     if (!recommendation?.id || addingToCollection || addedToCollection) return;
@@ -189,6 +200,7 @@ export default function ShowRecommendation() {
     if (result.success) {
       setReplyTime(new Date());
       setAddedToCollection(true);
+      playSuccessSound();
     } else {
       console.error(result.error);
     }

@@ -77,7 +77,11 @@ export default function BackgroundMusic() {
         cursor: "pointer",
       }}
     >
-      {isPlaying ? "🔊" : "🔇"}
+      {isPlaying ? (
+        <i className="hn hn-sound-on-solid text-6xl bg-linear-to-b from-[#00c3d0] to-[#ffffff] bg-clip-text text-transparent [-webkit-text-stroke:1px_var(--color-gray-600)]" />
+      ) : (
+        <i className="hn hn-sound-mute-solid text-6xl bg-linear-to-b from-[#00c3d0] to-[#ffffff] bg-clip-text text-transparent [-webkit-text-stroke:1px_var(--color-gray-600)]" />
+      )}
     </button>
   );
 }
