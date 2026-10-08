@@ -73,7 +73,6 @@ export default async function PrintCollection() {
         {/* Column headings */}
         <div className="flex flex-row w-full text-xs font-bold">
           <div className="flex-1 text-left">ITEM</div>
-
           <div className="w-[25%] text-right">DURATION</div>
         </div>
 
@@ -102,7 +101,7 @@ export default async function PrintCollection() {
                   </p>
 
                   <p className="text-xs tracking-wide leading-wide">
-                    "{song.message}"
+                    &quot;{song.message}&quot;
                   </p>
                 </div>
 
@@ -132,12 +131,12 @@ export default async function PrintCollection() {
       </div>
 
       {/* Print button */}
-      <div className="fixed top-6 right-6 z-50">
+      <div className="print:hidden fixed top-6 right-6 z-50">
         <PrintButton />
       </div>
 
       {/* Back button */}
-      <div className="fixed top-6 left-6 z-50">
+      <div className="print:hidden fixed top-6 left-6 z-50">
         <Button label="Back" href="/collection" />
       </div>
     </div>

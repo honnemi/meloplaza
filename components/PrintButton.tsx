@@ -14,7 +14,6 @@ function playSuccessSound() {
 }
 
 export default function PrintButton() {
-  // Print window on button click
   return (
     <SecondaryButton
       label="Print"
