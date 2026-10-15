@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
+
 export async function getCurrentUserId() {
   const supabase = await createClient();
 
@@ -24,6 +25,7 @@ export async function getCurrentUserId() {
   return userId;
 }
 
+
 interface RecommendationProps {
   prompt: string;
   songName: string;
@@ -35,6 +37,7 @@ interface RecommendationProps {
   songDuration: number;
   createdFor?: string;
 }
+
 
 export async function createRecommendation({
   prompt,
@@ -74,6 +77,7 @@ export async function createRecommendation({
   return { success: true };
 }
 
+
 export async function getUserRecommendationById(userId: string) {
   const supabase = await createClient();
 
@@ -94,6 +98,7 @@ export async function getUserRecommendationById(userId: string) {
   return data;
 }
 
+
 export async function getUserById(userId: string) {
   const supabase = await createClient();
 
@@ -112,31 +117,50 @@ export async function getUserById(userId: string) {
   return data;
 }
 
+
 export async function addToCollection(recommendationId: string) {
   const supabase = await createClient();
-  const userId = await getCurrentUserId();
+  const currentUserId = await getCurrentUserId();
 
-  if (!userId) {
-    return { error: "No active user found." };
+  if (!currentUserId) {
+    return { error: "You must be logged in to save recommendations." };
   }
 
-  const { error } = await supabase.from("CollectionItems").insert({
-    recommendation: recommendationId,
-    added_by: userId,
+  // 1. Fetch the recommendation snapshot data
+  const { data: recommendation, error: fetchError } = await supabase
+    .from("Recommendations")
+    .select("*")
+    .eq("id", recommendationId)
+    .single();
+
+  if (fetchError || !recommendation) {
+    console.error("Failed to fetch recommendation for collection:", fetchError?.message);
+    return { error: "Recommendation not found." };
+  }
+
+  // 2. Insert the snapshot copy using your exact table columns
+  const { error: insertError } = await supabase.from("CollectionItems").insert({
+    added_by: currentUserId, // Matches your 'added_by' column
+    recommendation: recommendationId, // Foreign key for collection count analytics
+    song_name: recommendation.song_name,
+    song_artist: recommendation.song_artist,
+    song_album: recommendation.song_album,
+    song_year: recommendation.song_year,
+    song_album_cover: recommendation.song_album_cover,
+    prompt: recommendation.prompt,
+    message: recommendation.message,
+    original_creator_id: recommendation.created_by,
   });
 
-  if (error) {
-    console.error("Error inserting data:", error.message);
-    return { error: error.message };
+  if (insertError) {
+    console.error("Failed to add snapshot to collection:", insertError.message);
+    return { error: insertError.message };
   }
 
-  const headerList = await headers();
-  const currentPath = headerList.get("x-pathname") || "/";
-
-  revalidatePath(currentPath);
-
+  revalidatePath("/collection");
   return { success: true };
 }
+
 
 export async function isInCollection(recommendationId: string) {
   const supabase = await createClient();
@@ -161,51 +185,154 @@ export async function isInCollection(recommendationId: string) {
   return !!data;
 }
 
-export async function getUserCollection() {
+
+export async function getUserCollection(userId?: string) {
+  if (!userId || userId === "undefined" || userId === "null") {
+    return [];
+  }
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("CollectionItems")
+    .select(`
+      id,
+      added_at,
+      recommendation,
+      song_name,
+      song_artist,
+      song_album,
+      song_year,
+      song_album_cover,
+      prompt,
+      message,
+      original_creator_id,
+      original_creator:Users!original_creator_id (
+        id,
+        display_name,
+        colour,
+        face_index
+      )
+    `)
+    .eq("added_by", userId)
+    .order("added_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching collection:", error.message);
+    return [];
+  }
+
+  // Unwrap original_creator array into a single object
+  return (data || []).map((item: any) => ({
+    ...item,
+    original_creator: Array.isArray(item.original_creator)
+      ? item.original_creator[0] || null
+      : item.original_creator,
+  }));
+}
+
+export async function getRecommendationCollectionCount(recommendationId: string) {
+  const supabase = await createClient();
+
+  const { count, error } = await supabase
+    .from("CollectionItems")
+    .select("*", { count: "exact", head: true })
+    .eq("recommendation", recommendationId);
+
+  if (error) {
+    console.error("Error fetching collection count:", error.message);
+    return 0;
+  }
+
+  return count || 0;
+}
+
+
+export async function upgradeAnonymousAccount(email: string, password: string) {
+  // 1. Sanitize input
+  const trimmedEmail = email.trim().toLowerCase();
+
+  // 2. Email format validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
+    return { error: "Please enter a valid email address." };
+  }
+
+  // 3. Password length check
+  if (!password || password.length < 6) {
+    return { error: "Password must be at least 6 characters long." };
+  }
+
+  const supabase = await createClient();
+
+  // 4. Update the anonymous user to a permanent account
+  const { data, error } = await supabase.auth.updateUser({
+    email: trimmedEmail,
+    password: password,
+  });
+
+  if (error) {
+    console.error("Failed to upgrade account:", error.message);
+
+    if (error.message.includes("already registered")) {
+      return { error: "An account with this email address already exists." };
+    }
+    return { error: error.message };
+  }
+
+  return { success: true, user: data.user };
+}
+
+
+export async function updateUserRecommendation(formData: {
+  displayName: string;
+  colour: string;
+  faceIndex: number;
+  prompt: string;
+  song: any;
+  message: string;
+}) {
   const supabase = await createClient();
   const userId = await getCurrentUserId();
 
   if (!userId) {
-    return [];
+    return { error: "User not authenticated." };
   }
 
-  const { data, error } = await supabase
-    .from("CollectionItems")
-    .select(
-      `
-      recommendation,
-      Recommendations (
-        id,
-        song_name,
-        song_artist,
-        song_album,
-        song_album_cover,
-        song_year,
-        song_duration,
-        created_at,
-        prompt,
-        message,
-        created_by
-      )
-    `,
-    )
-    .eq("added_by", userId);
+  // 1. Update user profile (display name, colour, face)
+  const { error: userError } = await supabase
+    .from("Users")
+    .update({
+      display_name: formData.displayName,
+      colour: formData.colour,
+      face_index: formData.faceIndex,
+    })
+    .eq("id", userId);
 
-  if (error) {
-    console.error("Error getting collection:", error.message);
-    return [];
+  if (userError) {
+    console.error("Failed to update user:", userError.message);
+    return { error: userError.message };
   }
 
-  const formattedData = data.map((item) => {
-    const rawRecommendations = item.Recommendations;
+  // 2. Update recommendation details
+  const { error: recError } = await supabase
+    .from("Recommendations")
+    .update({
+      prompt: formData.prompt,
+      song_id: formData.song.id,
+      song_name: formData.song.name,
+      song_artist: formData.song.artist,
+      song_album: formData.song.album,
+      song_year: formData.song.year,
+      song_album_cover: formData.song.albumCover,
+      message: formData.message,
+    })
+    .eq("created_by", userId);
 
-    return {
-      ...item,
-      Recommendations: Array.isArray(rawRecommendations)
-        ? rawRecommendations[0]
-        : rawRecommendations,
-    };
-  });
+  if (recError) {
+    console.error("Failed to update recommendation:", recError.message);
+    return { error: recError.message };
+  }
 
-  return formattedData;
+  return { success: true };
 }

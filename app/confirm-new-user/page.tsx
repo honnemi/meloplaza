@@ -4,13 +4,13 @@ import Window from "@/components/Window";
 import Button, { SecondaryButton } from "@/components/Button";
 import Avatar from "@/components/Avatar";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { useFormStore } from "@/app/context/FormContext";
 import { createClient } from "@/lib/supabase/client";
 import LoadingScreen from "@/components/LoadingScreen";
 
 export default function ConfirmNewUserPage() {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const { formData, clearForm } = useFormStore();
 
   const [loading, setLoading] = useState(false);
@@ -25,72 +25,103 @@ export default function ConfirmNewUserPage() {
     try {
       const supabase = createClient();
 
-      // Force clean session
-      await supabase.auth.signOut();
+      if (formData.isEditing) {
+        // --- EDIT MODE ---
+        // Retrieve current active user session
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-      // Execute anonymous sign-in
-      const { data, error: anonError } =
-        await supabase.auth.signInAnonymously();
+        const userId = session?.user?.id;
 
-      if (anonError) {
-        console.error("Supabase Anonymous Sign-In Error:", anonError);
-        throw new Error(`Auth failed: ${anonError.message}`);
+        if (!userId) {
+          throw new Error("No active user session found to update profile.");
+        }
+
+        // Update profile via PUT request
+        const res = await fetch("/api/users", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...formData,
+            userId,
+          }),
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Failed to update profile.");
+        }
+
+        clearForm();
+        router.push("/profile");
+      } else {
+        // --- CREATION MODE ---
+        // Force clean session
+        await supabase.auth.signOut();
+
+        // Execute anonymous sign-in
+        const { data, error: anonError } =
+          await supabase.auth.signInAnonymously();
+
+        if (anonError) {
+          console.error("Supabase Anonymous Sign-In Error:", anonError);
+          throw new Error(`Auth failed: ${anonError.message}`);
+        }
+
+        // Get new user ID
+        const userId = data?.user?.id || data?.session?.user?.id;
+
+        if (!userId) {
+          throw new Error(
+            "Failed to retrieve user ID after anonymous sign-in."
+          );
+        }
+
+        // Post new user profile
+        const res = await fetch("/api/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...formData,
+            userId,
+          }),
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Failed to save profile.");
+        }
+
+        clearForm();
+        router.push("/plaza");
       }
-
-      // Get new user ID
-      const userId = data?.user?.id || data?.session?.user?.id;
-
-      if (!userId) {
-        throw new Error("Failed to retrieve user ID after anonymous sign-in.");
-      }
-
-      // Post to API route then redirect to plaza
-      const res = await fetch("/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          userId,
-        }),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-
-        throw new Error(errorData.error || "Failed to save profile.");
-      }
-
-      clearForm();
-      router.push("/plaza");
     } catch (err: any) {
       console.error("Submission catch block:", err);
-
       setError(err.message || "An unexpected error occurred.");
-
       setLoading(false);
     }
   };
 
   // Show loading screen while submitting
   if (loading) {
-    return (
-      <LoadingScreen
-      />
-    );
+    return <LoadingScreen />;
   }
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-6 sm:p-12">
       <Window
-        title="Ready to enter?"
+        title={formData.isEditing ? "Save changes?" : "Ready to enter?"}
         footer={
           <div className="flex justify-between w-full items-center gap-3">
             <Button label="Back" href="/add-message" disabled={loading} />
 
             <SecondaryButton
-              label="Confirm"
+              label={formData.isEditing ? "Save" : "Confirm"}
               onClick={handleConfirm}
               disabled={loading}
             />
@@ -98,7 +129,9 @@ export default function ConfirmNewUserPage() {
         }
       >
         <div className="text-lg italic mb-4 text-center text-gray-600">
-          Make sure you're happy with everything first!
+          {formData.isEditing
+            ? "Review your changes before saving!"
+            : "You can always update your Melo later from your profile!"}
         </div>
 
         {error && (

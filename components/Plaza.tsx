@@ -3,12 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Application, Container, Graphics, Text } from "pixi.js";
 import { AVATAR_FACES } from "@/app/avatar-customisation";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import Popup from "@/components/PopupWindow";
 import { getCurrentUserId, getUserById } from "@/app/actions";
 import { RealtimeCursors } from "@/components/realtime-cursors";
 import { usePlazaPresence } from "@/hooks/use-plaza-presence";
 import OnlineCounter from "@/components/OnlineCounter";
+import Profile from "@/components/LoggedInUser";
 
 export interface PlazaAvatar {
   id: string;
@@ -40,12 +41,17 @@ const AVATAR_SPEED = 0.001;
 const WORLD_WIDTH = 3000;
 const WORLD_HEIGHT = 2000;
 
-// Camera edge scrolling
+// Camera edge scrolling (mouse only)
 const EDGE_SCROLL_SIZE = 100;
 const EDGE_SCROLL_SPEED = 8;
 
 // Camera drag sensitivity
 const CAMERA_DRAG_SPEED = 1;
+
+// How far a pointer must move before a press becomes a drag.
+// Fingers jitter more than mice, so touch gets a larger threshold.
+const MOUSE_MOVE_THRESHOLD = 5;
+const TOUCH_MOVE_THRESHOLD = 12;
 
 // Messages that avatars can say when dragged
 const DRAG_MESSAGES = [
@@ -232,13 +238,9 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 // PLAZA
 
 export default function Plaza({ avatars }: PlazaProps) {
-  const router = useRouter();
+  const router = useTransitionRouter();
 
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Collection button
-
-  const [isCollectionHovered, setIsCollectionHovered] = useState(false);
 
   // Welcome popup
 
@@ -297,7 +299,8 @@ export default function Plaza({ avatars }: PlazaProps) {
 
     let hasMoved = false;
 
-    const MOVE_THRESHOLD = 5;
+    // Changes depending on whether the press came from a mouse or a finger
+    let moveThreshold = MOUSE_MOVE_THRESHOLD;
 
     // Camera panning
 
@@ -310,6 +313,13 @@ export default function Plaza({ avatars }: PlazaProps) {
 
     let panStartCameraX = 0;
     let panStartCameraY = 0;
+
+    // Edge scrolling only applies while a real mouse is over the canvas.
+    // Without this, the last touch position keeps scrolling the camera.
+    let mouseInside = false;
+
+    // Resize observer (assigned during setup)
+    let resizeObserver: ResizeObserver | null = null;
 
     // CAMERA HELPERS
 
@@ -385,7 +395,7 @@ export default function Plaza({ avatars }: PlazaProps) {
       // has actually been dragged
       if (
         !hasMoved &&
-        (Math.abs(dx) > MOVE_THRESHOLD || Math.abs(dy) > MOVE_THRESHOLD)
+        (Math.abs(dx) > moveThreshold || Math.abs(dy) > moveThreshold)
       ) {
         hasMoved = true;
 
@@ -604,7 +614,8 @@ export default function Plaza({ avatars }: PlazaProps) {
 
           backgroundAlpha: 0,
 
-          resolution: window.devicePixelRatio,
+          // Cap pixel density: 3x phone screens are expensive to render
+          resolution: Math.min(window.devicePixelRatio, 2),
 
           antialias: true,
 
@@ -636,6 +647,17 @@ export default function Plaza({ avatars }: PlazaProps) {
         app.canvas.style.userSelect = "none";
 
         app.canvas.style.touchAction = "none";
+
+        // Track whether a real mouse is hovering the canvas
+        // (used to enable edge scrolling on desktop only)
+
+        app.canvas.addEventListener("pointermove", (event) => {
+          mouseInside = event.pointerType === "mouse";
+        });
+
+        app.canvas.addEventListener("pointerleave", () => {
+          mouseInside = false;
+        });
 
         // World
 
@@ -715,6 +737,12 @@ export default function Plaza({ avatars }: PlazaProps) {
 
             dragPointerId = event.pointerId;
 
+            // Bigger tolerance for fingers so taps don't become drags
+            moveThreshold =
+              event.pointerType === "touch"
+                ? TOUCH_MOVE_THRESHOLD
+                : MOUSE_MOVE_THRESHOLD;
+
             startPointerX = event.global.x;
 
             startPointerY = event.global.y;
@@ -756,9 +784,9 @@ export default function Plaza({ avatars }: PlazaProps) {
             return;
           }
 
-          // EDGE SCROLLING
+          // EDGE SCROLLING (mouse only)
 
-          if (!isPanning && !draggedAvatar) {
+          if (mouseInside && !isPanning && !draggedAvatar) {
             const pointer = app.renderer.events.pointer.global;
 
             const mouseX = pointer.x;
@@ -868,11 +896,22 @@ export default function Plaza({ avatars }: PlazaProps) {
           }
         });
 
-        // Resize listener
+        // Resize handling
+        //
+        // ResizeObserver is more reliable than window "resize" on mobile,
+        // where rotation and the collapsing address bar change the size.
 
-        window.addEventListener("resize", resize);
+        resizeObserver = new ResizeObserver(resize);
 
-        // Initial camera clamp
+        resizeObserver.observe(container);
+
+        // Start with the camera in the middle of the world
+        // (otherwise phones open on the top-left corner)
+
+        cameraX = (WORLD_WIDTH - app.screen.width) / 2;
+
+        cameraY = (WORLD_HEIGHT - app.screen.height) / 2;
+
         clampCamera();
       } catch (error) {
         console.error("Failed to initialise Plaza:", error);
@@ -886,7 +925,7 @@ export default function Plaza({ avatars }: PlazaProps) {
     return () => {
       destroyed = true;
 
-      window.removeEventListener("resize", resize);
+      resizeObserver?.disconnect();
 
       window.removeEventListener("pointermove", handleWindowPointerMove);
 
@@ -990,34 +1029,57 @@ export default function Plaza({ avatars }: PlazaProps) {
       <div ref={containerRef} className="fixed inset-0 overflow-hidden">
         {currentUser && <RealtimeCursors cursors={cursors} />}
 
-        <OnlineCounter count={onlineCount} />
+        <div className="fixed top-3 left-3 right-3 sm:top-5 sm:left-8 sm:right-8 z-50 flex flex-col items-start gap-2 sm:flex-row sm:items-start sm:justify-between pointer-events-none">
+        <div className="pointer-events-auto">
+          <Profile />
+        </div>
+        <div className="pointer-events-auto">
+          <OnlineCounter count={onlineCount} />
+        </div>
+      </div>
+
+        {/* Help button (bottom right) */}
+        <button
+          aria-label="Help"
+          onClick={() => {
+            setIsPopupOpen(true);
+            playClickSound("/assets/click.mp3");
+          }}
+          className="fixed bottom-24 right-3 sm:bottom-4 sm:right-4 z-50 cursor-pointer p-2 sm:px-4 sm:py-3"
+        >
+          <i className="hn hn-question-circle text-4xl sm:text-5xl bg-linear-to-b from-[#00c3d0] to-[#ffffff] bg-clip-text text-transparent [-webkit-text-stroke:1px_var(--color-gray-600)]"></i>
+        </button>
 
         {/* Welcome popup */}
         <div id="welcome-popup">
-          <Popup title="Welcome!" isOpen={isPopupOpen} onClose={closePopup}>
+          <Popup title="Info" isOpen={isPopupOpen} onClose={closePopup}>
             <div className="flex flex-col gap-4 text-center">
-              <p className="text-lg font-bold">About</p>
+              <p className="text-sm text-gray-600">
+                Please save your account from "Profile" if you want to access
+                it again!
+              </p>
+              <p className="text-lg font-bold font-heading">About</p>
 
               <p className="text-sm">
-                <b>meloplaza</b> is a music recommendation platform which
-                allows you to introduce songs to strangers in a meaningful way.
+                <b>meloplaza</b> is a music recommendation platform which allows
+                you to introduce songs to strangers in a meaningful way.
               </p>
 
               <p className="text-sm mb-2">
-                By exploring recommendations at your own pace instead of
-                relying on heavily- algorithmed streaming services, you might
-                discover new music you would never have heard otherwise!
+                By exploring recommendations at your own pace instead of relying
+                on heavily-algorithmed streaming services, you might discover
+                new music you would never have heard otherwise!
               </p>
 
-              <p className="font-bold">How to Play:</p>
+              <p className="font-bold font-heading text-lg">How to Play:</p>
 
               <ul className="list-disc list-inside text-left text-sm mb-2">
                 <li>
-                  Move your mouse to the edge of the screen or drag the ground
-                  to move the camera.
+                  Drag the ground to move the camera (or move your mouse to the
+                  edge of the screen on desktop).
                 </li>
                 <li>
-                  Try dragging and clicking on avatars to interact with them.
+                  Try dragging and tapping on avatars to interact with them.
                 </li>
 
                 <li>Add songs you like to your collection.</li>
@@ -1025,39 +1087,15 @@ export default function Plaza({ avatars }: PlazaProps) {
                 <li>Print your collection to take home as a memento.</li>
               </ul>
 
-              <p className="text-lg font-bold text-center">
+              <p className="text-lg font-bold text-center font-heading">
                 That's all, have fun!
               </p>
 
-              <p className="text-lg font-bold text-center">ヽ(・∀・)ﾉ</p>
+              <p className="text-lg font-bold text-center font-heading">
+                ヽ(・∀・)ﾉ
+              </p>
             </div>
           </Popup>
-        </div>
-
-        {/* Collection button */}
-        <div
-          id="collection-button"
-          className="fixed bottom-8 right-8 flex flex-col items-center justify-center hover:cursor-pointer"
-          onMouseEnter={() => setIsCollectionHovered(true)}
-          onMouseLeave={() => setIsCollectionHovered(false)}
-          onClick={() => {
-            playClickSound("/assets/click.mp3");
-
-            router.push("/collection");
-          }}
-        >
-          <img
-            id="folder"
-            className="w-30 h-30"
-            src={
-              isCollectionHovered
-                ? "/assets/folder-open.png"
-                : "/assets/folder-closed.png"
-            }
-            alt="Collection"
-          />
-
-          <h1 className="font-bold text-lg -mt-4">Go to Collection</h1>
         </div>
       </div>
     </>

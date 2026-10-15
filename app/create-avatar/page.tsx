@@ -8,7 +8,8 @@ import { useFormStore } from "@/app/context/FormContext";
 import { AVATAR_FACES, AVATAR_COLOURS } from "../avatar-customisation";
 
 export default function AvatarCreation() {
-  const { formData, updateForm } = useFormStore();
+  const { formData, updateForm, clearForm } = useFormStore();
+  
 
   // Restore from form data if available, otherwise default to initial values
   const [faceIndex, setFaceIndex] = useState<number>(formData.faceIndex ?? 0);
@@ -19,10 +20,31 @@ export default function AvatarCreation() {
     formData.colour || AVATAR_COLOURS[0] || "#3B82F6",
   );
 
-  // Randomise face index
-  const handleRandomise = () => {
-    const randomIndex = Math.floor(Math.random() * AVATAR_FACES.length);
-    setFaceIndex(randomIndex);
+  // Play sound on click/action
+  function playClickSound() {
+    if (typeof window !== "undefined") {
+      const clickAudio = new Audio("/assets/click.mp3");
+      clickAudio.volume = 0.2;
+      clickAudio
+        .play()
+        .catch((err) => console.error("Audio blocked by browser:", err));
+    }
+  }
+
+  // Handle face next
+  const handleFaceNext = () => {
+    playClickSound();
+    if (faceIndex >= 0 && faceIndex < AVATAR_FACES.length - 1) {
+      setFaceIndex(faceIndex + 1);
+    }
+  };
+
+  // Handle face back
+  const handleFaceBack = () => {
+    playClickSound();
+    if (faceIndex > 0) {
+      setFaceIndex(faceIndex - 1);
+    }
   };
 
   // Update form before navigating to next page
@@ -64,8 +86,8 @@ export default function AvatarCreation() {
         title="Customise your Melo"
         footer={
           <div className="flex justify-between w-full">
-            <Button label="Back" href="/" />
-            <Button label="Next" href="/select-prompt" onClick={handleNext} />
+            <Button label="Back" href="/" onClick={clearForm} />
+            <SecondaryButton label="Next" href="/select-prompt" onClick={handleNext} />
           </div>
         }
       >
@@ -124,17 +146,34 @@ export default function AvatarCreation() {
               <span className="text-sm font-bold text-center max-w-45 min-h-10 leading-5 wrap-break-word text-gray-800">
                 {displayName || "Anonymous"}
               </span>
-
               <Avatar colour={colour} faceIndex={faceIndex} />
             </div>
+            
+            {/* Styled face selection buttons */}
+            <div className="flex flex-row gap-4 w-65">
+              <button
+                type="button"
+                onClick={handleFaceBack}
+                className="flex-1 px-4 py-2.5 text-sm font-bold border-2 border-win-border-dark rounded-sm bg-win-alt shadow-[3px_3px_0px_rgba(0,90,100,0.3)] hover:-translate-y-[1px] active:translate-y-[1px] cursor-pointer text-gray-800 font-heading flex items-center justify-center gap-2 transition-transform"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(180deg, #ffffff 0%, #d5f0f5 100%)",
+                }}
+              >
+                <i className="hn hn-arrow-left-solid text-xs"></i> Prev Face
+              </button>
 
-            {/* Randomise button */}
-            <div className="flex justify-center">
-              <SecondaryButton
-                label="Randomise Face"
-                icon={<i className="hn hn-shuffle-solid"></i>}
-                onClick={handleRandomise}
-              />
+              <button
+                type="button"
+                onClick={handleFaceNext}
+                className="flex-1 px-4 py-2.5 text-sm font-bold border-2 border-win-border-dark rounded-sm bg-win-alt shadow-[3px_3px_0px_rgba(0,90,100,0.3)] hover:-translate-y-[1px] active:translate-y-[1px] cursor-pointer text-gray-800 font-heading flex items-center justify-center gap-2 transition-transform"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(180deg, #ffffff 0%, #d5f0f5 100%)",
+                }}
+              >
+                Next Face <i className="hn hn-arrow-right-solid text-xs"></i>
+              </button>
             </div>
           </div>
         </div>

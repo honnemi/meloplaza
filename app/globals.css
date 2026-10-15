@@ -66,7 +66,7 @@
   --win-border-dark: #2f8a99;
   --win-border-alt: #bfe6ec;
   --win-titlebar: linear-gradient(
-    to bottom,
+    to top,
     #ffffff 0%,
     #9fe6ee 45%,
     #00c3d0 100%

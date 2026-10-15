@@ -303,7 +303,7 @@ export default function ShowRecommendation() {
               </p>
             </div>
 
-            {/* Add to collection button*/}
+            {/* Styled Add to Collection Action Button */}
             <div
               className={`w-full transition-all duration-500 ${
                 showActions
@@ -312,26 +312,31 @@ export default function ShowRecommendation() {
               }`}
             >
               <div className="flex flex-col items-center w-full">
-                <SecondaryButton
-                  label={
-                    addedToCollection
-                      ? "Added"
-                      : addingToCollection
-                        ? "Adding..."
-                        : "Add to Collection"
-                  }
-                  icon={
-                    <i
-                      className={
-                        addedToCollection
-                          ? "hn hn-check-solid"
-                          : "hn hn-save-solid"
-                      }
-                    />
-                  }
+                <button
+                  type="button"
                   onClick={handleAddToCollection}
                   disabled={addingToCollection || addedToCollection}
-                />
+                  className="w-full px-4 py-3 text-sm font-bold border-2 border-win-border-dark rounded-sm bg-win-alt shadow-[3px_3px_0px_rgba(0,90,100,0.3)] hover:-translate-y-[1px] active:translate-y-[1px] cursor-pointer text-gray-800 font-heading flex flex-row items-center justify-center gap-2 transition-transform disabled:opacity-50"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(180deg, #ffffff 0%, #d5f0f5 100%)",
+                  }}
+                >
+                  <i
+                    className={
+                      addedToCollection
+                        ? "hn hn-check-solid text-base text-green-600"
+                        : "hn hn-save-solid text-base"
+                    }
+                  ></i>
+                  <span>
+                    {addedToCollection
+                      ? "Added"
+                      : addingToCollection
+                      ? "Adding..."
+                      : "Add to Collection"}
+                  </span>
+                </button>
               </div>
             </div>
           </div>

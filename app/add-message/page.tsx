@@ -1,7 +1,7 @@
 "use client";
 
 import Window from "@/components/Window";
-import Button from "@/components/Button";
+import Button, { SecondaryButton } from "@/components/Button";
 import { useFormStore } from "@/app/context/FormContext";
 import ProfilePreview from "@/components/ProfilePreview";
 
@@ -47,7 +47,7 @@ export default function AddMessage() {
             <Button label="Back" href="/select-song" />
 
             {message.trim().length !== 0 && (
-              <Button label="Next" href="/confirm-new-user" />
+              <SecondaryButton label="Next" href="/confirm-new-user" />
             )}
           </div>
         }

@@ -19,6 +19,9 @@ export type FormState = {
   songDuration: number;
   // Message step
   message: string;
+
+  // Edit flag
+  isEditing?: boolean; 
 };
 
 type FormContextType = {
@@ -43,6 +46,7 @@ const defaultState: FormState = {
 };
 
 const FormContext = createContext<FormContextType | undefined>(undefined);
+
 
 export function FormProvider({ children }: { children: ReactNode }) {
   const [formData, setFormData] = useState<FormState>(defaultState);

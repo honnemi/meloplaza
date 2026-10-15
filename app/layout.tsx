@@ -53,8 +53,7 @@ export default function RootLayout({
             {/* Wrap in FormProvider to provide form context (carry state between pages) */}
             <FormProvider>{children}</FormProvider>
           </div>
-          <div className="fixed bottom-4 left-4 z-50">
-            {/* Play background music */}
+          <div className="fixed bottom-24 left-3 sm:bottom-4 sm:left-4 z-50 flex items-center">
             <BackgroundMusic />
           </div>
         </body>

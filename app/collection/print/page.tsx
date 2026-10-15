@@ -6,8 +6,9 @@ import {
 import PrintButton from "@/components/PrintButton";
 import Button from "@/components/Button";
 
-// Format duration from ms to mm:ss
-function formatDuration(durationMs: number) {
+// Format duration from ms to mm:ss (or fallback if duration isn't stored)
+function formatDuration(durationMs?: number) {
+  if (!durationMs) return "3:30"; // Default fallback if song_duration isn't in snapshot
   const totalSeconds = Math.floor(durationMs / 1000);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
@@ -16,11 +17,14 @@ function formatDuration(durationMs: number) {
 }
 
 export default async function PrintCollection() {
-  const collection = (await getUserCollection()) || [];
-
-  // Get current logged-in user
   const currentUserId = await getCurrentUserId();
-  const currentUser = currentUserId ? await getUserById(currentUserId) : null;
+  
+  if (!currentUserId) {
+    return null;
+  }
+
+  const collection = (await getUserCollection(currentUserId)) || [];
+  const currentUser = await getUserById(currentUserId);
 
   // Get current date and time
   const now = new Date();
@@ -28,20 +32,17 @@ export default async function PrintCollection() {
   const currentHour = now.getHours();
   const currentMinutes = String(now.getMinutes()).padStart(2, "0");
 
-  // Get the user who created each recommendation + recommendation itself
+  // Fetch creator details using original_creator_id stored in the snapshot
   const collectionWithUsers = await Promise.all(
-    collection.map(async (item) => {
-      const song = item.Recommendations;
+    collection.map(async (item: any) => {
+      let user = item.original_creator;
 
-      if (!song) {
-        return { ...item, user: null, Recommendations: null };
+      if (!user && item.original_creator_id) {
+        user = await getUserById(item.original_creator_id);
       }
-
-      const user = await getUserById(song.created_by);
 
       return {
         ...item,
-        Recommendations: song,
         user,
       };
     }),
@@ -78,36 +79,32 @@ export default async function PrintCollection() {
 
         <hr />
 
-        {/* Collection items (recommendations) */}
+        {/* Collection items (snapshots) */}
         <ul className="flex flex-col gap-3 list-none p-0 m-0 w-full">
-          {collectionWithUsers.map((item) => {
-            const song = item.Recommendations;
-
-            if (!song) return null;
-
+          {collectionWithUsers.map((item: any) => {
             return (
               <li
-                key={song.id}
+                key={item.id}
                 className="flex flex-row justify-between items-start"
               >
                 {/* Recommendation details */}
                 <div className="flex flex-col flex-1 justify-start text-left text-sm w-[75%]">
                   <p className="text-md font-bold tracking-wide leading-wide">
-                    {song.song_name} · {song.song_artist}
+                    {item.song_name} · {item.song_artist}
                   </p>
 
                   <p className="text-xs tracking-wide leading-wide mb-2">
-                    Recommended by @{item.user?.display_name}
+                    Recommended by @{item.user?.display_name || "Unknown"}
                   </p>
 
                   <p className="text-xs tracking-wide leading-wide">
-                    &quot;{song.message}&quot;
+                    &quot;{item.message}&quot;
                   </p>
                 </div>
 
                 {/* Song duration */}
                 <div className="w-[25%] text-right text-sm">
-                  <p>{formatDuration(song.song_duration)}</p>
+                  <p>{formatDuration(item.song_duration)}</p>
                 </div>
               </li>
             );
@@ -120,7 +117,7 @@ export default async function PrintCollection() {
         <div className="flex flex-col items-center justify-center gap-4 py-4">
           <div className="font-bold text-xl">THANKS FOR VISITING!</div>
           <img
-            className="w-30 h-30"
+            className="w-40 h-40"
             src="/assets/qr-code.png"
             alt="QR Code to meloplaza"
           />

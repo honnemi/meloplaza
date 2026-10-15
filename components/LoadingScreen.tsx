@@ -26,7 +26,7 @@ export default function LoadingScreen({ title = "Loading" }: { title?: string })
   const filled = Math.floor((progress / 100) * SEGMENTS);
 
   return (
-    <div className="flex min-h-dvh items-center justify-center">
+    <div className="flex min-h-dvh w-full items-center justify-center">
       <Window
         title={title}
         className="md:w-[28rem] h-auto"

@@ -68,20 +68,16 @@ export default function BackgroundMusic() {
   };
 
   return (
-    // Toggle button for background music
     <button
       onClick={toggleMusic}
-      style={{
-        fontSize: "36px",
-        padding: "10px 15px",
-        cursor: "pointer",
-      }}
+      aria-label={isPlaying ? "Mute music" : "Play music"}
+      className="cursor-pointer p-2 sm:px-4 sm:py-3"
     >
-      {isPlaying ? (
-        <i className="hn hn-sound-on-solid text-6xl bg-linear-to-b from-[#00c3d0] to-[#ffffff] bg-clip-text text-transparent [-webkit-text-stroke:1px_var(--color-gray-600)]" />
-      ) : (
-        <i className="hn hn-sound-mute-solid text-6xl bg-linear-to-b from-[#00c3d0] to-[#ffffff] bg-clip-text text-transparent [-webkit-text-stroke:1px_var(--color-gray-600)]" />
-      )}
+      <i
+        className={`hn ${
+          isPlaying ? "hn-sound-on-solid" : "hn-sound-mute-solid"
+        } text-4xl sm:text-5xl bg-linear-to-b from-[#00c3d0] to-[#ffffff] bg-clip-text text-transparent [-webkit-text-stroke:1px_var(--color-gray-600)]`}
+      />
     </button>
   );
 }

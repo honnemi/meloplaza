@@ -3,7 +3,6 @@ import { getUsers } from "@/lib/supabase/server";
 import Navigation from "@/components/Navigation";
 
 export default async function PlazaPage() {
-  // Get all users and map them to an array to pass to Plaza component
   const users = await getUsers();
 
   const avatars = (users ?? []).map((user) => ({
@@ -14,11 +13,14 @@ export default async function PlazaPage() {
   }));
 
   return (
-    <>
+    <div className="relative min-h-screen w-full flex flex-col items-center overflow-x-hidden">
+      {/* Plaza */}
+      <main className="w-full flex-1">
+        <Plaza avatars={avatars} />
+      </main>
+
       {/* Navigation bar */}
       <Navigation />
-      {/* Plaza component */}
-      <Plaza avatars={avatars} />
-    </>
+    </div>
   );
 }

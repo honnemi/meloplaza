@@ -10,18 +10,22 @@ import { useState } from "react";
 import { getUserById } from "@/app/actions";
 
 export interface CollectionItem {
-  recommendation: string;
-  Recommendations: {
+  id: string;
+  recommendation: string; // original recommendation ID for analytics/counting
+  song_name: string;
+  song_artist: string;
+  song_album: string;
+  song_album_cover: string;
+  song_year: string;
+  added_at: Date;
+  original_creator_id: string;
+  prompt: string;
+  message: string;
+  original_creator?: {
     id: string;
-    song_name: string;
-    song_artist: string;
-    song_album: string;
-    song_album_cover: string;
-    song_year: string;
-    created_at: Date;
-    created_by: string;
-    prompt: string;
-    message: string;
+    display_name: string;
+    colour: string;
+    face_index: number;
   };
 }
 
@@ -29,20 +33,9 @@ interface CollectionProps {
   collection: CollectionItem[];
 }
 
-export interface SelectedUser {
-  id: string;
-  display_name: string;
-  colour: string;
-  face_index: number;
-}
-
 export default function Collection({ collection }: CollectionProps) {
-  const [selectedSong, setSelectedSong] = useState<
-    CollectionItem["Recommendations"] | null
-  >(null);
-
-  const [selectedUser, setSelectedUser] = useState<SelectedUser | null>(null);
-
+  const [selectedItem, setSelectedItem] = useState<CollectionItem | null>(null);
+  const [selectedUser, setSelectedUser] = useState<CollectionItem["original_creator"] | null>(null);
   const [loadingUser, setLoadingUser] = useState(false);
 
   // Play sound on click
@@ -56,23 +49,25 @@ export default function Collection({ collection }: CollectionProps) {
     }
   }
 
-  // Open details popup for selected song and fetch user data for that recommendation
-  const openPopup = async (
-    recommendation: CollectionItem["Recommendations"],
-  ) => {
-    setSelectedSong(recommendation);
-    setLoadingUser(true);
+  // Open details popup for selected song and fetch user data
+  const openPopup = async (item: CollectionItem) => {
+    setSelectedItem(item);
     playClickSound();
 
-    const user = await getUserById(recommendation.created_by);
-
-    setSelectedUser(user);
-    setLoadingUser(false);
+    // If the creator data wasn't fully preloaded, fetch it using original_creator_id
+    if (item.original_creator) {
+      setSelectedUser(item.original_creator);
+    } else if (item.original_creator_id) {
+      setLoadingUser(true);
+      const user = await getUserById(item.original_creator_id);
+      setSelectedUser(user);
+      setLoadingUser(false);
+    }
   };
 
-  // Close popup and reset selected song and user
+  // Close popup and reset selected state
   const closePopup = () => {
-    setSelectedSong(null);
+    setSelectedItem(null);
     setSelectedUser(null);
     playClickSound();
   };
@@ -93,7 +88,7 @@ export default function Collection({ collection }: CollectionProps) {
           </div>
         }
       >
-        {/* Diplay message if collection is empty, otherwise show grid of songs */}
+        {/* Display message if collection is empty, otherwise show grid of songs */}
         {collection.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <p className="text-center text-gray-400">
@@ -114,77 +109,73 @@ export default function Collection({ collection }: CollectionProps) {
               sm:p-4
             "
           >
-            {collection.map((item) => {
-              const recommendation = item.Recommendations;
-
-              return (
+            {collection.map((item) => (
+              <div
+                key={item.id}
+                className="
+                  flex
+                  flex-col
+                  gap-3
+                  items-center
+                  text-center
+                  min-w-0
+                "
+              >
+                {/* Song */}
                 <div
-                  key={item.recommendation}
                   className="
-                    flex
-                    flex-col
-                    gap-3
-                    items-center
-                    text-center
-                    min-w-0
+                    relative
+                    w-full
+                    max-w-40
+                    aspect-square
+                    group
+                    cursor-pointer
                   "
+                  onClick={() => openPopup(item)}
                 >
-                  {/* Song */}
+                  {/* CD */}
                   <div
                     className="
-                      relative
-                      w-full
-                      max-w-40
-                      aspect-square
-                      group
-                      cursor-pointer
+                      absolute
+                      top-1/2
+                      right-0
+                      -translate-y-1/2
+                      z-0
+                      transition-all
+                      duration-200
+                      group-hover:right-[-20px]
                     "
-                    onClick={() => openPopup(recommendation)}
                   >
-                    {/* CD */}
-                    <div
-                      className="
-                        absolute
-                        top-1/2
-                        right-0
-                        -translate-y-1/2
-                        z-0
-                        transition-all
-                        duration-200
-                        group-hover:right-[-20px]
-                      "
-                    >
-                      <CD />
-                    </div>
-
-                    {/* Album cover */}
-                    <img
-                      src={recommendation.song_album_cover}
-                      alt={recommendation.song_name}
-                      className="
-                        relative
-                        z-10
-                        w-full
-                        h-full
-                        object-cover
-                        shadow-[0_4px_6px_rgba(0,90,100,0.3),inset_0_1px_0px_rgba(255,255,255,0.9)]
-                      "
-                    />
+                    <CD />
                   </div>
 
-                  {/* Song name + artist */}
-                  <div className="min-w-0 w-full max-w-40">
-                    <p className="text-sm font-bold truncate">
-                      {recommendation.song_name}
-                    </p>
-
-                    <p className="text-sm text-gray-600 truncate">
-                      {recommendation.song_artist}
-                    </p>
-                  </div>
+                  {/* Album cover */}
+                  <img
+                    src={item.song_album_cover}
+                    alt={item.song_name}
+                    className="
+                      relative
+                      z-10
+                      w-full
+                      h-full
+                      object-cover
+                      shadow-[0_4px_6px_rgba(0,90,100,0.3),inset_0_1px_0px_rgba(255,255,255,0.9)]
+                    "
+                  />
                 </div>
-              );
-            })}
+
+                {/* Song name + artist */}
+                <div className="min-w-0 w-full max-w-40">
+                  <p className="text-sm font-bold truncate">
+                    {item.song_name}
+                  </p>
+
+                  <p className="text-sm text-gray-600 truncate">
+                    {item.song_artist}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </Window>
@@ -192,10 +183,10 @@ export default function Collection({ collection }: CollectionProps) {
       {/* Song details popup */}
       <Popup
         title="Details"
-        isOpen={selectedSong !== null}
+        isOpen={selectedItem !== null}
         onClose={closePopup}
       >
-        {selectedSong && (
+        {selectedItem && (
           <div className="flex flex-col">
             {/* Song details */}
             <section className="flex flex-col gap-3 pb-5 border-b border-gray-300">
@@ -205,20 +196,20 @@ export default function Collection({ collection }: CollectionProps) {
 
               <div className="flex flex-row gap-4 items-start">
                 <img
-                  src={selectedSong.song_album_cover}
-                  alt={selectedSong.song_name}
-                  className="w-20 h-20 object-cover shrink-0"
+                  src={selectedItem.song_album_cover}
+                  alt={selectedItem.song_name}
+                  className="w-20 h-20 object-cover shrink-0 rounded"
                 />
 
                 <div className="min-w-0">
-                  <p className="text-lg font-bold">{selectedSong.song_name}</p>
+                  <p className="text-lg font-bold">{selectedItem.song_name}</p>
 
                   <p className="text-sm text-gray-600">
-                    {selectedSong.song_artist}
+                    {selectedItem.song_artist}
                   </p>
 
                   <p className="text-xs text-gray-600 mt-1">
-                    {selectedSong.song_album} · {selectedSong.song_year}
+                    {selectedItem.song_album} · {selectedItem.song_year}
                   </p>
                 </div>
               </div>
@@ -267,7 +258,7 @@ export default function Collection({ collection }: CollectionProps) {
                     PROMPT
                   </p>
 
-                  <p className="text-sm leading-5">{selectedSong.prompt}</p>
+                  <p className="text-sm leading-5">{selectedItem.prompt}</p>
                 </div>
 
                 <div>
@@ -275,7 +266,7 @@ export default function Collection({ collection }: CollectionProps) {
                     MESSAGE
                   </p>
 
-                  <p className="text-sm leading-5">{selectedSong.message}</p>
+                  <p className="text-sm leading-5">{selectedItem.message}</p>
                 </div>
               </div>
             </section>

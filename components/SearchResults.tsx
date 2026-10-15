@@ -38,7 +38,7 @@ export default function SearchResults({
         <ul className="w-full h-64 overflow-y-auto border-2 border-t-win-border-dark border-l-win-border-dark border-b-win-border-alt border-r-win-border-alt rounded-sm bg-white">
           {tracks.length === 0 ? (
             <li className="p-3 text-sm italic text-gray-400 text-center">
-              Search above to see tracks.
+              Search above to see more tracks.
             </li>
           ) : (
             tracks.map((track, index) => {
