@@ -336,3 +336,24 @@ export async function updateUserRecommendation(formData: {
 
   return { success: true };
 }
+
+export async function getRooms() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("Rooms").select(`*`)
+
+  if (error) {
+    console.error('Error fetching items:', error);
+    return [];
+  }
+
+  const items = data.map((row) => ({
+    id: row.id,
+    createdAt: row.created_at,
+    name: row.name,
+    description: row.description,
+    capacity: row.capacity
+  }));
+
+  return items
+}
+

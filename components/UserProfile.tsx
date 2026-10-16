@@ -166,7 +166,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="w-full min-h-screen flex items-center justify-center p-6 sm:p-12">
         <LoadingScreen />
       </div>
     );
@@ -187,7 +187,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="w-full flex items-center justify-center">
+    <div className="w-full min-h-screen flex items-center justify-center p-6 sm:p-12">
       <Window
         title="User Profile"
         contentClassName="p-5 md:p-6"

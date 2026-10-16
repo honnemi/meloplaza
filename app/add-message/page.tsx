@@ -36,7 +36,7 @@ export default function AddMessage() {
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row">
+    <div className="w-full min-h-screen overflow-hidden flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row lg:h-screen">
       {/* Show profile preview */}
       <ProfilePreview />
 
@@ -47,7 +47,7 @@ export default function AddMessage() {
             <Button label="Back" href="/select-song" />
 
             {message.trim().length !== 0 && (
-              <SecondaryButton label="Next" href="/confirm-new-user" />
+              <SecondaryButton label="Next" href="/confirm-profile" />
             )}
           </div>
         }

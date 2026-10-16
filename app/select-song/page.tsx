@@ -27,7 +27,7 @@ export default async function SelectSong({ searchParams }: PageProps) {
   }));
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row">
+    <div className="w-full min-h-screen overflow-hidden flex flex-col items-center justify-start gap-10 p-6 sm:p-12 lg:flex-row lg:h-screen">
       {/* Show profile preview */}
       <ProfilePreview />
       {/* Show song selection component */}

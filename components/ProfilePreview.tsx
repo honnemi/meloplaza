@@ -85,7 +85,7 @@ export default function ProfilePreview() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center flex-1 h-full min-h-[120px]">
-          <div className="text-gray-400">
+          <div className="text-gray-400 text-center">
             Please follow the instructions to complete your profile!
           </div>
           </div>

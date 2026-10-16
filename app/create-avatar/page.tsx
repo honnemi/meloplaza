@@ -6,6 +6,8 @@ import Avatar from "@/components/Avatar";
 import { useState } from "react";
 import { useFormStore } from "@/app/context/FormContext";
 import { AVATAR_FACES, AVATAR_COLOURS } from "../avatar-customisation";
+import { routerServerGlobal } from "next/dist/server/lib/router-utils/router-server-context";
+import { useTransitionRouter } from "next-view-transitions";
 
 export default function AvatarCreation() {
   const { formData, updateForm, clearForm } = useFormStore();
@@ -37,6 +39,18 @@ export default function AvatarCreation() {
     if (faceIndex >= 0 && faceIndex < AVATAR_FACES.length - 1) {
       setFaceIndex(faceIndex + 1);
     }
+  };
+
+  const handleBack = () => {
+   clearForm();
+   const router = useTransitionRouter();
+
+   if (formData.isEditing) {
+    router.push("/plaza");
+   }
+   else {
+    router.push("/");
+   }
   };
 
   // Handle face back
@@ -81,12 +95,14 @@ export default function AvatarCreation() {
   };
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-12">
+    <div className="w-full h-screen overflow-hidden flex items-center justify-center p-6 sm:p-12">
       <Window
         title="Customise your Melo"
         footer={
           <div className="flex justify-between w-full">
-            <Button label="Back" href="/" onClick={clearForm} />
+            <Button label="Back" href={formData.isEditing
+            ? "/plaza"
+            : "/"} onClick={clearForm} />
             <SecondaryButton label="Next" href="/select-prompt" onClick={handleNext} />
           </div>
         }

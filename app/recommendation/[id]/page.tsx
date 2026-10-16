@@ -211,7 +211,9 @@ export default function ShowRecommendation() {
   // Show loading screen if data is still being fetched
   if (!otherUser || !recommendation || checkingCollection) {
     return (
-      <LoadingScreen />
+      <div className="w-full h-screen overflow-hidden flex items-center justify-center p-6 sm:p-12">
+        <LoadingScreen />
+      </div>
     );
   }
 
@@ -231,7 +233,7 @@ export default function ShowRecommendation() {
   });
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center p-6 pb-10 sm:p-12">
+    <div className="w-full h-screen overflow-hidden flex items-center justify-center p-6 sm:p-12">
       <Window
         title="MeloMessenger"
         icon={<i className="hn hn-message-solid"></i>}
