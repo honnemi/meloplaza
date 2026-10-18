@@ -8,6 +8,11 @@ import Popup from "@/components/PopupWindow";
 import { getCurrentUserId, getUserById } from "@/app/actions";
 import { RealtimeCursors } from "@/components/realtime-cursors";
 import { usePlazaPresence } from "@/hooks/use-plaza-presence";
+import {
+  changedRow,
+  useRealtimeRefresh,
+  type RealtimeSubscription,
+} from "@/hooks/use-realtime-refresh";
 import OnlineCounter from "@/components/OnlineCounter";
 import Profile from "@/components/LoggedInUser";
 
@@ -20,6 +25,8 @@ export interface PlazaAvatar {
 
 interface PlazaProps {
   avatars: PlazaAvatar[];
+  /** Set when the plaza is showing a single room, to watch that room live. */
+  roomId?: string;
 }
 
 interface AnimatedContainer extends Container {
@@ -237,8 +244,16 @@ function createAvatar(data: PlazaAvatar): AnimatedContainer {
 
 // PLAZA
 
-export default function Plaza({ avatars }: PlazaProps) {
+export default function Plaza({ avatars, roomId }: PlazaProps) {
   const router = useTransitionRouter();
+
+  // The Pixi setup effect only runs once, so it reads these through refs
+  // instead of re-running (and rebuilding the whole world) on every change.
+  const routerRef = useRef(router);
+  routerRef.current = router;
+
+  const avatarsRef = useRef(avatars);
+  const syncAvatarsRef = useRef<((next: PlazaAvatar[]) => void) | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -260,7 +275,7 @@ export default function Plaza({ avatars }: PlazaProps) {
     }
   }
 
-  // PIXI + CAMERA
+  // PIXI + CAMERA (runs once)
 
   useEffect(() => {
     const container = containerRef.current;
@@ -276,9 +291,21 @@ export default function Plaza({ avatars }: PlazaProps) {
 
     const activeAvatars: AnimatedContainer[] = [];
 
+    // Lookup of avatars currently in the world, by user id
+    const avatarEntries = new Map<
+      string,
+      { container: AnimatedContainer; data: PlazaAvatar }
+    >();
+
     // World
 
     const world = new Container();
+
+    const margin = AVATAR_RADIUS;
+
+    const randomX = () => margin + Math.random() * (WORLD_WIDTH - margin * 2);
+
+    const randomY = () => margin + Math.random() * (WORLD_HEIGHT - margin * 2);
 
     let cameraX = 0;
     let cameraY = 0;
@@ -497,7 +524,7 @@ export default function Plaza({ avatars }: PlazaProps) {
 
         avatar.hoverIcon.visible = false;
 
-        router.push(`/recommendation/${avatarData.id}`);
+        routerRef.current.push(`/recommendation/${avatarData.id}`);
       }
 
       // Avatar dragged
@@ -599,6 +626,157 @@ export default function Plaza({ avatars }: PlazaProps) {
 
     window.addEventListener("pointercancel", handleWindowPointerCancel);
 
+    // ADD / REMOVE / SYNC AVATARS
+
+    const addAvatar = (
+      avatarData: PlazaAvatar,
+      position?: { x: number; y: number },
+    ) => {
+      const avatar = createAvatar(avatarData);
+
+      // Initial position (new arrivals appear at a random spot,
+      // updated avatars keep their current spot)
+      avatar.x = position?.x ?? randomX();
+
+      avatar.y = position?.y ?? randomY();
+
+      // Target position
+      avatar.targetX = randomX();
+
+      avatar.targetY = randomY();
+
+      avatar.eventMode = "static";
+
+      avatar.cursor = "pointer";
+
+      // Avatar pointer down
+
+      avatar.on("pointerdown", (event) => {
+        playClickSound("/assets/melo.mp3");
+
+        if (draggedAvatar || isPanning) {
+          return;
+        }
+
+        event.stopPropagation();
+
+        draggedAvatar = avatar;
+
+        draggedAvatarData = avatarData;
+
+        dragPointerId = event.pointerId;
+
+        // Bigger tolerance for fingers so taps don't become drags
+        moveThreshold =
+          event.pointerType === "touch"
+            ? TOUCH_MOVE_THRESHOLD
+            : MOUSE_MOVE_THRESHOLD;
+
+        startPointerX = event.global.x;
+
+        startPointerY = event.global.y;
+
+        hasMoved = false;
+
+        // Get position in world
+        const localPos = event.getLocalPosition(world);
+
+        dragOffsetX = localPos.x - avatar.x;
+
+        dragOffsetY = localPos.y - avatar.y;
+
+        avatar.targetX = avatar.x;
+
+        avatar.targetY = avatar.y;
+
+        avatar.speechBubble.visible = false;
+
+        avatar.hoverIcon.visible = false;
+
+        document.body.style.userSelect = "none";
+
+        document.body.style.cursor = "default";
+
+        event.preventDefault?.();
+      });
+
+      // Put avatar inside world
+      world.addChild(avatar);
+
+      activeAvatars.push(avatar);
+
+      avatarEntries.set(avatarData.id, { container: avatar, data: avatarData });
+    };
+
+    const removeAvatar = (id: string) => {
+      const entry = avatarEntries.get(id);
+
+      if (!entry) return;
+
+      const avatar = entry.container;
+
+      // If someone is mid-drag on this avatar, drop the interaction cleanly
+      if (draggedAvatar === avatar) {
+        draggedAvatar = null;
+        draggedAvatarData = null;
+        dragPointerId = null;
+        dragOffsetX = 0;
+        dragOffsetY = 0;
+        hasMoved = false;
+
+        document.body.style.userSelect = "";
+        document.body.style.cursor = "";
+      }
+
+      const index = activeAvatars.indexOf(avatar);
+
+      if (index !== -1) {
+        activeAvatars.splice(index, 1);
+      }
+
+      world.removeChild(avatar);
+
+      avatar.destroy({ children: true });
+
+      avatarEntries.delete(id);
+    };
+
+    // Make the world match the latest list of avatars without
+    // rebuilding it: add new ones, remove missing ones, and
+    // refresh any whose name/colour/face changed.
+    const syncAvatars = (next: PlazaAvatar[]) => {
+      if (!initialized || destroyed) return;
+
+      const nextIds = new Set(next.map((data) => data.id));
+
+      for (const id of [...avatarEntries.keys()]) {
+        if (!nextIds.has(id)) {
+          removeAvatar(id);
+        }
+      }
+
+      for (const data of next) {
+        const existing = avatarEntries.get(data.id);
+
+        if (!existing) {
+          addAvatar(data);
+          continue;
+        }
+
+        const changed =
+          existing.data.displayName !== data.displayName ||
+          existing.data.colour !== data.colour ||
+          existing.data.faceIndex !== data.faceIndex;
+
+        if (changed) {
+          const { x, y } = existing.container;
+
+          removeAvatar(data.id);
+          addAvatar(data, { x, y });
+        }
+      }
+    };
+
     // PIXI SETUP
 
     async function setup() {
@@ -695,87 +873,12 @@ export default function Plaza({ avatars }: PlazaProps) {
           document.body.style.cursor = "grabbing";
         });
 
-        // Create avatars
+        // Create the initial avatars, then let realtime updates
+        // flow in through syncAvatarsRef
 
-        const margin = AVATAR_RADIUS;
+        syncAvatars(avatarsRef.current);
 
-        for (const avatarData of avatars) {
-          if (destroyed) {
-            return;
-          }
-
-          const avatar = createAvatar(avatarData);
-
-          // Initial position
-          avatar.x = margin + Math.random() * (WORLD_WIDTH - margin * 2);
-
-          avatar.y = margin + Math.random() * (WORLD_HEIGHT - margin * 2);
-
-          // Target position
-          avatar.targetX = margin + Math.random() * (WORLD_WIDTH - margin * 2);
-
-          avatar.targetY = margin + Math.random() * (WORLD_HEIGHT - margin * 2);
-
-          avatar.eventMode = "static";
-
-          avatar.cursor = "pointer";
-
-          // Avatar pointer down
-
-          avatar.on("pointerdown", (event) => {
-            playClickSound("/assets/melo.mp3");
-
-            if (draggedAvatar || isPanning) {
-              return;
-            }
-
-            event.stopPropagation();
-
-            draggedAvatar = avatar;
-
-            draggedAvatarData = avatarData;
-
-            dragPointerId = event.pointerId;
-
-            // Bigger tolerance for fingers so taps don't become drags
-            moveThreshold =
-              event.pointerType === "touch"
-                ? TOUCH_MOVE_THRESHOLD
-                : MOUSE_MOVE_THRESHOLD;
-
-            startPointerX = event.global.x;
-
-            startPointerY = event.global.y;
-
-            hasMoved = false;
-
-            // Get position in world
-            const localPos = event.getLocalPosition(world);
-
-            dragOffsetX = localPos.x - avatar.x;
-
-            dragOffsetY = localPos.y - avatar.y;
-
-            avatar.targetX = avatar.x;
-
-            avatar.targetY = avatar.y;
-
-            avatar.speechBubble.visible = false;
-
-            avatar.hoverIcon.visible = false;
-
-            document.body.style.userSelect = "none";
-
-            document.body.style.cursor = "default";
-
-            event.preventDefault?.();
-          });
-
-          // Put avatar inside world
-          world.addChild(avatar);
-
-          activeAvatars.push(avatar);
-        }
+        syncAvatarsRef.current = syncAvatars;
 
         // TICKER
 
@@ -832,11 +935,9 @@ export default function Plaza({ avatars }: PlazaProps) {
 
             // New random target
             if (distance < 5) {
-              avatar.targetX =
-                margin + Math.random() * (WORLD_WIDTH - margin * 2);
+              avatar.targetX = randomX();
 
-              avatar.targetY =
-                margin + Math.random() * (WORLD_HEIGHT - margin * 2);
+              avatar.targetY = randomY();
             }
           }
 
@@ -873,11 +974,9 @@ export default function Plaza({ avatars }: PlazaProps) {
 
                   a.y -= separationY;
 
-                  a.targetX =
-                    margin + Math.random() * (WORLD_WIDTH - margin * 2);
+                  a.targetX = randomX();
 
-                  a.targetY =
-                    margin + Math.random() * (WORLD_HEIGHT - margin * 2);
+                  a.targetY = randomY();
                 }
 
                 if (!b.isDragging) {
@@ -885,11 +984,9 @@ export default function Plaza({ avatars }: PlazaProps) {
 
                   b.y += separationY;
 
-                  b.targetX =
-                    margin + Math.random() * (WORLD_WIDTH - margin * 2);
+                  b.targetX = randomX();
 
-                  b.targetY =
-                    margin + Math.random() * (WORLD_HEIGHT - margin * 2);
+                  b.targetY = randomY();
                 }
               }
             }
@@ -925,6 +1022,8 @@ export default function Plaza({ avatars }: PlazaProps) {
     return () => {
       destroyed = true;
 
+      syncAvatarsRef.current = null;
+
       resizeObserver?.disconnect();
 
       window.removeEventListener("pointermove", handleWindowPointerMove);
@@ -948,7 +1047,43 @@ export default function Plaza({ avatars }: PlazaProps) {
         }
       }
     };
-  }, [avatars, router]);
+  }, []);
+
+  // KEEP AVATARS IN SYNC (realtime updates arrive as a new `avatars` prop)
+
+  useEffect(() => {
+    avatarsRef.current = avatars;
+
+    syncAvatarsRef.current?.(avatars);
+  }, [avatars]);
+
+  // REALTIME
+
+  const realtimeSubscriptions: RealtimeSubscription[] = [
+    // People joining the app, or changing their avatar
+    { table: "Users" },
+  ];
+
+  if (roomId) {
+    // People joining/leaving this room
+    realtimeSubscriptions.push({
+      table: "RoomMembers",
+      filter: (payload) => changedRow(payload).room_id === roomId,
+    });
+
+    // If the room gets deleted while you're inside, go back to the rooms list
+    realtimeSubscriptions.push({
+      table: "Rooms",
+      event: "DELETE",
+      filter: (payload) => changedRow(payload).id === roomId,
+      onEvent: () => routerRef.current.push("/rooms"),
+    });
+  }
+
+  useRealtimeRefresh(
+    roomId ? `room-${roomId}` : "plaza",
+    realtimeSubscriptions,
+  );
 
   // GET CURRENT USER TO BROADCAST CURSOR
 
@@ -1020,23 +1155,24 @@ export default function Plaza({ avatars }: PlazaProps) {
   const { onlineCount, cursors } = usePlazaPresence({
     user: currentUser,
     throttleMs: 50,
+    roomId,
   });
 
   // RENDER
 
   return (
     <>
-      <div ref={containerRef} className="fixed inset-0 overflow-hidden">
+      <div ref={containerRef} className="absolute inset-0 overflow-hidden">
         {currentUser && <RealtimeCursors cursors={cursors} />}
 
-        <div className="fixed top-3 left-3 right-3 sm:top-5 sm:left-8 sm:right-8 z-50 flex flex-col items-start gap-2 sm:flex-row sm:items-start sm:justify-between pointer-events-none">
-        <div className="pointer-events-auto">
-          <Profile />
+        <div className="fixed top-3 left-3 right-3 lg:top-5 lg:left-8 lg:right-8 z-50 flex flex-col items-start gap-2 lg:flex-row lg:items-start lg:justify-between pointer-events-none">
+          <div className="pointer-events-auto">
+            <Profile />
+          </div>
+          <div className="pointer-events-auto">
+            <OnlineCounter count={onlineCount} />
+          </div>
         </div>
-        <div className="pointer-events-auto">
-          <OnlineCounter count={onlineCount} />
-        </div>
-      </div>
 
         {/* Help button (bottom right) */}
         <button
@@ -1052,11 +1188,11 @@ export default function Plaza({ avatars }: PlazaProps) {
 
         {/* Welcome popup */}
         <div id="welcome-popup">
-          <Popup title="Info" isOpen={isPopupOpen} onClose={closePopup}>
+          <Popup title="Welcome!" isOpen={isPopupOpen} onClose={closePopup}>
             <div className="flex flex-col gap-4 text-center">
               <p className="text-sm text-gray-600">
-                Please save your account from "Profile" if you want to access
-                it again!
+                <strong>IMPORTANT:</strong> Please save your account from
+                "Profile" if you want to access it again!
               </p>
               <p className="text-lg font-bold font-heading">About</p>
 
@@ -1079,12 +1215,16 @@ export default function Plaza({ avatars }: PlazaProps) {
                   edge of the screen on desktop).
                 </li>
                 <li>
-                  Try dragging and tapping on avatars to interact with them.
+                  Try dragging and clicking on avatars to interact with them.
                 </li>
 
                 <li>Add songs you like to your collection.</li>
 
                 <li>Print your collection to take home as a memento.</li>
+
+                <li>
+                  Create/join rooms to find people with similar music taste!
+                </li>
               </ul>
 
               <p className="text-lg font-bold text-center font-heading">
@@ -1093,6 +1233,9 @@ export default function Plaza({ avatars }: PlazaProps) {
 
               <p className="text-lg font-bold text-center font-heading">
                 ヽ(・∀・)ﾉ
+              </p>
+              <p className="text-xs font-bold text-center font-heading">
+                - angelica siv
               </p>
             </div>
           </Popup>

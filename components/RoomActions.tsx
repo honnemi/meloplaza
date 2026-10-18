@@ -1,71 +1,77 @@
-
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { joinRoom, leaveRoom } from "@/app/actions";
-import Button from "@/components/Button";
+import Button, { SecondaryButton } from "@/components/Button";
 
 export default function RoomActions({
-    roomId,
-    isMember,
+  roomId,
+  isMember,
+  isOwner,
 }: {
-    roomId: string;
-    isMember: boolean;
+  roomId: string;
+  isMember: boolean;
+  isOwner: boolean;
 }) {
-    const router = useRouter();
-    const [joined, setJoined] = useState(isMember);
-    const [isPending, startTransition] = useTransition();
-    const [error, setError] = useState("");
+  const router = useRouter();
+  const [joined, setJoined] = useState(isMember);
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState("");
 
-    function handleToggleMembership() {
-        setError("");
+  // Keep the button in step with the server after a realtime refresh
+  useEffect(() => {
+    setJoined(isMember);
+  }, [isMember]);
 
-        startTransition(async () => {
-            try {
-                if (joined) {
-                    await leaveRoom(roomId);
-                    setJoined(false);
-                } else {
-                    await joinRoom(roomId);
-                    setJoined(true);
-                }
+  function handleToggleMembership() {
+    setError("");
 
-                router.refresh();
-            } catch {
-                setError("Unable to update room membership. Please try again.");
+    startTransition(async () => {
+      try {
+        const result = joined
+          ? await leaveRoom(roomId)
+          : await joinRoom(roomId);
+
+        if (!result?.success) {
+          setError(result?.error || "Unable to update room membership.");
+          return;
+        }
+
+        setJoined(!joined);
+        router.refresh();
+      } catch (err) {
+        console.error("Room membership error:", err);
+        setError("Unable to update room membership. Please try again.");
+      }
+    });
+  }
+
+  function returnToPlaza() {
+    router.push("/plaza");
+  }
+
+  return (
+    <div className="flex w-full min-w-0 flex-col items-end gap-2">
+      <div className="flex max-w-full flex-wrap justify-end gap-2">
+        {!isOwner && (
+          <SecondaryButton
+            label={
+              isPending ? "Please wait..." : joined ? "Leave room" : "Join room"
             }
-        });
-    }
+            onClick={handleToggleMembership}
+            disabled={isPending}
+          />
+        )}
 
-    function returnToPlaza() {
-        router.push("/plaza");
-    }
+        <Button label="Return to plaza" onClick={returnToPlaza} />
+      </div>
 
-    return (
-        <div className="flex flex-col items-center gap-2">
-            <div className="flex justify-center gap-2">
-                <Button
-                    label={
-                        isPending
-                            ? "Please wait..."
-                            : joined
-                              ? "Leave room"
-                              : "Join room"
-                    }
-                    onClick={handleToggleMembership}
-                    disabled={isPending}
-                />
-
-                <Button
-                    label="Return to plaza"
-                    onClick={returnToPlaza}
-                />
-            </div>
-
-            {error && (
-                <p className="text-sm text-red-500">{error}</p>
-            )}
-        </div>
-    );
+      {error && (
+        <p className="max-w-full break-words text-right text-sm text-[#a3326f]">
+          {error}
+        </p>
+      )}
+    </div>
+  );
 }

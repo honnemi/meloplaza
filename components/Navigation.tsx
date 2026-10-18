@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransitionRouter } from "next-view-transitions";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const NAV_ITEMS = [
@@ -29,7 +30,17 @@ const NAV_ITEMS = [
 
 export default function Navigation() {
   const router = useTransitionRouter();
+  const pathname = usePathname();
   const [hovered, setHovered] = useState<string | null>(null);
+
+  // On /room/<id> this is the room's id; anywhere else (e.g. /plaza) it's null
+  const roomMatch = pathname.match(/^\/room\/([^/?#]+)/);
+  const roomId = roomMatch ? decodeURIComponent(roomMatch[1]) : null;
+
+  // Adds ?fromRoom=<id> when you're inside a room so Back returns to it
+  function hrefFor(base: string) {
+    return roomId ? `${base}?fromRoom=${encodeURIComponent(roomId)}` : base;
+  }
 
   // Play sound on click
   function playClickSound() {
@@ -38,7 +49,6 @@ export default function Navigation() {
       clickAudio.volume = 0.2;
       clickAudio
         .play()
-        .catch((err) => console.error("Audio blocked by browser:", err));
     }
   }
 
@@ -65,7 +75,8 @@ export default function Navigation() {
             onMouseLeave={() => setHovered(null)}
             onClick={() => {
               playClickSound();
-              router.push(item.href);
+              const target = hrefFor(item.href);
+              router.push(hrefFor(item.href));
             }}
           >
             <img

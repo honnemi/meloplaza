@@ -81,11 +81,18 @@ interface PlazaUser {
 
 export const usePlazaPresence = ({
   user,
+  roomId = null,
   throttleMs = 50,
 }: {
   user: PlazaUser | null;
+  /** Leave empty for the main plaza; pass a room id to scope to that room. */
+  roomId?: string | null;
   throttleMs?: number;
 }) => {
+  // Presence and cursors only reach people on the same channel, so each
+  // room gets its own channel and the main plaza keeps "plaza".
+  const channelName = roomId ? `plaza:room:${roomId}` : "plaza";
+
   const [onlineCount, setOnlineCount] = useState(0);
 
   const [cursors, setCursors] = useState<
@@ -155,14 +162,18 @@ export const usePlazaPresence = ({
       return;
     }
 
-    const channel = supabase.channel("plaza");
+    // Starting fresh on this channel (also runs when moving between rooms)
+    setOnlineCount(0);
+    setCursors({});
+
+    const channel = supabase.channel(channelName);
 
     channel
       // Presence sync
       .on("presence", { event: "sync" }, () => {
         const state = channel.presenceState();
 
-        // Count all users currently in the plaza
+        // Count all users currently on this channel
         const count = Object.values(state).reduce(
           (total, presences) => total + presences.length,
           0,
@@ -253,9 +264,13 @@ export const usePlazaPresence = ({
     return () => {
       channelReadyRef.current = false;
       channelRef.current = null;
-      channel.unsubscribe();
+
+      // removeChannel (not just unsubscribe) so the client forgets this
+      // channel; otherwise re-entering the same room/plaza hands back the
+      // old, already-subscribed channel and adding callbacks throws.
+      supabase.removeChannel(channel);
     };
-  }, [user?.id]);
+  }, [user?.id, channelName]);
 
   // Add event listener for mousemove
   useEffect(() => {

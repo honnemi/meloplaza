@@ -23,13 +23,16 @@ export default function PromptSelection() {
   const { formData, updateForm } = useFormStore();
 
   // Restore previously saved prompt if available
-  const initialIndex = formData.prompt
-    ? PROMPTS.indexOf(formData.prompt)
-    : null;
+  const initialIndex = formData.prompt ? PROMPTS.indexOf(formData.prompt) : -1;
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(
-    initialIndex !== -1 ? initialIndex : null,
+    initialIndex >= 0 ? initialIndex : null,
   );
+
+const backHref =
+  formData.editMode || formData.isEditing
+    ? "/profile"
+    : "/";
 
   // Get selected prompt text based on selected index and display it below list of prompts
   const selectedPromptText =
@@ -55,7 +58,7 @@ export default function PromptSelection() {
         title="Select a prompt"
         footer={
           <div className="flex justify-between w-full">
-            <Button label="Back" href="/create-avatar" />
+            <Button label="Back" href={backHref} />
 
             {selectedIndex !== null && (
               <SecondaryButton label="Next" href="/select-song" />

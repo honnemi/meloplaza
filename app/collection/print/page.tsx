@@ -6,6 +6,9 @@ import {
 import PrintButton from "@/components/PrintButton";
 import Button from "@/components/Button";
 
+// Only the most recent saved items go on the receipt
+const PRINT_LIMIT = 5;
+
 // Format duration from ms to mm:ss (or fallback if duration isn't stored)
 function formatDuration(durationMs?: number) {
   if (!durationMs) return "3:30"; // Default fallback if song_duration isn't in snapshot
@@ -16,14 +19,29 @@ function formatDuration(durationMs?: number) {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-export default async function PrintCollection() {
+export default async function PrintCollection({
+  searchParams,
+}: {
+  searchParams: Promise<{ fromRoom?: string }>;
+}) {
+  const { fromRoom } = await searchParams;
+
+  // Keep the room so Back on the collection page can still return to it
+  const backHref = fromRoom
+    ? `/collection?fromRoom=${encodeURIComponent(fromRoom)}`
+    : "/collection";
+
   const currentUserId = await getCurrentUserId();
-  
+
   if (!currentUserId) {
     return null;
   }
 
-  const collection = (await getUserCollection(currentUserId)) || [];
+  // getUserCollection returns newest first, so the first 5 are the latest
+  const collection = ((await getUserCollection(currentUserId)) || []).slice(
+    0,
+    PRINT_LIMIT,
+  );
   const currentUser = await getUserById(currentUserId);
 
   // Get current date and time
@@ -134,7 +152,7 @@ export default async function PrintCollection() {
 
       {/* Back button */}
       <div className="print:hidden fixed top-6 left-6 z-50">
-        <Button label="Back" href="/collection" />
+        <Button label="Back" href={backHref} />
       </div>
     </div>
   );

@@ -1,15 +1,15 @@
+
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
+
+export type EditMode = "melo" | "recommendation" | null;
 
 export type FormState = {
-  // Avatar step
   colour: string;
   faceIndex: number;
   displayName: string;
-  // Prompt step
   prompt: string;
-  // Song step
   songName: string;
   songArtist: string;
   songAlbum: string;
@@ -17,11 +17,10 @@ export type FormState = {
   songYear: string;
   songId: string;
   songDuration: number;
-  // Message step
   message: string;
-
-  // Edit flag
-  isEditing?: boolean; 
+  editMode: EditMode;
+  isEditing?: boolean;
+  returnTo?: string;
 };
 
 type FormContextType = {
@@ -43,19 +42,23 @@ const defaultState: FormState = {
   songId: "",
   songDuration: 0,
   message: "",
+  editMode: null,
+  isEditing: false,
+  returnTo: undefined,
 };
 
 const FormContext = createContext<FormContextType | undefined>(undefined);
-
 
 export function FormProvider({ children }: { children: ReactNode }) {
   const [formData, setFormData] = useState<FormState>(defaultState);
 
   const updateForm = (data: Partial<FormState>) => {
-    setFormData((prev) => ({ ...prev, ...data }));
+    setFormData((previous) => ({ ...previous, ...data }));
   };
 
-  const clearForm = () => setFormData(defaultState);
+  const clearForm = () => {
+    setFormData(defaultState);
+  };
 
   return (
     <FormContext.Provider value={{ formData, updateForm, clearForm }}>
@@ -65,7 +68,11 @@ export function FormProvider({ children }: { children: ReactNode }) {
 }
 
 export const useFormStore = () => {
-  const ctx = useContext(FormContext);
-  if (!ctx) throw new Error("useFormStore must be used inside FormProvider");
-  return ctx;
+  const context = useContext(FormContext);
+
+  if (!context) {
+    throw new Error("useFormStore must be used within a FormProvider");
+  }
+
+  return context;
 };

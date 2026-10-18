@@ -6,12 +6,11 @@ import Avatar from "@/components/Avatar";
 import { useState } from "react";
 import { useFormStore } from "@/app/context/FormContext";
 import { AVATAR_FACES, AVATAR_COLOURS } from "../avatar-customisation";
-import { routerServerGlobal } from "next/dist/server/lib/router-utils/router-server-context";
 import { useTransitionRouter } from "next-view-transitions";
 
 export default function AvatarCreation() {
   const { formData, updateForm, clearForm } = useFormStore();
-  
+  const router = useTransitionRouter();
 
   // Restore from form data if available, otherwise default to initial values
   const [faceIndex, setFaceIndex] = useState<number>(formData.faceIndex ?? 0);
@@ -41,17 +40,13 @@ export default function AvatarCreation() {
     }
   };
 
-  const handleBack = () => {
-   clearForm();
-   const router = useTransitionRouter();
+  const nextHref =
+    formData.editMode === "melo" ? "/confirm-profile" : "/select-prompt";
 
-   if (formData.isEditing) {
-    router.push("/plaza");
-   }
-   else {
-    router.push("/");
-   }
-  };
+  const backHref =
+  formData.editMode || formData.isEditing
+    ? "/profile"
+    : "/";
 
   // Handle face back
   const handleFaceBack = () => {
@@ -59,15 +54,6 @@ export default function AvatarCreation() {
     if (faceIndex > 0) {
       setFaceIndex(faceIndex - 1);
     }
-  };
-
-  // Update form before navigating to next page
-  const handleNext = () => {
-    updateForm({
-      faceIndex,
-      displayName,
-      colour,
-    });
   };
 
   // Play sound on type
@@ -100,10 +86,19 @@ export default function AvatarCreation() {
         title="Customise your Melo"
         footer={
           <div className="flex justify-between w-full">
-            <Button label="Back" href={formData.isEditing
-            ? "/plaza"
-            : "/"} onClick={clearForm} />
-            <SecondaryButton label="Next" href="/select-prompt" onClick={handleNext} />
+            <Button
+              label="Back"
+              href={backHref}
+              onClick={() => {
+                if (!formData.editMode) clearForm();
+              }}
+            />
+
+            <SecondaryButton
+              label="Next"
+              href={nextHref}
+              onClick={() => updateForm({ faceIndex, displayName, colour })}
+            />
           </div>
         }
       >
@@ -164,7 +159,7 @@ export default function AvatarCreation() {
               </span>
               <Avatar colour={colour} faceIndex={faceIndex} />
             </div>
-            
+
             {/* Styled face selection buttons */}
             <div className="flex flex-row gap-4 w-65">
               <button
