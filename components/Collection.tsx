@@ -1,7 +1,7 @@
 "use client";
 
 import Window from "@/components/Window";
-import Button, { SecondaryButton } from "@/components/Button";
+import Button, { ActionButton, SecondaryButton } from "@/components/Button";
 import CD from "@/components/CD";
 import Avatar from "@/components/Avatar";
 import Popup from "@/components/PopupWindow";
@@ -14,9 +14,10 @@ import {
   deleteCollectionItem,
 } from "@/app/actions";
 
+// A saved recommendation made by another user
 export interface CollectionItem {
   id: string;
-  recommendation: string; // original recommendation ID for analytics/counting
+  recommendation: string;
   song_name: string;
   song_artist: string;
   song_album: string;
@@ -34,7 +35,7 @@ export interface CollectionItem {
   } | null;
 }
 
-// A recommendation made by the current user.
+// A recommendation made by the current user
 export interface MyRecommendationItem {
   id: string;
   song_name: string;
@@ -46,7 +47,7 @@ export interface MyRecommendationItem {
   message: string;
   collection_count: number; // how many people have saved it
   created_at: string;
-  is_current: boolean; // the newest one, i.e. what shows on your profile
+  is_current: boolean;
 }
 
 interface CollectionProps {
@@ -60,15 +61,7 @@ type Selected =
   | { kind: "saved"; item: CollectionItem }
   | { kind: "mine"; item: MyRecommendationItem };
 
-const buttonGradient = {
-  backgroundImage: "linear-gradient(180deg, #ffffff 0%, #d5f0f5 100%)",
-};
-
-// Standard button look used across the app (red text variant for destructive actions)
-const buttonClass =
-  "px-4 py-2.5 text-sm font-bold border-2 border-win-border-dark rounded-sm bg-win-alt shadow-[3px_3px_0px_rgba(0,90,100,0.3)] hover:-translate-y-[1px] active:translate-y-[1px] cursor-pointer font-heading transition-transform disabled:opacity-50";
-
-// A single album cover + CD + title/artist tile.
+// A single album cover + CD + title/artist tile
 function SongTile({
   cover,
   name,
@@ -233,7 +226,7 @@ export default function Collection({
     router.refresh();
   };
 
-  // Same look as the tabs in the Rooms window
+  // Tabs for sections
   const tabClasses = (tab: Tab) =>
     `flex-1 min-w-0 flex items-center justify-center gap-1.5 overflow-hidden rounded-sm border-2 px-2 sm:px-3 py-2.5 font-heading text-xs font-bold transition-colors sm:text-sm cursor-pointer ${
       activeTab === tab
@@ -345,11 +338,7 @@ export default function Collection({
       </Window>
 
       {/* Song details popup */}
-      <Popup
-        title="Details"
-        isOpen={selected !== null}
-        onClose={closePopup}
-      >
+      <Popup title="Details" isOpen={selected !== null} onClose={closePopup}>
         {selected && (
           <div className="flex flex-col">
             {/* Song details */}
@@ -483,44 +472,38 @@ export default function Collection({
                     </p>
 
                     <div className="flex flex-wrap justify-end gap-2">
-                      <button
-                        type="button"
+                      <ActionButton
+                        label="Keep"
                         disabled={deleting}
                         onClick={() => {
                           setConfirmingDelete(false);
                           setDeleteError(null);
                           playClickSound();
                         }}
-                        className={`${buttonClass} text-gray-800`}
-                        style={buttonGradient}
                       >
-                        Keep
-                      </button>
+                      </ActionButton>
 
-                      <button
-                        type="button"
+                      <ActionButton
+                        label={deleting ? "Deleting..." : "Delete"}
+                        icon="hn hn-trash-alt-solid text-base"
                         disabled={deleting}
                         onClick={handleDelete}
-                        className={`${buttonClass} text-red-700`}
-                        style={buttonGradient}
+                        className="text-[#FF2D55]"
                       >
-                        {deleting ? "Deleting..." : "Delete"}
-                      </button>
+                      </ActionButton>
                     </div>
                   </div>
                 ) : (
-                  <button
-                    type="button"
+                  <ActionButton
+                    label="Delete"
+                    icon="hn hn-trash-alt-solid text-base"
                     onClick={() => {
                       setConfirmingDelete(true);
                       playClickSound();
                     }}
-                    className={`${buttonClass} self-start flex items-center gap-2 text-red-700`}
-                    style={buttonGradient}
+                    className="self-end text-[#FF2D55]"
                   >
-                    <i className="hn hn-trash-alt-solid text-base"></i>
-                    Delete
-                  </button>
+                  </ActionButton>
                 )}
               </section>
             )}

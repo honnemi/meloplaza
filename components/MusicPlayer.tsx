@@ -13,6 +13,7 @@ export default function MusicPlayer({
 }) {
   const trackId = songId ?? selectedTrack?.id;
 
+  // Display selected song details
   const displayName = selectedTrack
     ? `${selectedTrack.name} — ${selectedTrack.artists?.[0]?.name}`
     : songName && songArtist

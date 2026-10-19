@@ -47,8 +47,7 @@ export default function Navigation() {
     if (typeof window !== "undefined") {
       const clickAudio = new Audio("/assets/click.mp3");
       clickAudio.volume = 0.2;
-      clickAudio
-        .play()
+      clickAudio.play();
     }
   }
 
@@ -63,8 +62,7 @@ export default function Navigation() {
         fixed bottom-0 left-1/2 -translate-x-1/2
         rounded-tl-lg rounded-tr-lg"
     >
-      {/* Icons poke up above the bar. The offset is (icon height - 32px):
-          56px icons on mobile (-top-6), 80px icons from sm up (-top-12). */}
+      {/* Navigation buttons */}
       <div className="absolute -top-6 sm:-top-12 left-0 right-0 flex flex-row justify-center gap-4 sm:gap-10 w-full z-30">
         {NAV_ITEMS.map((item) => (
           <button
@@ -79,11 +77,13 @@ export default function Navigation() {
               router.push(hrefFor(item.href));
             }}
           >
+            {/* Icon */}
             <img
               className="w-14 h-14 sm:w-20 sm:h-20 max-w-none shrink-0 object-contain"
               src={hovered === item.key ? item.iconHover : item.icon}
               alt={item.label}
             />
+            {/* Label */}
             <p className="font-heading text-sm sm:text-lg font-bold -mt-3 sm:-mt-4 whitespace-nowrap">
               {item.label}
             </p>

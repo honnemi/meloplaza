@@ -4,6 +4,7 @@ interface OnlineCounterProps {
   count: number;
 }
 
+// Display number of users currently online and viewing the same plaza
 export default function OnlineCounter({ count }: OnlineCounterProps) {
   return (
     <div className="flex items-center gap-2">

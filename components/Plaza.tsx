@@ -25,7 +25,7 @@ export interface PlazaAvatar {
 
 interface PlazaProps {
   avatars: PlazaAvatar[];
-  /** Set when the plaza is showing a single room, to watch that room live. */
+  // Set when plaza is showing a single room
   roomId?: string;
 }
 

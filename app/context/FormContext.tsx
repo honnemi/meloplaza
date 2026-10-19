@@ -1,4 +1,3 @@
-
 "use client";
 
 import { createContext, useContext, useState, type ReactNode } from "react";
@@ -49,6 +48,7 @@ const defaultState: FormState = {
 
 const FormContext = createContext<FormContextType | undefined>(undefined);
 
+// Store data across pages during user onboarding phase
 export function FormProvider({ children }: { children: ReactNode }) {
   const [formData, setFormData] = useState<FormState>(defaultState);
 

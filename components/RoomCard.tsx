@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ActionButton } from "./Button";
 
 interface RoomProps {
   id: string;
@@ -13,7 +14,7 @@ interface RoomProps {
   created_by: string | null;
   tag?: "OWNER" | null;
   onJoin: () => void;
-  /** Only passed for rooms the current user owns. Shows the ▾ menu. */
+  // Only passed for rooms the current user owns. Shows the ▾ menu.
   onDelete?: () => void;
 }
 
@@ -76,17 +77,19 @@ export default function RoomCard({
         }}
       />
 
-      {/* Header: wraps instead of overlapping when the card gets narrow */}
+      {/* Header */}
       <div className="relative flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 rounded-t-[4px] border-b-2 border-[#8bbfc9] bg-gradient-to-r from-[#b8f2fa] to-[#e8fdff] px-2.5 py-2 sm:px-3">
         <div className="flex min-w-[7rem] flex-1 items-center gap-1.5 sm:gap-2">
           <span className="shrink-0 text-base leading-none text-[#4a8da0] sm:text-lg">
             ♫
           </span>
+          {/* Room name */}
           <h2 className="min-w-0 font-heading text-sm font-bold text-[#174e65] [overflow-wrap:anywhere]">
             {name}
           </h2>
         </div>
 
+        {/* Display owner tag if user owns the room */}
         <div className="ml-auto flex shrink-0 items-center gap-1.5">
           {tag && (
             <span
@@ -96,6 +99,7 @@ export default function RoomCard({
             </span>
           )}
 
+          {/* Delete dropdown */}
           {onDelete && (
             <div ref={menuRef} className="relative">
               <button
@@ -115,7 +119,7 @@ export default function RoomCard({
               {menuOpen && (
                 <div
                   role="menu"
-                  className="absolute right-0 top-full z-40 mt-1 w-40 overflow-hidden rounded-sm border-2 border-[#397b8b] bg-gradient-to-b from-white to-[#e6f9fc] shadow-[3px_3px_0px_rgba(0,90,100,0.3)] sm:w-36"
+                  className="absolute right-0 top-full z-40 mt-1 w-36 overflow-hidden rounded-sm border-2 border-win-border-dark bg-white shadow-[3px_3px_0px_rgba(0,90,100,0.25)]"
                 >
                   <button
                     type="button"
@@ -124,11 +128,12 @@ export default function RoomCard({
                     onClick={() => {
                       setMenuOpen(false);
                       onDelete();
+                      playClickSound();
                     }}
-                    className="flex min-h-11 w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-[11px] font-bold tracking-wider text-[#a3326f] hover:bg-[#d5f0f5] active:bg-[#d5f0f5] disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0"
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-bold font-heading text-[#FF2D55] transition-colors hover:bg-[#fff0f3] active:bg-[#ffe0e7] disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <i className="hn hn-trash-solid" />
-                    Delete room
+                    <i className="hn hn-trash-solid text-sm" />
+                    <span>{isPending ? "Deleting..." : "Delete room"}</span>
                   </button>
                 </div>
               )}
@@ -139,8 +144,7 @@ export default function RoomCard({
 
       {/* Body */}
       <div className="relative flex flex-col gap-3 p-2.5 sm:p-3">
-        {/* Description + member count: the count drops below the text
-            when there isn't room for both side by side */}
+        {/* Description + member count */}
         <div className="flex flex-wrap items-start justify-between gap-2.5 sm:gap-3">
           <div className="min-w-[9rem] flex-1 basis-40">
             <p className="mb-1 text-[10px] font-bold font-heading uppercase tracking-[0.15em] text-[#428293]">
@@ -160,22 +164,22 @@ export default function RoomCard({
             </p>
           </div>
         </div>
-
+        
+        {/* Button to navigate to room */}
         <div className="flex justify-end border-t border-dashed border-[#91c5cf] pt-3">
-          <button
-            type="button"
+          <ActionButton
+            label={
+              isPending
+                ? "Please wait..."
+                : canVisit
+                  ? "Visit Room"
+                  : isFull
+                    ? "Room Full"
+                    : "Visit Room"
+            }
             onClick={onJoin}
             disabled={isPending || (!canVisit && isFull)}
-            className="min-h-10 w-full cursor-pointer rounded-sm border-2 border-[#397b8b] bg-gradient-to-b from-white to-[#bceef5] px-3 py-2 font-heading text-xs font-bold text-[#245b6a] shadow-[3px_3px_0px_rgba(0,90,100,0.25)] transition-all hover:-translate-y-[1px] hover:to-[#a9e3ec] active:translate-y-[1px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0 sm:w-auto"
-          >
-            {isPending
-              ? "Please wait..."
-              : canVisit
-                ? "Visit Room"
-                : isFull
-                  ? "Room Full"
-                  : "Visit Room"}
-          </button>
+          ></ActionButton>
         </div>
       </div>
     </div>

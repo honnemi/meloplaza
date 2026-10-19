@@ -2,7 +2,7 @@
 
 import { SecondaryButton } from "@/components/Button";
 
-// Play success sound on add to collection
+// Play success sound on print
 function playSuccessSound() {
   if (typeof window !== "undefined") {
     const clickAudio = new Audio("/assets/success.mp3");
@@ -19,6 +19,7 @@ export default function PrintButton() {
       label="Print"
       icon={<i className="hn hn-print-solid"></i>}
       onClick={() => {
+        // Trigger print dialog for browser page
         window.print();
         playSuccessSound();
       }}

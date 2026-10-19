@@ -10,7 +10,7 @@ import {
   getCurrentUserId,
 } from "@/app/actions";
 import Window from "@/components/Window";
-import Button, { SecondaryButton } from "@/components/Button";
+import Button from "@/components/Button";
 import Avatar from "@/components/Avatar";
 import MusicPlayer from "@/components/MusicPlayer";
 import LoadingScreen from "@/components/LoadingScreen";
@@ -32,7 +32,6 @@ const REPLIES = [
   "I've added it to my collection ♡",
 ];
 
-// Number of entries in the `messages` array built in the component
 // The music player's animation delay is MESSAGE_COUNT * 1000ms
 const MESSAGE_COUNT = 5;
 
@@ -305,7 +304,7 @@ export default function ShowRecommendation() {
               </p>
             </div>
 
-            {/* Styled Add to Collection Action Button */}
+            {/* Add to collection button */}
             <div
               className={`w-full transition-all duration-500 ${
                 showActions
@@ -335,8 +334,8 @@ export default function ShowRecommendation() {
                     {addedToCollection
                       ? "Added"
                       : addingToCollection
-                      ? "Adding..."
-                      : "Add to Collection"}
+                        ? "Adding..."
+                        : "Add to Collection"}
                   </span>
                 </button>
               </div>

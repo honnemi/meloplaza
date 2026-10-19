@@ -26,14 +26,14 @@ export default function Home() {
     }
   }
 
-  // Handle Login Submission
+  // Handle login submission
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError(null);
 
     const trimmedEmail = email.trim().toLowerCase();
 
-    // Client-side validation checks
+    // Validation checks
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(trimmedEmail)) {
       setLoginError("Please enter a valid email address.");
@@ -77,7 +77,7 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen w-full">
       <main className="flex flex-col items-center justify-center w-full">
         <img src="/assets/logo.svg" alt="Meloplaza Logo" />
-        {/* Animated text typing effect for Meloplaza*/}
+        {/* Animated text typing effect */}
         <TextType
           text={["meloplaza"]}
           typingSpeed={100}
@@ -91,7 +91,7 @@ export default function Home() {
           {/* Start button */}
           <Button label="Get Started" href="/create-avatar" />
 
-          {/* Custom Button for Login modal trigger */}
+          {/* Login button */}
           <div
             onClick={() => {
               setIsLoginModalOpen(true);
@@ -103,7 +103,7 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Login Modal Popup */}
+      {/* Login modal */}
       <Popup
         title="Account Login"
         isOpen={isLoginModalOpen}
@@ -111,7 +111,7 @@ export default function Home() {
       >
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <p className="text-sm text-gray-600">
-            Enter your credentials to access your saved Meloplaza account.
+            Enter your credentials to access your saved melo.
           </p>
 
           {loginError && (
@@ -130,7 +130,7 @@ export default function Home() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="text-input"
-              placeholder="melo@example.com"
+              placeholder="Enter email"
             />
           </div>
 
@@ -145,7 +145,7 @@ export default function Home() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="text-input"
-              placeholder="••••••••"
+              placeholder="Enter password"
             />
           </div>
 

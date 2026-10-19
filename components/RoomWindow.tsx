@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useTransitionRouter } from "next-view-transitions";
 import Window from "@/components/Window";
 import RoomCard from "@/components/RoomCard";
-import Button from "@/components/Button";
+import Button, { ActionButton } from "@/components/Button";
 import Popup from "@/components/PopupWindow";
 import { createRoom, deleteRoom } from "@/app/actions";
 import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
@@ -56,7 +56,7 @@ export default function RoomWindow({
     { table: "RoomMembers" },
   ]);
 
-  // Owned rooms first, then rooms you've only joined (original order kept within each group)
+  // Owned rooms first, then rooms you've joined 
   const joinedRooms = rooms
     .filter((room) => room.isMember || room.created_by === currentUserId)
     .sort((a, b) => {
@@ -87,14 +87,17 @@ export default function RoomWindow({
     },
   };
 
+  // Track currently opened tab
   const current = tabContent[activeTab];
 
+  // Play sound on click
   function playClickSound() {
     const clickAudio = new Audio("/assets/click.mp3");
     clickAudio.volume = 0.2;
     clickAudio.play().catch(() => {});
   }
 
+  // Navigate to room on click
   function handleJoin(roomId: string) {
     playClickSound();
     router.push(`/room/${roomId}`);
@@ -121,6 +124,7 @@ export default function RoomWindow({
     playClickSound();
   }
 
+  // Create room
   async function handleCreateRoom(event: FormEvent) {
     event.preventDefault();
     setMessage("");
@@ -145,6 +149,7 @@ export default function RoomWindow({
     });
   }
 
+  // Delete room
   function handleDeleteRoom(room: Room) {
     if (room.created_by !== currentUserId) {
       setMessage("You can only delete rooms you created.");
@@ -181,7 +186,8 @@ export default function RoomWindow({
       }
     });
   }
-
+  
+  // Display room card
   const renderRoom = (room: Room) => {
     const isOwner = room.created_by === currentUserId;
 
@@ -220,6 +226,7 @@ export default function RoomWindow({
         </div>
       }
     >
+      {/* Error message */}
       <div className="flex h-full min-h-0 flex-col">
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 p-3 sm:gap-3 sm:p-4">
           {message ? (
@@ -233,29 +240,24 @@ export default function RoomWindow({
             <span className="hidden sm:block" />
           )}
 
-          <button
-            type="button"
+          {/* Open modal to add new room */}
+          <ActionButton
+            label="Add New Room"
+            icon="hn hn-plus-solid"
             onClick={() => {
               setMessage("");
               setIsAddModalOpen(true);
               playClickSound();
             }}
             disabled={isPending}
-            className="flex min-h-10 w-full shrink-0 flex-row items-center justify-center gap-2 rounded-sm border-2 border-win-border-dark bg-win-alt px-3 py-2 text-sm font-bold font-heading text-gray-800 shadow-[3px_3px_0px_rgba(0,90,100,0.3)] transition-transform hover:-translate-y-[1px] active:translate-y-[1px] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-4 sm:py-3 cursor-pointer"
-            style={{
-              backgroundImage:
-                "linear-gradient(180deg, #ffffff 0%, #d5f0f5 100%)",
-            }}
-          >
-            <i className="hn hn-plus-solid" />
-            Add New Room
-          </button>
+          ></ActionButton>
         </div>
-
+        
+        {/* Empty message */}
         <div className="flex min-h-0 flex-1 flex-col px-2.5 pb-3 sm:px-4 sm:pb-4">
           {rooms.length === 0 ? (
-            <p className="py-8 text-center text-sm text-gray-500">
-              No rooms found. Create your first room!
+            <p className="py-8 text-center text-gray-500">
+              No rooms found. Create the first room!
             </p>
           ) : (
             <>
@@ -291,7 +293,7 @@ export default function RoomWindow({
                   {current.subtitle}
                 </p>
 
-                {/* Scrolling list: cards flow into as many columns as fit */}
+                {/* Scrolling list */}
                 <div className="min-h-0 flex-1 overflow-y-auto px-2.5 pb-20 pt-3 sm:px-3 sm:pt-4">
                   {current.list.length === 0 ? (
                     <p className="py-3 text-sm text-gray-500">
@@ -308,7 +310,8 @@ export default function RoomWindow({
           )}
         </div>
       </div>
-
+      
+      {/* Add room modal */}
       <Popup
         title="Add New Room"
         isOpen={isAddModalOpen}
@@ -319,6 +322,7 @@ export default function RoomWindow({
             Create a room for people to join and share similar music with.
           </p>
 
+          {/* Room name */}
           <div className="flex flex-col gap-1">
             <label
               htmlFor="room-name"
@@ -339,6 +343,7 @@ export default function RoomWindow({
             />
           </div>
 
+          {/* Room description */}
           <div className="flex flex-col gap-1">
             <label
               htmlFor="room-description"
@@ -358,6 +363,7 @@ export default function RoomWindow({
             />
           </div>
 
+          {/* Room capacity */}
           <div className="flex flex-col gap-1">
             <label
               htmlFor="room-capacity"
@@ -381,12 +387,14 @@ export default function RoomWindow({
             />
           </div>
 
+          {/* Error message */}
           {message && (
             <p role="alert" className="text-sm text-[#a3326f]">
               {message}
             </p>
           )}
 
+          {/* Confirm button */}
           <div className="mt-2 flex justify-end gap-2">
             <button
               type="submit"

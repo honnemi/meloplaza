@@ -9,7 +9,7 @@ interface PageProps {
 export default async function SelectSong({ searchParams }: PageProps) {
   const { q: query } = await searchParams;
 
-  // Fetch tracks from Spotify based on the query parameter
+  // Fetch tracks from Spotify based on query
   const data = query ? await getSpotifyTracks(query) : null;
   const rawTracks = data?.tracks?.items || [];
 

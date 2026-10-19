@@ -3,6 +3,7 @@ import { getUsers } from "@/lib/supabase/server";
 import Navigation from "@/components/Navigation";
 
 export default async function PlazaPage() {
+  // Get users to populate the plaza
   const users = await getUsers();
 
   const avatars = (users ?? []).map((user) => ({

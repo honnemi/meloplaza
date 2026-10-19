@@ -1,8 +1,9 @@
 import RoomWindow from "@/components/RoomWindow";
 import { getCurrentUserId, getRooms } from "@/app/actions";
-import { redirect } from "next/navigation"; //  Import redirect
+import { redirect } from "next/navigation";
 
 export default async function RoomsPage() {
+  // Get rooms to display
   const rooms = await getRooms();
   const currentUser = await getCurrentUserId();
 

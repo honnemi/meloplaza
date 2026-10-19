@@ -8,16 +8,10 @@ import { useTransitionRouter } from "next-view-transitions";
 import { useFormStore } from "@/app/context/FormContext";
 import { createClient } from "@/lib/supabase/client";
 
-// Shared with the profile page so the loading screen sits in exactly the same spot.
-const PAGE_WRAPPER_CLASS =
-  "w-full min-h-screen flex items-center justify-center p-6 sm:p-12";
-
 export default function ConfirmNewUserPage() {
   const router = useTransitionRouter();
   const { formData: liveFormData, clearForm } = useFormStore();
 
-  // clearForm() runs before navigation finishes, which would blank the page
-  // (and flip Cancel/Save labels) mid-save. Freeze what's shown once saving starts.
   const [snapshot, setSnapshot] = useState<typeof liveFormData | null>(null);
   const formData = snapshot ?? liveFormData;
 
@@ -28,12 +22,13 @@ export default function ConfirmNewUserPage() {
   const isEditing = editMode !== null || formData.isEditing === true;
   const isMeloConfirmation = editMode === "melo";
 
-  // Where the edit started (the profile page stores this, including ?fromRoom=…)
   const returnTo = formData.returnTo || "/profile";
 
+  // If editing, return to profile, else, return to previous page (add-message)
   const backHref =
     formData.editMode || formData.isEditing ? returnTo : "/add-message";
 
+  // On confirm, send API request to update user profile
   const handleConfirm = async () => {
     if (loading) return;
 
@@ -123,7 +118,7 @@ export default function ConfirmNewUserPage() {
   };
 
   return (
-    <div className={PAGE_WRAPPER_CLASS}>
+    <div className="w-full min-h-screen flex items-center justify-center p-6 sm:p-12">
       <Window
         title={isEditing ? "Save changes?" : "Ready to enter?"}
         contentClassName="p-4 sm:p-6"
@@ -142,18 +137,21 @@ export default function ConfirmNewUserPage() {
           </div>
         }
       >
+        {/* Confirmation message */}
         <div className="text-base sm:text-lg italic mb-4 text-center text-gray-600">
           {isMeloConfirmation || editMode === "recommendation"
             ? "Review your changes before saving."
             : "You can always update your profile later!"}
         </div>
-
+        
+        {/* Error message */}
         {error && (
           <div className="mb-4 p-3 text-sm text-[#a80f35] bg-[#ffe3ea] rounded-sm border-2 border-[#ff9bb0] text-center">
             {error}
           </div>
         )}
 
+        {/* User profile */}
         {isMeloConfirmation ? (
           <div className="flex flex-col items-center justify-center py-2 sm:py-6">
             <div className="flex flex-col items-center gap-4 sm:gap-5 w-full">

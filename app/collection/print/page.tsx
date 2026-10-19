@@ -9,9 +9,9 @@ import Button from "@/components/Button";
 // Only the most recent saved items go on the receipt
 const PRINT_LIMIT = 5;
 
-// Format duration from ms to mm:ss (or fallback if duration isn't stored)
+// Format duration from ms to mm:ss
 function formatDuration(durationMs?: number) {
-  if (!durationMs) return "3:30"; // Default fallback if song_duration isn't in snapshot
+  if (!durationMs) return "3:30"; // Default fallback
   const totalSeconds = Math.floor(durationMs / 1000);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
@@ -26,7 +26,7 @@ export default async function PrintCollection({
 }) {
   const { fromRoom } = await searchParams;
 
-  // Keep the room so Back on the collection page can still return to it
+  // If coming from a room, return back to it
   const backHref = fromRoom
     ? `/collection?fromRoom=${encodeURIComponent(fromRoom)}`
     : "/collection";
@@ -50,7 +50,7 @@ export default async function PrintCollection({
   const currentHour = now.getHours();
   const currentMinutes = String(now.getMinutes()).padStart(2, "0");
 
-  // Fetch creator details using original_creator_id stored in the snapshot
+  // Fetch creator details
   const collectionWithUsers = await Promise.all(
     collection.map(async (item: any) => {
       let user = item.original_creator;
@@ -97,7 +97,7 @@ export default async function PrintCollection({
 
         <hr />
 
-        {/* Collection items (snapshots) */}
+        {/* Collection items */}
         <ul className="flex flex-col gap-3 list-none p-0 m-0 w-full">
           {collectionWithUsers.map((item: any) => {
             return (

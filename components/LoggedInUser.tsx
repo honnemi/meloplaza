@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getCurrentUserId, getUserById } from "@/app/actions";
 import { useTransitionRouter } from "next-view-transitions";
-import Avatar from "@/components/Avatar"; 
+import Avatar from "@/components/Avatar";
 import { createClient } from "@/lib/supabase/client";
 
 interface UserProfile {
@@ -18,6 +18,7 @@ export default function LoggedInUser() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Load current user profile on page mount
   useEffect(() => {
     async function loadProfile() {
       try {
@@ -46,6 +47,7 @@ export default function LoggedInUser() {
     loadProfile();
   }, []);
 
+  // Log user out on button click
   const handleLogout = async () => {
     try {
       router.push("/");
@@ -56,6 +58,7 @@ export default function LoggedInUser() {
     }
   };
 
+  // Display loading message if data is still being fetched
   if (loading) {
     return (
       <div className="w-64 bg-win border-2 border-win-border-dark rounded-md p-2 text-xs font-bold shadow-[3px_3px_0px_rgba(0,90,100,0.3)] select-none font-heading">
@@ -74,10 +77,10 @@ export default function LoggedInUser() {
       <div className="bg-(image:--win-titlebar) border-b-2 border-win-border-dark px-2.5 py-1 text-xs font-bold flex items-center justify-between shadow-[inset_0_1px_0px_rgba(255,255,255,0.9)]">
         <span className="truncate leading-none text-gray-800 font-heading font-bold flex flex-row gap-2 items-center">
           <i className="hn hn-user-solid"></i>
-          My Profile
+          Me
         </span>
 
-        {/* Window controls wrapper */}
+        {/* Fake window controls */}
         <div className="flex items-center gap-1.5 shrink-0">
           {/* Green button */}
           <div
@@ -101,9 +104,8 @@ export default function LoggedInUser() {
             }}
           />
 
-          {/* Red button (Log out) */}
+          {/* Red button */}
           <div
-            onClick={handleLogout}
             title="Log Out"
             className="w-3.5 h-3.5 rounded-full border border-red-800 transition-[filter,transform] duration-100 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),inset_0_-2px_3px_rgba(140,0,20,0.4),0_1px_2px_rgba(0,0,0,0.25)] hover:-translate-y-[1px] hover:brightness-110 active:translate-y-[1px] active:brightness-95 cursor-pointer"
             style={{
@@ -116,7 +118,7 @@ export default function LoggedInUser() {
         </div>
       </div>
 
-      {/* Main Inner Well */}
+      {/* Main window */}
       <div
         className="p-1.5"
         style={{
@@ -126,7 +128,7 @@ export default function LoggedInUser() {
       >
         <div className="bg-white/60 p-2 rounded-sm border-2 border-win-border shadow-[inset_1px_1px_0px_rgba(0,90,100,0.25),inset_-1px_-1px_0px_rgba(255,255,255,0.9)] flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            {/* Avatar Wrapper - -mb-4 prevents clipping from <Avatar>'s built-in pb-4 */}
+            {/* Avatar */}
             <div className="shrink-0 scale-75 -mb-4 -ml-2">
               <Avatar
                 colour={profile.colour}
@@ -136,7 +138,7 @@ export default function LoggedInUser() {
               />
             </div>
 
-            {/* Display Name */}
+            {/* Display name */}
             <div className="flex flex-col min-w-0">
               <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wide leading-none mb-0.5 font-heading">
                 Logged in
@@ -147,7 +149,7 @@ export default function LoggedInUser() {
             </div>
           </div>
 
-          {/* Retro Tactile "Exit" Button */}
+          {/* Logout button */}
           <button
             onClick={handleLogout}
             className="shrink-0 px-2 py-1 text-[11px] font-bold border-2 border-win-border-dark rounded-sm bg-win-alt shadow-[1px_1px_0px_rgba(0,90,100,0.3)] hover:-translate-y-[1px] active:translate-y-[1px] cursor-pointer text-gray-800 font-heading flex flex-row gap-2 items-center"

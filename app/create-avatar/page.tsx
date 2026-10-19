@@ -1,7 +1,11 @@
 "use client";
 
 import Window from "@/components/Window";
-import Button, { SecondaryButton, ColourButton } from "@/components/Button";
+import Button, {
+  SecondaryButton,
+  ColourButton,
+  ActionButton,
+} from "@/components/Button";
 import Avatar from "@/components/Avatar";
 import { useState } from "react";
 import { useFormStore } from "@/app/context/FormContext";
@@ -43,10 +47,7 @@ export default function AvatarCreation() {
   const nextHref =
     formData.editMode === "melo" ? "/confirm-profile" : "/select-prompt";
 
-  const backHref =
-  formData.editMode || formData.isEditing
-    ? "/profile"
-    : "/";
+  const backHref = formData.editMode || formData.isEditing ? "/profile" : "/";
 
   // Handle face back
   const handleFaceBack = () => {
@@ -134,7 +135,7 @@ export default function AvatarCreation() {
               </div>
             </div>
 
-            {/* Colours */}
+            {/* Colour selection */}
             <div>
               <h3 className="text-sm font-bold text-gray-600 mb-2">
                 Colour Select
@@ -160,31 +161,19 @@ export default function AvatarCreation() {
               <Avatar colour={colour} faceIndex={faceIndex} />
             </div>
 
-            {/* Styled face selection buttons */}
+            {/* Face selection */}
             <div className="flex flex-row gap-4 w-65">
-              <button
-                type="button"
+              <ActionButton
+                label="Prev Face"
+                icon="hn hn-arrow-left-solid text-xs"
                 onClick={handleFaceBack}
-                className="flex-1 px-4 py-2.5 text-sm font-bold border-2 border-win-border-dark rounded-sm bg-win-alt shadow-[3px_3px_0px_rgba(0,90,100,0.3)] hover:-translate-y-[1px] active:translate-y-[1px] cursor-pointer text-gray-800 font-heading flex items-center justify-center gap-2 transition-transform"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(180deg, #ffffff 0%, #d5f0f5 100%)",
-                }}
-              >
-                <i className="hn hn-arrow-left-solid text-xs"></i> Prev Face
-              </button>
+              ></ActionButton>
 
-              <button
-                type="button"
+              <ActionButton
+                label="Next Face"
+                icon="hn hn-arrow-right-solid text-xs"
                 onClick={handleFaceNext}
-                className="flex-1 px-4 py-2.5 text-sm font-bold border-2 border-win-border-dark rounded-sm bg-win-alt shadow-[3px_3px_0px_rgba(0,90,100,0.3)] hover:-translate-y-[1px] active:translate-y-[1px] cursor-pointer text-gray-800 font-heading flex items-center justify-center gap-2 transition-transform"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(180deg, #ffffff 0%, #d5f0f5 100%)",
-                }}
-              >
-                Next Face <i className="hn hn-arrow-right-solid text-xs"></i>
-              </button>
+              ></ActionButton>
             </div>
           </div>
         </div>

@@ -19,11 +19,11 @@ export default function RoomActions({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
 
-  // Keep the button in step with the server after a realtime refresh
   useEffect(() => {
     setJoined(isMember);
   }, [isMember]);
 
+  // Join/leave room
   function handleToggleMembership() {
     setError("");
 
@@ -47,12 +47,14 @@ export default function RoomActions({
     });
   }
 
+  // Return to plaza
   function returnToPlaza() {
     router.push("/plaza");
   }
 
   return (
     <div className="flex w-full min-w-0 flex-col items-end gap-2">
+      {/* Only show join/leave button for members of the room (owners cannot leave their own room) */}
       <div className="flex max-w-full flex-wrap justify-end gap-2">
         {!isOwner && (
           <SecondaryButton
@@ -64,9 +66,11 @@ export default function RoomActions({
           />
         )}
 
+        {/* Return to plaza button */}
         <Button label="Return to plaza" onClick={returnToPlaza} />
       </div>
 
+      {/* Error message */}
       {error && (
         <p className="max-w-full break-words text-right text-sm text-[#a3326f]">
           {error}

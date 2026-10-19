@@ -1,28 +1,30 @@
-import { MousePointer2 } from 'lucide-react'
+import { MousePointer2 } from "lucide-react";
 
-import { cn } from '@/lib/utils'
+import { cn } from "@/lib/utils";
 
+// Realtime cursor appearance
 export const Cursor = ({
   className,
   style,
   color,
   name,
 }: {
-  className?: string
-  style?: React.CSSProperties
-  color: string
-  name: string
+  className?: string;
+  style?: React.CSSProperties;
+  color: string;
+  name: string;
 }) => {
   return (
-    <div className={cn('pointer-events-none', className)} style={style}>
+    <div className={cn("pointer-events-none", className)} style={style}>
       <MousePointer2 color={color} fill={color} size={30} />
-
+      {/* Colour comes from user's avatar colour */}
       <div
         className="mt-1 px-2 py-1 rounded-sm text-xs font-bold text-white text-center"
         style={{ backgroundColor: color }}
       >
+        {/* Name comes from user's display name */}
         {name}
       </div>
     </div>
-  )
-}
+  );
+};

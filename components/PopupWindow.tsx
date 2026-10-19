@@ -98,9 +98,9 @@ export default function Popup({
             <span className="font-heading leading-none truncate">{title}</span>
           </div>
 
-          {/* Window controls wrapper */}
+          {/* Window fake controls */}
           <div className="flex items-center gap-1.5 pl-4 shrink-0">
-            {/* Green button (Passive) */}
+            {/* Green button */}
             <div
               className="w-4 h-4 rounded-full border border-green-800 transition-[filter,transform] duration-100 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),inset_0_-2px_3px_rgba(0,100,20,0.4),0_1px_2px_rgba(0,0,0,0.25)] hover:-translate-y-[1px] hover:brightness-110 active:translate-y-[1px] active:brightness-95 cursor-pointer"
               style={{
@@ -111,7 +111,7 @@ export default function Popup({
               }}
             ></div>
 
-            {/* Yellow button (Passive) */}
+            {/* Yellow button */}
             <div
               className="w-4 h-4 rounded-full border border-amber-700 transition-[filter,transform] duration-100 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),inset_0_-2px_3px_rgba(150,80,0,0.4),0_1px_2px_rgba(0,0,0,0.25)] hover:-translate-y-[1px] hover:brightness-110 active:translate-y-[1px] active:brightness-95 cursor-pointer"
               style={{
@@ -122,7 +122,7 @@ export default function Popup({
               }}
             ></div>
 
-            {/* Red Close button (Active action) */}
+            {/* Red button (close popup) */}
             <button
               type="button"
               onClick={onClose}

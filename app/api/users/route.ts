@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
+// Add new user
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -40,10 +41,7 @@ export async function POST(request: Request) {
 
     if (userError && userError.code !== "23505") {
       console.error("Users insert error:", userError);
-      return NextResponse.json(
-        { error: userError.message },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: userError.message }, { status: 500 });
     }
 
     const { error: recommendationError } = await supabaseAdmin
@@ -71,8 +69,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Server error";
+    const message = error instanceof Error ? error.message : "Server error";
 
     console.error("API POST error:", error);
 
@@ -80,6 +77,7 @@ export async function POST(request: Request) {
   }
 }
 
+// Update existing user profile
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
@@ -109,10 +107,7 @@ export async function PUT(request: Request) {
     }
 
     if (editMode !== "melo" && editMode !== "recommendation") {
-      return NextResponse.json(
-        { error: "Invalid edit mode" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid edit mode" }, { status: 400 });
     }
 
     const supabase = await createClient();
@@ -131,12 +126,11 @@ export async function PUT(request: Request) {
     const supabaseAdmin = createAdminClient();
 
     if (editMode === "melo") {
-      const { data: existingUser, error: lookupError } =
-        await supabaseAdmin
-          .from("Users")
-          .select("id")
-          .eq("id", userId)
-          .maybeSingle();
+      const { data: existingUser, error: lookupError } = await supabaseAdmin
+        .from("Users")
+        .select("id")
+        .eq("id", userId)
+        .maybeSingle();
 
       if (lookupError) {
         throw lookupError;
@@ -164,9 +158,6 @@ export async function PUT(request: Request) {
     }
 
     if (editMode === "recommendation") {
-      // A user can now have many recommendations (history). The newest one is
-      // their "current" recommendation, so look that one up (the old
-      // .maybeSingle() would throw as soon as there were two rows).
       const { data: latest, error: lookupError } = await supabaseAdmin
         .from("Recommendations")
         .select("id, prompt, song_id, message")
@@ -186,8 +177,6 @@ export async function PUT(request: Request) {
         );
       }
 
-      // If nothing about the recommendation changed (e.g. user hit Save
-      // without editing), don't add a duplicate to their history.
       const unchanged =
         (latest.song_id ?? null) === (songId || null) &&
         (latest.prompt ?? null) === (prompt || null) &&
@@ -215,8 +204,7 @@ export async function PUT(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Server error";
+    const message = error instanceof Error ? error.message : "Server error";
 
     console.error("API PUT error:", error);
 

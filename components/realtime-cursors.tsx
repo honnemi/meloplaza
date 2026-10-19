@@ -3,6 +3,7 @@
 import { Cursor } from "@/components/cursor";
 import { CursorEventPayload } from "@/hooks/use-plaza-presence";
 
+// Display cursors for each active user
 export const RealtimeCursors = ({
   cursors,
 }: {

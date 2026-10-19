@@ -5,8 +5,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 // ─────────────────────────────────────────────────────────────
-// Types & helpers (not exported: "use server" files may only
-// export async functions)
+// Helpers
 // ─────────────────────────────────────────────────────────────
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
@@ -40,7 +39,7 @@ const MAX_ROOM_CAPACITY = 50;
 
 const fail = (error: string) => ({ success: false as const, error });
 
-/** Returns the signed-in user, or null (no logging, for callers that handle it themselves). */
+// Returns authorised user
 async function getAuthUser(supabase: SupabaseClient) {
   const {
     data: { user },
@@ -50,12 +49,13 @@ async function getAuthUser(supabase: SupabaseClient) {
   return error ? null : user;
 }
 
-/** Supabase joins can come back as an object or a one-item array. */
+// Supabase joins can come back as an object or a one-item array
 function unwrapRelation<T>(value: T | T[] | null | undefined): T | null {
   if (Array.isArray(value)) return value[0] ?? null;
   return value ?? null;
 }
 
+// Refreshes cashed data for page
 function revalidateRoomPaths(roomId?: string) {
   revalidatePath("/rooms");
   revalidatePath("/plaza");
@@ -176,7 +176,6 @@ export async function createRecommendation({
   return { success: true };
 }
 
-
 interface SongInput {
   id: string;
   name: string;
@@ -186,7 +185,6 @@ interface SongInput {
   albumCover: string;
   duration?: number;
 }
-
 
 export async function getUserRecommendationById(userId: string) {
   const supabase = await createClient();
@@ -206,7 +204,6 @@ export async function getUserRecommendationById(userId: string) {
 
   return data;
 }
-
 
 export async function getUserRecommendations(userId?: string) {
   if (!userId || userId === "undefined" || userId === "null") {
@@ -251,7 +248,6 @@ export async function getUserRecommendations(userId?: string) {
     collection_count: counts.get(r.id) ?? 0,
   }));
 }
-
 
 export async function updateUserRecommendation(formData: {
   displayName: string;
@@ -317,22 +313,21 @@ export async function updateUserRecommendation(formData: {
   return { success: true };
 }
 
-
 export async function deleteRecommendation(recommendationId: string) {
   const supabase = await createClient();
   const user = await getAuthUser(supabase);
- 
+
   if (!user) return fail("You must be signed in to delete a recommendation.");
   if (!recommendationId) return fail("Invalid recommendation.");
- 
+
   const latest = await getUserRecommendationById(user.id);
- 
+
   if (latest?.id === recommendationId) {
     return fail(
       "You can't delete your current recommendation. Edit it to replace it, then delete the old one.",
     );
   }
- 
+
   const { data: deleted, error } = await supabase
     .from("Recommendations")
     .delete()
@@ -340,22 +335,21 @@ export async function deleteRecommendation(recommendationId: string) {
     .eq("created_by", user.id)
     .select("id")
     .maybeSingle();
- 
+
   if (error) {
     console.error("Error deleting recommendation:", error.message);
     return fail(`Could not delete recommendation: ${error.message}`);
   }
- 
+
   if (!deleted) {
     return fail(
       "Recommendation not found, or deletion was blocked. Check the Recommendations DELETE policy in Supabase.",
     );
   }
- 
+
   revalidatePath("/collection");
   return { success: true as const };
 }
- 
 
 // ─────────────────────────────────────────────────────────────
 // Collection
@@ -491,10 +485,10 @@ export async function getRecommendationCollectionCount(
 export async function deleteCollectionItem(collectionItemId: string) {
   const supabase = await createClient();
   const user = await getAuthUser(supabase);
- 
+
   if (!user) return fail("You must be signed in to edit your collection.");
   if (!collectionItemId) return fail("Invalid collection item.");
- 
+
   const { data: deleted, error } = await supabase
     .from("CollectionItems")
     .delete()
@@ -502,22 +496,21 @@ export async function deleteCollectionItem(collectionItemId: string) {
     .eq("added_by", user.id)
     .select("id")
     .maybeSingle();
- 
+
   if (error) {
     console.error("Error deleting collection item:", error.message);
     return fail(`Could not remove this song: ${error.message}`);
   }
- 
+
   if (!deleted) {
     return fail(
       "Song not found, or removal was blocked. Check the CollectionItems DELETE policy in Supabase.",
     );
   }
- 
+
   revalidatePath("/collection");
   return { success: true as const };
 }
- 
 
 // ─────────────────────────────────────────────────────────────
 // Rooms: reading
@@ -684,7 +677,6 @@ export async function createRoom(
   if (memberError) {
     console.error("Error adding creator to room:", memberError);
 
-    // Roll back so we don't leave an ownerless-looking room behind
     const { error: cleanupError } = await supabase
       .from("Rooms")
       .delete()
@@ -735,7 +727,7 @@ export async function joinRoom(roomId: string) {
     return fail(`Could not check membership: ${membershipError.message}`);
   }
 
-  // Already in the room, nothing to do
+  // Already in the room
   if (existingMembership) return { success: true as const };
 
   const { count, error: countError } = await supabase

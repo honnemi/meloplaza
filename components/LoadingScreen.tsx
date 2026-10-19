@@ -5,14 +5,20 @@ import Window from "./Window";
 
 const SEGMENTS = 20;
 
-export default function LoadingScreen({ title = "Loading" }: { title?: string }) {
+export default function LoadingScreen({
+  title = "Loading",
+}: {
+  title?: string;
+}) {
   const [progress, setProgress] = useState(0);
   const [dots, setDots] = useState(0);
 
   // Fake progress animation
   useEffect(() => {
     const id = setInterval(() => {
-      setProgress((p) => (p >= 100 ? 0 : Math.min(100, p + 2 + Math.random() * 8)));
+      setProgress((p) =>
+        p >= 100 ? 0 : Math.min(100, p + 2 + Math.random() * 8),
+      );
     }, 150);
     return () => clearInterval(id);
   }, []);

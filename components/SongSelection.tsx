@@ -88,7 +88,9 @@ export default function SongSelection({ tracks, query }: SongSelectionProps) {
         <div className="flex justify-between items-center w-full">
           <Button label="Back" href="/select-prompt" />
 
-          {selectedTrack && <SecondaryButton label="Next" href="/add-message" />}
+          {selectedTrack && (
+            <SecondaryButton label="Next" href="/add-message" />
+          )}
         </div>
       }
     >
@@ -108,15 +110,16 @@ export default function SongSelection({ tracks, query }: SongSelectionProps) {
           />
 
           <button
-                type="submit"
-                className="flex-1 px-4 py-2.5 text-sm font-bold border-2 border-win-border-dark rounded-sm bg-win-alt shadow-[3px_3px_0px_rgba(0,90,100,0.3)] hover:-translate-y-[1px] active:translate-y-[1px] cursor-pointer text-gray-800 font-heading flex items-center justify-center gap-2 transition-transform"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(180deg, #ffffff 0%, #d5f0f5 100%)",
-                }}
-              >
-                <i className="hn hn-search"></i> Search
-              </button>
+            type="submit"
+            className="flex-1 px-4 py-2.5 text-sm font-bold border-2 border-win-border-dark rounded-sm bg-win-alt shadow-[3px_3px_0px_rgba(0,90,100,0.3)] hover:-translate-y-[1px] active:translate-y-[1px] cursor-pointer text-gray-800 font-heading flex items-center justify-center gap-2 transition-transform"
+            style={{
+              backgroundImage:
+                "linear-gradient(180deg, #ffffff 0%, #d5f0f5 100%)",
+            }}
+            onClick={() => playClickSound()}
+          >
+            <i className="hn hn-search"></i> Search
+          </button>
         </Form>
 
         {/* Results */}

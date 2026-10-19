@@ -34,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    // Wrap in ViewTransitions for smooth page transitions
+    // Wrap in ViewTransitions for transition animation
     <ViewTransitions>
       <html lang="en" className={`${mPlus.variable} ${gruppo.variable}`}>
         <body className="font-sans antialiased min-h-screen bg-slate-50 text-black m-0 p-0">
@@ -54,6 +54,7 @@ export default function RootLayout({
             <FormProvider>{children}</FormProvider>
           </div>
           <div className="fixed bottom-24 left-3 sm:bottom-4 sm:left-4 z-50 flex items-center">
+            {/* Toggle background music */}
             <BackgroundMusic />
           </div>
         </body>

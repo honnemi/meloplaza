@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Link } from "next-view-transitions";
 import type { ReactNode } from "react";
@@ -23,6 +23,7 @@ function playClickSound() {
   }
 }
 
+// Navigation button (blue)
 export default function Button({
   label,
   icon,
@@ -55,7 +56,7 @@ export default function Button({
     </>
   );
 
-  // Unified click handler that triggers sound + consumer logic
+  // Unified click handler that triggers sound + onClick function
   const handleClick = (e: React.MouseEvent) => {
     playClickSound();
     if (onClick) onClick(e);
@@ -87,6 +88,7 @@ export default function Button({
   );
 }
 
+// Secondary navigation button (green)
 export function SecondaryButton({
   label,
   icon,
@@ -150,6 +152,7 @@ export function SecondaryButton({
   );
 }
 
+// Colour select buttons
 interface ColourButtonProps {
   colour: string;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -180,5 +183,41 @@ export function ColourButton({
         backgroundImage: `linear-gradient(to bottom, ${colour}, #fff)`,
       }}
     />
+  );
+}
+
+// Action buttons
+interface ActionButtonProps {
+  label: string;
+  icon?: string;
+  onClick?: () => void;
+  disabled?: boolean;
+  className?: string;
+}
+
+export function ActionButton({
+  label,
+  icon,
+  onClick,
+  disabled = false,
+  className = "",
+}: ActionButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`inline-flex w-fit shrink-0 items-center justify-center ${
+        icon ? "gap-2.5" : ""
+      } whitespace-nowrap px-4 py-2 text-sm font-bold font-heading ${
+        className.includes("text-") ? "" : "text-gray-800"
+      } border-2 border-win-border-dark rounded-sm bg-win-alt shadow-[3px_3px_0px_rgba(0,90,100,0.3)] hover:-translate-y-[1px] active:translate-y-[1px] cursor-pointer transition-transform disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      style={{
+        backgroundImage: "linear-gradient(180deg, #ffffff 0%, #d5f0f5 100%)",
+      }}
+    >
+      {icon && <i className={`${icon} text-base`} />}
+      {label}
+    </button>
   );
 }

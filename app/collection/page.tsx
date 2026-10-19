@@ -8,7 +8,7 @@ import Collection, { MyRecommendationItem } from "@/components/Collection";
 export default async function CollectionPage() {
   const userId = await getCurrentUserId();
 
-  // If no user is logged in, pass empty arrays
+  // If no user is logged in, pass empty array
   if (!userId) {
     return <Collection collection={[]} myRecommendations={[]} />;
   }
@@ -18,7 +18,7 @@ export default async function CollectionPage() {
     getUserRecommendations(userId),
   ]);
 
-  // Newest first, so index 0 is the user's current recommendation.
+  // Newest first, so index 0 is the user's current recommendation
   const myRecommendations: MyRecommendationItem[] = recommendations.map(
     (r, index) => ({
       id: r.id,
@@ -35,8 +35,6 @@ export default async function CollectionPage() {
     }),
   );
 
-  // Collection renders its own full-page wrapper, so no extra h-screen /
-  // overflow-hidden wrapper here (it clipped content on short screens).
   return (
     <Collection collection={collection} myRecommendations={myRecommendations} />
   );

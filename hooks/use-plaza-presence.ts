@@ -95,9 +95,9 @@ export const usePlazaPresence = ({
 
   const [onlineCount, setOnlineCount] = useState(0);
 
-  const [cursors, setCursors] = useState<
-    Record<string, CursorEventPayload>
-  >({});
+  const [cursors, setCursors] = useState<Record<string, CursorEventPayload>>(
+    {},
+  );
 
   const cursorPayload = useRef<CursorEventPayload | null>(null);
 
@@ -115,39 +115,36 @@ export const usePlazaPresence = ({
 
   // SEND CURSOR POSITION
 
-  const callback = useCallback(
-    (event: MouseEvent) => {
-      const currentUser = userRef.current;
+  const callback = useCallback((event: MouseEvent) => {
+    const currentUser = userRef.current;
 
-      if (!currentUser || !channelReadyRef.current) {
-        return;
-      }
+    if (!currentUser || !channelReadyRef.current) {
+      return;
+    }
 
-      const { clientX, clientY } = event;
+    const { clientX, clientY } = event;
 
-      const payload: CursorEventPayload = {
-        position: {
-          x: clientX,
-          y: clientY,
-        },
-        user: {
-          id: currentUser.id,
-          name: `${currentUser.displayName} + ${AVATAR_FACES[currentUser.faceIndex]}`,
-        },
-        color: currentUser.colour,
-        timestamp: Date.now(),
-      };
+    const payload: CursorEventPayload = {
+      position: {
+        x: clientX,
+        y: clientY,
+      },
+      user: {
+        id: currentUser.id,
+        name: `${currentUser.displayName} + ${AVATAR_FACES[currentUser.faceIndex]}`,
+      },
+      color: currentUser.colour,
+      timestamp: Date.now(),
+    };
 
-      cursorPayload.current = payload;
+    cursorPayload.current = payload;
 
-      channelRef.current?.send({
-        type: "broadcast",
-        event: EVENT_NAME,
-        payload,
-      });
-    },
-    [],
-  );
+    channelRef.current?.send({
+      type: "broadcast",
+      event: EVENT_NAME,
+      payload,
+    });
+  }, []);
 
   const handleMouseMove = useThrottleCallback(callback, throttleMs);
 

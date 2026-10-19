@@ -12,13 +12,13 @@ export type ChangePayload = RealtimePostgresChangesPayload<
 export interface RealtimeSubscription {
   table: string;
   event?: "INSERT" | "UPDATE" | "DELETE" | "*";
-  /** Return false to ignore an event (e.g. it's for a different room). */
+  // Return false to ignore an event (e.g. it's for a different room)
   filter?: (payload: ChangePayload) => boolean;
-  /** Runs for every event that passes the filter, before the refresh. */
+  // Runs for every event that passes the filter, before the refresh
   onEvent?: (payload: ChangePayload) => void;
 }
 
-/** The row an event is about: the old row for deletes, the new row otherwise. */
+// The row an event is about: the old row for deletes, the new row otherwise 
 export function changedRow(payload: ChangePayload) {
   return (payload.eventType === "DELETE" ? payload.old : payload.new) as Record<
     string,

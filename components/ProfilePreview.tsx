@@ -4,11 +4,16 @@ import { useFormStore } from "@/app/context/FormContext";
 import Avatar from "@/components/Avatar";
 import Window from "@/components/Window";
 
+// Show selections at each stage of user onboarding (only show once you arrive on the relevant page)
 export default function ProfilePreview() {
   const { formData } = useFormStore();
 
   return (
-    <Window title="Your Profile" className="w-[60%] h-auto" contentClassName="p-3">
+    <Window
+      title="Your Profile"
+      className="w-[60%] h-auto"
+      contentClassName="p-3"
+    >
       <div className="flex flex-col items-center md:flex-row md:items-start gap-3 w-full">
         {/* Avatar preview */}
         <div className="bg-white w-30 h-30 shrink-0 flex flex-col items-center justify-center border-2 border-win-border-alt rounded-sm gap-2">
@@ -85,9 +90,10 @@ export default function ProfilePreview() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center flex-1 h-full min-h-[120px]">
-          <div className="text-gray-400 text-center">
-            Please follow the instructions to complete your profile!
-          </div>
+            {/* Empty message */}
+            <div className="text-gray-400 text-center">
+              Please follow the instructions to complete your profile!
+            </div>
           </div>
         )}
       </div>
