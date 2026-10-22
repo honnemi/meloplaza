@@ -3,6 +3,7 @@ import Navigation from "@/components/Navigation";
 import RoomActions from "@/components/RoomActions";
 import { getCurrentUserId, getRoomById } from "@/app/actions";
 import { notFound } from "next/navigation";
+import ChatWidget from "@/components/ChatWidget";
 
 export default async function RoomPage({
   params,
@@ -52,6 +53,9 @@ export default async function RoomPage({
         </div>
       </header>
 
+      <div className="absolute fixed ">
+      <ChatWidget roomId={room.id} />
+      </div>
       <Navigation />
     </div>
   );

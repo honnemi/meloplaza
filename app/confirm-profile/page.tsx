@@ -143,7 +143,7 @@ export default function ConfirmNewUserPage() {
             ? "Review your changes before saving."
             : "You can always update your profile later!"}
         </div>
-        
+
         {/* Error message */}
         {error && (
           <div className="mb-4 p-3 text-sm text-[#a80f35] bg-[#ffe3ea] rounded-sm border-2 border-[#ff9bb0] text-center">

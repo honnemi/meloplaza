@@ -861,3 +861,48 @@ export async function deleteRoom(roomId: string) {
   revalidateRoomPaths();
   return { success: true as const };
 }
+
+// ─────────────────────────────────────────────────────────────
+// Global chat
+// ─────────────────────────────────────────────────────────────
+
+export async function addMessage(
+  room_id: string | null,
+  text: string,
+) {
+  const supabase = await createClient();
+  const user = await getAuthUser(supabase);
+
+  if (!user) {
+    return fail("You must be signed in to chat.");
+  }
+
+  const messageText = text.trim();
+
+  if (!messageText) {
+    return fail("Message cannot be empty.");
+  }
+
+  if (messageText.length > 100) {
+    return fail("Message cannot exceed 100 characters.");
+  }
+
+  const { data: message, error: messageError } = await supabase
+    .from("ChatMessages")
+    .insert({
+      user_id: user.id,
+      room_id,
+      text: messageText,
+    })
+    .select("id")
+    .single();
+
+  if (messageError || !message) {
+    console.error("Error adding message:", messageError);
+    return fail(messageError?.message ?? "Could not send the message.");
+  }
+
+  return { success: true as const, id: message.id };
+}
+
+
