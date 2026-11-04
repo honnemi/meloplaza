@@ -1190,10 +1190,7 @@ export default function Plaza({ avatars, roomId }: PlazaProps) {
         <div id="welcome-popup">
           <Popup title="Welcome!" isOpen={isPopupOpen} onClose={closePopup}>
             <div className="flex flex-col gap-4 text-center">
-              <p className="text-sm text-gray-600">
-                <strong>IMPORTANT:</strong> Please save your account from
-                "Profile" if you want to access it again!
-              </p>
+              
               <p className="text-lg font-bold font-heading">About</p>
 
               <p className="text-sm">

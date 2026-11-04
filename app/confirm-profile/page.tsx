@@ -78,16 +78,29 @@ export default function ConfirmNewUserPage() {
         return;
       }
 
-      await supabase.auth.signOut();
+      const {
+        data: { user: currentUser },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-      const { data, error: signInError } =
-        await supabase.auth.signInAnonymously();
-
-      if (signInError) {
-        throw new Error(`Auth failed: ${signInError.message}`);
+      if (userError) {
+        throw userError;
       }
 
-      const userId = data.user?.id || data.session?.user?.id;
+      let userId = currentUser?.id;
+
+      // Only create an anonymous account if the user
+      // hasn't already authenticated through signup.
+      if (!userId) {
+        const { data, error: signInError } =
+          await supabase.auth.signInAnonymously();
+
+        if (signInError) {
+          throw new Error(`Auth failed: ${signInError.message}`);
+        }
+
+        userId = data.user?.id || data.session?.user?.id;
+      }
 
       if (!userId) {
         throw new Error("Failed to retrieve user ID.");
