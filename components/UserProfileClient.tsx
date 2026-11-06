@@ -421,7 +421,7 @@ export default function ProfilePageClient() {
                   className={actionButtonClass}
                   style={actionButtonStyle}
                 >
-                  <i className="hn hn-pencil-solid text-base" />
+                  <i className="hn hn-face-laugh-squint-solid text-base" />
                   Edit Melo
                 </button>
 
@@ -441,11 +441,7 @@ export default function ProfilePageClient() {
                   className={actionButtonClass}
                   style={actionButtonStyle}
                 >
-                  <i
-                    className={`hn ${
-                      isAnonymous ? "hn-save-solid" : "hn-pencil-solid"
-                    } text-base`}
-                  />
+                  <i className="hn hn-user-solid text-base" />
                   {isAnonymous ? "Save Account" : "Edit Account"}
                 </button>
               </div>
@@ -463,7 +459,7 @@ export default function ProfilePageClient() {
                   className={actionButtonClass}
                   style={actionButtonStyle}
                 >
-                  <i className="hn hn-pencil-solid text-base" />
+                  <i className="hn hn-face-laugh-squint-solid" />
                   Edit Melo
                 </button>
 
@@ -483,11 +479,7 @@ export default function ProfilePageClient() {
                   className={actionButtonClass}
                   style={actionButtonStyle}
                 >
-                  <i
-                    className={`hn ${
-                      isAnonymous ? "hn-save-solid" : "hn-pencil-solid"
-                    } text-base`}
-                  />
+                  <i className="hn hn-user-solid text-base" />
                   {isAnonymous ? "Save Account" : "Edit Account"}
                 </button>
               </div>

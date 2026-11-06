@@ -219,7 +219,7 @@ export default function RoomWindow({
   return (
     <Window
       title="Rooms"
-      icon={<i className="hn hn-users-solid" />}
+      icon={<i className="hn hn-home-solid" />}
       footer={
         <div className="flex w-full justify-between">
           <Button label="Back" href={backHref} />

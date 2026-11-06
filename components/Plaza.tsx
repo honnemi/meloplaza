@@ -1231,9 +1231,6 @@ export default function Plaza({ avatars, roomId }: PlazaProps) {
               <p className="text-lg font-bold text-center font-heading">
                 ヽ(・∀・)ﾉ
               </p>
-              <p className="text-xs font-bold text-center font-heading">
-                - angelica siv
-              </p>
             </div>
           </Popup>
         </div>
