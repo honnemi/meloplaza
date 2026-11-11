@@ -470,7 +470,7 @@ export default function ProfilePageClient() {
                   style={actionButtonStyle}
                 >
                   <i className="hn hn-music-solid text-base" />
-                  Edit Recommendation
+                  New Recommendation
                 </button>
 
                 <button

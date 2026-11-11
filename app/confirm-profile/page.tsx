@@ -77,21 +77,33 @@ export default function ConfirmNewUserPage() {
         router.push(returnTo);
         return;
       }
-
+      
       const {
-        data: { user: currentUser },
-        error: userError,
-      } = await supabase.auth.getUser();
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
-      if (userError) {
-        throw userError;
+      if (sessionError) {
+        throw sessionError;
       }
 
-      let userId = currentUser?.id;
+      let userId: string | undefined;
 
-      // Only create an anonymous account if the user
-      // hasn't already authenticated through signup.
-      if (!userId) {
+      if (session) {
+        // An existing authenticated or anonymous session exists.
+        // Verify the user before creating their profile.
+        const {
+          data: { user: currentUser },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError) {
+          throw userError;
+        }
+
+        userId = currentUser?.id;
+      } else {
+        // No existing session: create an anonymous account.
         const { data, error: signInError } =
           await supabase.auth.signInAnonymously();
 
@@ -120,6 +132,7 @@ export default function ConfirmNewUserPage() {
 
       clearForm();
       router.push("/plaza");
+
     } catch (err: unknown) {
       console.error("Profile submission failed:", err);
       setError(
